@@ -18,7 +18,7 @@ The root repository does not replace the component repositories. It documents an
 | M1TFC | `git@github.com:lbuchman/m1tfc.git` | `components/m1tfc` | Fixture CLI, ICT, functional tests, hardware orchestration |
 | M1 fixture Teensy firmware | `git@github.com:lbuchman/m1-fixture-teensy-fw.git` | `components/m1-fixture-teensy-fw` | Teensy firmware for M1 fixture boards |
 | Mercury test board firmware | `git@github.com:lbuchman/mercury-testboard-fw.git` | `components/mercury-testboard-fw` | PlatformIO Teensy firmware for Mercury test board, aligned to the `redDiamondsFixture/teensy` skeleton |
-| STM32MP1 bare-metal firmware | `git@github.com:lbuchman/stm32mp1-baremetal.git` | `components/stm32mp1-baremetal` | STM32MP1 bare-metal firmware/work; existing GitHub repo |
+| STM32MP1 bare-metal ICT firmware | `git@github.com:lbuchman/stm32mp1-baremetal.git` | `components/stm32mp1-baremetal` | Bare-metal STM32MP1 firmware for ICT, including SDRAM test coverage unavailable when Linux owns the target |
 | REST server | `git@github.com:lbuchman/m1-rest-server.git` | `components/m1-rest-server` | REST API around fixture commands and status |
 | Operator UI | `git@github.com:lbuchman/m1-operator-ui.git` | `components/m1-operator-ui` | React production/debug operator interface |
 | Fixture PC cloud client (`tfcroncli`, test fixture cron CLI) | `git@github.com:lbuchman/tfcroncli.git` | `components/tfcroncli` | Fixture PC cloud communication, logs, secrets, nightly FW/SW updates |
@@ -73,6 +73,14 @@ The script runs PlatformIO for the `teensy41` environment in `components/mercury
 
 Use `--output-dir PATH` to select an artifact directory or `--dry-run` to inspect the build command without building.
 
+### STM32MP1 ICT Firmware
+
+`components/stm32mp1-baremetal` is the STM32MP1 bare-metal firmware component
+used by ICT. ICT must execute without Linux running on the target: SDRAM is a
+test subject, so Linux cannot own, initialize, or use the memory under test.
+The component is therefore a standalone firmware repository, separate from the
+Snap-packaged host-side tools.
+
 ## Platform Runtime Configuration
 
 M1 platform runtime configuration files live in:
@@ -120,4 +128,4 @@ The local component repositories are under:
 
 New component repositories use `main`.
 
-The existing `stm32mp1-baremetal` repository is handled specially. Platform-management work may add documentation, metadata, manifests, or integration notes, but must not modify Makefiles or C/C++ source files unless explicitly approved.
+The `stm32mp1-baremetal` repository is handled specially. Platform-management work may add documentation, metadata, manifests, or integration notes, but must not modify Makefiles or C/C++ source files unless explicitly approved.

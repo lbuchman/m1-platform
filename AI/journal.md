@@ -32,6 +32,8 @@ This file records concise work history for AI-assisted platform work. Keep entri
 
 ## 2026-07-19
 
+- Confirmed `components/stm32mp1-baremetal` as a standalone local firmware repository imported from `M1Combined`; generated build output is excluded from the import.
+- Documented its ICT purpose: SDRAM is the test subject, so the STM32MP1 target must run bare-metal rather than Linux during SDRAM ICT.
 - Added `READMEConfig.md` documenting fixture configuration and calibration behavior.
 - Updated M1TFC calibration seed handling to fill incomplete profiles from defaults while retaining populated persisted data; added focused Jest coverage.
 - Changed M1TFC label printing to use unique temporary staging directories and cleanup; added focused Jest coverage.
@@ -43,6 +45,7 @@ This file records concise work history for AI-assisted platform work. Keep entri
 
 ## Next Work
 
+- Create/push the `lbuchman/stm32mp1-baremetal` remote and set its `main` branch as the component upstream.
 - Configure remotes/upstreams for M1TFC, Operator UI, and tfcroncli, then push their local commits.
 - Finish `tfcroncli` clean snap build under Node 24.
 - Add or plan snap packaging for `m1-cloud-client`.

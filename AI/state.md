@@ -23,7 +23,7 @@ Firmware components:
 
 - M1 fixture Teensy firmware
 - Mercury test board firmware: converted to a PlatformIO Teensy 4.1 Arduino project using `redDiamondsFixture/teensy` as the reference skeleton. Mercury-specific Ethernet, TCP terminal, UDP terminal, NTP, persistent config, and LED status support are restored in the PlatformIO project.
-- STM32MP1 bare-metal firmware
+- STM32MP1 bare-metal ICT firmware: target-side firmware used while SDRAM is under test. Linux must not run during this ICT path because it initializes and uses the test subject.
 
 ## Version Authority
 

@@ -25,6 +25,8 @@ components/m1-cloud-client
 
 Mercury firmware in `components/mercury-testboard-fw` is a PlatformIO Teensy 4.1 project converted from the old CMake tree. `git@github.com:lbuchman/redDiamondsFixture.git` subdirectory `teensy/` is the reference skeleton and shared-module pattern.
 
+`components/stm32mp1-baremetal` is a standalone STM32MP1 target firmware repository imported from `M1Combined`. It supplies the bare-metal ICT path because SDRAM is tested and cannot be owned by Linux during that test.
+
 Observed USB identities during Mercury/M1 fixture validation:
 
 - Mercury test board Teensy: serial `13167650`.
@@ -74,6 +76,7 @@ Mercury firmware Ethernet defaults observed on bench:
 ## Protected Areas
 
 - Do not modify `components/stm32mp1-baremetal` Makefiles or C/C++ source unless explicitly approved.
+- Do not run Linux on the STM32MP1 target during SDRAM ICT; it initializes and uses the memory being tested.
 - Do not commit generated dependency directories or snap artifacts.
 - Do not edit generated Snapcraft paths: `parts/`, `prime/`, `stage/`, or `*.snap` packages.
 - Preserve ordered fixture I/O, retry waits, and non-awaited STM32CubeProgrammer launch behavior unless bench evidence requires a timing change.
