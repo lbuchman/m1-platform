@@ -90,6 +90,7 @@ Important fact: `tfcroncli` uses `better-sqlite3` in `app/src/secrets.js`; SQLit
 ## Git Delivery State
 
 - Root platform commit `160b07b` and REST server commit `a5459e7` are pushed to `origin/main`.
+- STM32MP1 ICT firmware is published in the private `lbuchman/stm32mp1-baremetal` repository; its archive-backed `main` branch is the default. Historical remote branches remain preserved.
 - M1TFC commit `70e221c`, Operator UI commit `64916a4`, and tfcroncli commit `543ac5b` exist locally. Those component repositories currently have no configured remote or upstream.
 
 ## Current Target

@@ -42,10 +42,10 @@ This file records concise work history for AI-assisted platform work. Keep entri
 - Added Snapcraft artifact ignores and removed tracked Snap packages across the root and component repositories.
 - Resolved M1TFC ESLint findings without changing ordered hardware/retry execution; `npm run lint` passes.
 - Committed and pushed root platform `160b07b` and REST server `a5459e7`; committed M1TFC `70e221c`, Operator UI `64916a4`, and tfcroncli `543ac5b` locally.
+- Published the private `lbuchman/stm32mp1-baremetal` component repository. Its archive-backed `main` branch is the default; existing remote history remains on `master`, `m1`, and `stm31mp151faa`.
 
 ## Next Work
 
-- Create/push the `lbuchman/stm32mp1-baremetal` remote and set its `main` branch as the component upstream.
 - Configure remotes/upstreams for M1TFC, Operator UI, and tfcroncli, then push their local commits.
 - Finish `tfcroncli` clean snap build under Node 24.
 - Add or plan snap packaging for `m1-cloud-client`.
