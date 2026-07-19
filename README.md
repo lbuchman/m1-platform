@@ -61,6 +61,18 @@ Use fast-forward-only git updates when a fresh build from current remotes is nee
 
 The script copies built snap artifacts into `artifacts/snaps/<timestamp>/` and writes a small `build-manifest.txt` with component names, source commits, dirty/clean state, and artifact names. The General Ubuntu cloud client is a production snap requirement, but it is not included in this build script until `components/m1-cloud-client` has snap packaging.
 
+## Platform Firmware Builds
+
+Build the Mercury test board firmware from the platform root:
+
+```bash
+./scripts/build_fw.sh
+```
+
+The script runs PlatformIO for the `teensy41` environment in `components/mercury-testboard-fw`, without uploading to hardware. It copies the generated `firmware.hex` into `artifacts/firmware/mercury-testboard-fw/<timestamp>/` and writes a `build-manifest.txt` with the source commit and dirty/clean state.
+
+Use `--output-dir PATH` to select an artifact directory or `--dry-run` to inspect the build command without building.
+
 ## Platform Runtime Configuration
 
 M1 platform runtime configuration files live in:
