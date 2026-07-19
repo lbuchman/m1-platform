@@ -23,6 +23,15 @@ components/tfcroncli
 components/m1-cloud-client
 ```
 
+Mercury firmware in `components/mercury-testboard-fw` is a PlatformIO Teensy 4.1 project converted from the old CMake tree. `git@github.com:lbuchman/redDiamondsFixture.git` subdirectory `teensy/` is the reference skeleton and shared-module pattern.
+
+Observed USB identities during Mercury/M1 fixture validation:
+
+- Mercury test board Teensy: serial `13167650`.
+- M1 fixture Teensy: serial `13169080`.
+
+Always verify board identity and expected image before flashing firmware.
+
 ## Build Tooling
 
 - Node target for production snaps: Node 24.
@@ -38,6 +47,21 @@ components/m1-cloud-client
 /etc/m1platform/calibration.json
 /home/lenel/logs/logfile.log
 ```
+
+`/etc/m1platform/calibration.json` is the active A/D calibration file used by M1TFC. It may be root-owned on bench systems; calibration save paths need write permission or sudo execution.
+
+## Service Endpoints
+
+- M1TFC REST server default bind: `0.0.0.0:3300`.
+- Health endpoint: `GET /health`.
+- Command endpoint: `POST /command` with `{ "command": "ict", "argument": { ... } }`.
+- Logs: `GET /logs/stream`, `GET /logs/tail`, `GET /logs/download`, `POST /logs/clear`.
+
+Mercury firmware Ethernet defaults observed on bench:
+
+- Static IP: `192.168.0.60`.
+- TCP terminal: port `23`.
+- UDP terminal: port `4111`.
 
 ## Remote Development Notes
 

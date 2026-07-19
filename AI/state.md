@@ -22,7 +22,7 @@ Snap software components:
 Firmware components:
 
 - M1 fixture Teensy firmware
-- Mercury test board firmware
+- Mercury test board firmware: converted to a PlatformIO Teensy 4.1 Arduino project using `redDiamondsFixture/teensy` as the reference skeleton. Mercury-specific Ethernet, TCP terminal, UDP terminal, NTP, persistent config, and LED status support are restored in the PlatformIO project.
 - STM32MP1 bare-metal firmware
 
 ## Version Authority
@@ -30,6 +30,8 @@ Firmware components:
 - Snap software actual version comes from installed snap metadata.
 - Firmware expected version comes from manifests, repo metadata, or image metadata.
 - Firmware actual version must be read from connected hardware through `m1tfc` or another hardware query path.
+- Mercury firmware has an `about` command returning JSON with `fw`, backed by `FWVERSION=0.1` in `components/mercury-testboard-fw/platformio.ini`.
+- Latest Mercury runtime validation: Ethernet responds at `192.168.0.60`, TCP terminal listens on port `23`, and `about` over TCP returns firmware `0.1`.
 
 ## Runtime Configuration
 
@@ -45,6 +47,15 @@ Active files:
 - `/etc/m1platform/calibration.json`
 
 Do not store file contents, secrets, cloud credentials, private keys, or raw calibration values in AI notes.
+
+Calibration persistence currently depends on process permission to write `/etc/m1platform/calibration.json`. REST command execution is intended to run routed `m1tfc` commands through non-interactive `sudo` so calibration writes can persist.
+
+## REST Command State
+
+- REST server source path: `components/m1-rest-server`.
+- Local development server listens on port `3300`.
+- REST `/command` routes M1TFC commands through the component command runner.
+- Current command runner behavior: spawn `sudo -n m1tfc <command> ...` for both buffered and streamed command execution.
 
 ## Snap Build State
 

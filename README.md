@@ -17,7 +17,7 @@ The root repository does not replace the component repositories. It documents an
 | --- | --- | --- | --- |
 | M1TFC | `git@github.com:lbuchman/m1tfc.git` | `components/m1tfc` | Fixture CLI, ICT, functional tests, hardware orchestration |
 | M1 fixture Teensy firmware | `git@github.com:lbuchman/m1-fixture-teensy-fw.git` | `components/m1-fixture-teensy-fw` | Teensy firmware for M1 fixture boards |
-| Mercury test board firmware | `git@github.com:lbuchman/mercury-testboard-fw.git` | `components/mercury-testboard-fw` | Teensy firmware for Mercury test board |
+| Mercury test board firmware | `git@github.com:lbuchman/mercury-testboard-fw.git` | `components/mercury-testboard-fw` | PlatformIO Teensy firmware for Mercury test board, aligned to the `redDiamondsFixture/teensy` skeleton |
 | STM32MP1 bare-metal firmware | `git@github.com:lbuchman/stm32mp1-baremetal.git` | `components/stm32mp1-baremetal` | STM32MP1 bare-metal firmware/work; existing GitHub repo |
 | REST server | `git@github.com:lbuchman/m1-rest-server.git` | `components/m1-rest-server` | REST API around fixture commands and status |
 | Operator UI | `git@github.com:lbuchman/m1-operator-ui.git` | `components/m1-operator-ui` | React production/debug operator interface |

@@ -27,6 +27,8 @@ Separate observed facts from inference, especially for hardware, firmware, produ
 - Prefer repeatable scripts and manifests over memory-only process.
 - Prefer small validated changes over broad speculative refactors.
 - Do not hide build warnings or dirty repo state when discussing release readiness.
+- Before flashing firmware, state and verify physical board identity, connection path, and expected image.
+- For runtime config and calibration behavior, verify both the in-memory effect and persisted file write; silent save failures are production-relevant failures.
 - Do not store secrets, raw config data, or raw calibration data in AI files.
 
 ## Quality Target
