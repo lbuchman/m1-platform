@@ -45,6 +45,7 @@ Always verify board identity and expected image before flashing firmware.
 ```text
 /etc/m1platform/config.json
 /etc/m1platform/calibration.json
+/var/m1mtf
 /home/lenel/logs/logfile.log
 ```
 
@@ -74,4 +75,6 @@ Mercury firmware Ethernet defaults observed on bench:
 
 - Do not modify `components/stm32mp1-baremetal` Makefiles or C/C++ source unless explicitly approved.
 - Do not commit generated dependency directories or snap artifacts.
+- Do not edit generated Snapcraft paths: `parts/`, `prime/`, `stage/`, or `*.snap` packages.
+- Preserve ordered fixture I/O, retry waits, and non-awaited STM32CubeProgrammer launch behavior unless bench evidence requires a timing change.
 - Do not store secrets or raw calibration data in this directory.

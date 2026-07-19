@@ -80,6 +80,18 @@ Latest known build state:
 
 Important fact: `tfcroncli` uses `better-sqlite3` in `app/src/secrets.js`; SQLite is an actual runtime dependency.
 
+## M1TFC Fixture Behavior
+
+- Calibration seed loading completes missing, empty, or null board profile groups from defaults while preserving populated persisted values.
+- M1TFC label generation stages each print in a unique temporary directory and removes it after printing, preventing stale `/tmp` artifact collisions.
+- ICT firmware download deliberately does not await STM32CubeProgrammer process teardown. The transfer completes quickly, fixed fixture delays remain, and subsequent firmware revision query verifies startup.
+- `components/m1tfc` lint is clean with `npm run lint`; Snapcraft-generated `parts/`, `prime/`, and `stage/` directories are excluded from linting.
+
+## Git Delivery State
+
+- Root platform commit `160b07b` and REST server commit `a5459e7` are pushed to `origin/main`.
+- M1TFC commit `70e221c`, Operator UI commit `64916a4`, and tfcroncli commit `543ac5b` exist locally. Those component repositories currently have no configured remote or upstream.
+
 ## Current Target
 
 Target state is a 9.5-class hardware-first manufacturing test platform: repeatable build, install, debug, update, recover, and prove actual state on physical systems.

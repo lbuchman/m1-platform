@@ -30,8 +30,20 @@ This file records concise work history for AI-assisted platform work. Keep entri
 - Updated REST command runner so routed M1TFC commands execute through `sudo -n`; updated and passed `components/m1-rest-server` tests.
 - Restarted local REST development server from `components/m1-rest-server`; health endpoint responded on port `3300`.
 
+## 2026-07-19
+
+- Added `READMEConfig.md` documenting fixture configuration and calibration behavior.
+- Updated M1TFC calibration seed handling to fill incomplete profiles from defaults while retaining populated persisted data; added focused Jest coverage.
+- Changed M1TFC label printing to use unique temporary staging directories and cleanup; added focused Jest coverage.
+- Preserved asynchronous STM32CubeProgrammer launch and fixed fixture delays after confirming programmer teardown must not control ICT timing.
+- Updated operator UI log behavior: production shows failures, debug shows full logs, clear calls the backend, and failed runs show a debug summary.
+- Added Snapcraft artifact ignores and removed tracked Snap packages across the root and component repositories.
+- Resolved M1TFC ESLint findings without changing ordered hardware/retry execution; `npm run lint` passes.
+- Committed and pushed root platform `160b07b` and REST server `a5459e7`; committed M1TFC `70e221c`, Operator UI `64916a4`, and tfcroncli `543ac5b` locally.
+
 ## Next Work
 
+- Configure remotes/upstreams for M1TFC, Operator UI, and tfcroncli, then push their local commits.
 - Finish `tfcroncli` clean snap build under Node 24.
 - Add or plan snap packaging for `m1-cloud-client`.
 - Add release manifests for expected snap and firmware versions.
