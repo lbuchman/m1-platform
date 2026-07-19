@@ -1,2 +1,8 @@
 components/
 artifacts/
+
+# Snapcraft generated artifacts
+*.snap
+parts/
+prime/
+stage/
