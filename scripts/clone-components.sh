@@ -14,8 +14,8 @@ Usage: scripts/clone-components.sh [options]
 Clone all split component repositories into components/.
 
 Options:
-  --https      Use HTTPS clone URLs
-  --ssh        Use SSH clone URLs (default)
+    --https      Use HTTPS clone URLs
+    --ssh        Use SSH clone URLs (default, auto-fallback to HTTPS on failure)
   --update     Fast-forward pull existing component repos
   -h, --help   Show this help
 
@@ -54,6 +54,17 @@ clone_or_update_component() {
 
     if [[ -e "${target_dir}" ]]; then
         log "skip: ${target_dir} exists but is not a git repo"
+        return
+    fi
+
+    if [[ "${CLONE_MODE}" == "ssh" ]]; then
+        log "+ git clone ${repo_url} ${target_dir}"
+        if git clone "${repo_url}" "${target_dir}"; then
+            return
+        fi
+        log "SSH clone failed for ${name}; retrying with HTTPS"
+        log "+ git clone ${https_url} ${target_dir}"
+        git clone "${https_url}" "${target_dir}"
         return
     fi
 
