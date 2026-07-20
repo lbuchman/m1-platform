@@ -6,6 +6,7 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 COMPONENTS_DIR="${ROOT_DIR}/components"
 CLONE_MODE="ssh"
 DO_UPDATE=0
+FAILED_COMPONENTS=()
 
 usage() {
     cat <<'EOF'
@@ -64,12 +65,20 @@ clone_or_update_component() {
         fi
         log "SSH clone failed for ${name}; retrying with HTTPS"
         log "+ git clone ${https_url} ${target_dir}"
-        git clone "${https_url}" "${target_dir}"
+        if git clone "${https_url}" "${target_dir}"; then
+            return
+        fi
+        log "failed: ${name} (SSH and HTTPS clone failed)"
+        FAILED_COMPONENTS+=("${name}")
         return
     fi
 
     log "+ git clone ${repo_url} ${target_dir}"
-    git clone "${repo_url}" "${target_dir}"
+    if git clone "${repo_url}" "${target_dir}"; then
+        return
+    fi
+    log "failed: ${name}"
+    FAILED_COMPONENTS+=("${name}")
 }
 
 while [[ $# -gt 0 ]]; do
@@ -104,6 +113,10 @@ clone_or_update_component "m1tfc" \
     "git@github.com:lbuchman/m1tfc.git" \
     "https://github.com/lbuchman/m1tfc.git"
 
+clone_or_update_component "m1testBoardFw" \
+    "git@github.com:lbuchman/m1testBoardFw.git" \
+    "https://github.com/lbuchman/m1testBoardFw.git"
+
 clone_or_update_component "mercury-testboard-fw" \
     "git@github.com:lbuchman/mercury-testboard-fw.git" \
     "https://github.com/lbuchman/mercury-testboard-fw.git"
@@ -128,6 +141,11 @@ clone_or_update_component "m1-cloud-client" \
     "git@github.com:lbuchman/m1-cloud-client.git" \
     "https://github.com/lbuchman/m1-cloud-client.git"
 
-log ""
-log "Note: components/m1testBoardFw is currently an in-platform component and is not cloned by this script."
+if [[ "${#FAILED_COMPONENTS[@]}" -gt 0 ]]; then
+    log ""
+    log "Missing or inaccessible repos: ${FAILED_COMPONENTS[*]}"
+    log "Done with warnings."
+    exit 1
+fi
+
 log "Done."

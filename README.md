@@ -27,15 +27,12 @@ existing component clones:
 ./scripts/clone-components.sh --update
 ```
 
-`components/m1testBoardFw` is currently an in-platform component and is not
-cloned by this script.
-
 ## Components
 
 | Component | Planned Repo | Local Path | Purpose |
 | --- | --- | --- | --- |
 | M1TFC | `git@github.com:lbuchman/m1tfc.git` | `components/m1tfc` | Fixture CLI, ICT, functional tests, hardware orchestration |
-| M1 fixture Teensy firmware | in-platform component | `components/m1testBoardFw` | Teensy 4.1 firmware for M1 fixture boards |
+| M1 fixture Teensy firmware | `git@github.com:lbuchman/m1testBoardFw.git` | `components/m1testBoardFw` | Teensy 4.1 firmware for M1 fixture boards |
 | Mercury test board firmware | `git@github.com:lbuchman/mercury-testboard-fw.git` | `components/mercury-testboard-fw` | PlatformIO Teensy firmware for Mercury test board, aligned to the `redDiamondsFixture/teensy` skeleton |
 | STM32MP1 bare-metal ICT firmware | `git@github.com:lbuchman/stm32mp1-baremetal.git` | `components/stm32mp1-baremetal` | Bare-metal STM32MP1 firmware for ICT, including SDRAM test coverage unavailable when Linux owns the target |
 | REST server | `git@github.com:lbuchman/m1-rest-server.git` | `components/m1-rest-server` | REST API around fixture commands and status |
