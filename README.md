@@ -11,6 +11,25 @@ https://github.com/lbuchman/m1-platform
 
 The root repository does not replace the component repositories. It documents and organizes them so the full platform can be cloned, set up, released, and recovered as one system.
 
+## Bootstrap Components
+
+After cloning the platform root, populate `components/` with split repositories:
+
+```bash
+./scripts/clone-components.sh
+```
+
+Use `--https` when SSH keys are not configured, and `--update` to fast-forward
+existing component clones:
+
+```bash
+./scripts/clone-components.sh --https
+./scripts/clone-components.sh --update
+```
+
+`components/m1testBoardFw` is currently an in-platform component and is not
+cloned by this script.
+
 ## Components
 
 | Component | Planned Repo | Local Path | Purpose |
