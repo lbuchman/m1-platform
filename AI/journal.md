@@ -32,8 +32,14 @@ This file records concise work history for AI-assisted platform work. Keep entri
 
 ## 2026-07-19
 
+- Added `doc/operator-ui-user-guide.md`: operator workflow for the React test panel, including the existing `ui.png` reference image, production/debug mode behavior, run/re-test behavior, failure handling, debug controls, log behavior, and REST interfaces.
+- Added `doc/pictures/m1-fixture-and-mercury-test-architecture.svg`: software integration diagram covering React Operator UI, REST server, M1TFC, runtime files, Mercury TCP/UDP terminal access, and scheduled `tfcroncli`. The diagram explicitly labels documented communication interfaces and excludes fixture wiring/UUT hardware.
 - Confirmed `components/stm32mp1-baremetal` as a standalone local firmware repository imported from `M1Combined`; generated build output is excluded from the import.
 - Documented its ICT purpose: SDRAM is the test subject, so the STM32MP1 target must run bare-metal rather than Linux during SDRAM ICT.
+- Documented Arm GNU Toolchain `12.2.MPACBTI-Rel1` at `/opt/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi` as the STM32MP1 bare-metal component-only compiler toolchain.
+- Reduced `bootloaders/mp1-boot` to the active FSBL path: removed unused U-Boot-derived DDR tuning/test sources, an unused CPU port source, formatter/editor/build debris, and replaced upstream tutorial documentation with the M1 ICT FSBL contract.
+- Recovered the `STRIKE2_KICKER_POWER` board symbol from original monorepo history: it had been renamed to `STRIKE1_KICKER_POWER` by `59b8cfc1`, producing a duplicate and breaking clean builds. Restored its prior `GPIO::H` pin `3` assignment; clean FSBL build now produces `build/fsbl.stm32` (43,288 bytes).
+- Moved the active STM32MP1 FSBL closure from `bootloaders/mp1-boot` into root `src/`, `include/`, `tools/`, `linker.ld`, and `Makefile`; root `source env.sh && make clean && make` produces `build/fsbl.stm32` (43,280 bytes). Removed obsolete prebuilt U-Boot images and the legacy nested MP1-Boot path.
 - Added `READMEConfig.md` documenting fixture configuration and calibration behavior.
 - Updated M1TFC calibration seed handling to fill incomplete profiles from defaults while retaining populated persisted data; added focused Jest coverage.
 - Changed M1TFC label printing to use unique temporary staging directories and cleanup; added focused Jest coverage.
@@ -46,6 +52,7 @@ This file records concise work history for AI-assisted platform work. Keep entri
 
 ## Next Work
 
+- Validate the newly built STM32MP1 FSBL on the fixture target, including DDR/SDRAM ICT behavior.
 - Configure remotes/upstreams for M1TFC, Operator UI, and tfcroncli, then push their local commits.
 - Finish `tfcroncli` clean snap build under Node 24.
 - Add or plan snap packaging for `m1-cloud-client`.

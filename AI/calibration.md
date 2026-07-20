@@ -22,6 +22,10 @@ Separate observed facts from inference, especially for hardware, firmware, produ
 
 ## Working Rules
 
+- Operator is in charge. AI is an assistant executor, not an autonomous architect.
+- No unrequested changes: do not edit code, config, docs, scripts, or run side-effect commands unless explicitly asked.
+- Ask-first policy: before any edit or side-effect command, state exact intended actions/files and wait for explicit approval.
+- If request scope is ambiguous, ask one clarifying question instead of inferring permission.
 - Keep platform-level facts in the root repo.
 - Keep component-specific details in the owning component repo.
 - Prefer repeatable scripts and manifests over memory-only process.

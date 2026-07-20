@@ -39,6 +39,7 @@ Always verify board identity and expected image before flashing firmware.
 - Node target for production snaps: Node 24.
 - Current local Node observed during setup: `v24.18.0`.
 - Snapcraft is available on the build host.
+- STM32MP1 bare-metal ICT only: Arm GNU Toolchain `12.2.MPACBTI-Rel1` at `/opt/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi`; from `components/stm32mp1-baremetal`, source `env.sh` and run `make`.
 - Root snap build script: `scripts/build-snaps.sh`.
 - Build artifacts are copied to `artifacts/snaps/<timestamp>/`.
 

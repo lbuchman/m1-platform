@@ -24,6 +24,7 @@ Firmware components:
 - M1 fixture Teensy firmware
 - Mercury test board firmware: converted to a PlatformIO Teensy 4.1 Arduino project using `redDiamondsFixture/teensy` as the reference skeleton. Mercury-specific Ethernet, TCP terminal, UDP terminal, NTP, persistent config, and LED status support are restored in the PlatformIO project.
 - STM32MP1 bare-metal ICT firmware: target-side firmware used while SDRAM is under test. Linux must not run during this ICT path because it initializes and uses the test subject.
+- The STM32MP1 production FSBL builds from the component root `Makefile`; active source is in `src/`, headers/configuration in `include/`, vendor code in `third-party/`, and image tooling in `tools/`. It produces `build/fsbl.stm32` for bare-metal DDR/SDRAM ICT. A clean root build using the pinned Arm GNU toolchain passed on 2026-07-19 after restoring the historically renamed `STRIKE2_KICKER_POWER` symbol to its prior `GPIO::H` pin `3` assignment.
 
 ## Version Authority
 
