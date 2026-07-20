@@ -50,6 +50,15 @@ This file records concise work history for AI-assisted platform work. Keep entri
 - Committed and pushed root platform `160b07b` and REST server `a5459e7`; committed M1TFC `70e221c`, Operator UI `64916a4`, and tfcroncli `543ac5b` locally.
 - Published the private `lbuchman/stm32mp1-baremetal` component repository. Its archive-backed `main` branch is the default; existing remote history remains on `master`, `m1`, and `stm31mp151faa`.
 
+## 2026-07-20
+
+- Confirmed user-reported baseline: `components/m1testBoardFw` CMake firmware flow is working.
+- Added PlatformIO configuration at `components/m1testBoardFw/platformio.ini` for Teensy 4.1 (`teensy41`) to preserve existing source layout and compile-time behavior.
+- Added `components/m1testBoardFw/README.platformio.md` documenting PlatformIO build and USB upload usage.
+- Kept legacy CMake build files intact; migration did not remove or rewrite the existing CMake path.
+- Explicitly excluded `program.sh` integration from PlatformIO upload flow per user request.
+- Removed host-specific Arduino IDE library path from `components/m1testBoardFw/platformio.ini`; PlatformIO now relies on its own Teensy framework packages plus local project `libs/`.
+
 ## Next Work
 
 - Validate the newly built STM32MP1 FSBL on the fixture target, including DDR/SDRAM ICT behavior.

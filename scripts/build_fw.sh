@@ -100,6 +100,16 @@ component_dirty_state() {
     fi
 }
 
+extract_stm32_fw_revision() {
+    local source_file="${STM32_DIR}/src/main.cc"
+    if [[ ! -f "${source_file}" ]]; then
+        printf 'unknown'
+        return
+    fi
+
+    sed -n 's/.*fwRev[[:space:]]*=[[:space:]]*(char\*)[[:space:]]*"\([^"]*\)".*/\1/p' "${source_file}" | head -n 1
+}
+
 build_mercury() {
     if [[ ! -f "${MERCURY_DIR}/platformio.ini" ]]; then
         log "Missing Mercury PlatformIO project: ${MERCURY_DIR}"
@@ -168,12 +178,20 @@ build_stm32() {
     local commit
     local dirty
     local firmware_stm32="${STM32_DIR}/build/fsbl.stm32"
+    local fw_revision
+    local fw_revision_file="${STM32_DIR}/stm32mp1_rev"
     commit="$(component_revision "${STM32_DIR}")"
     dirty="$(component_dirty_state "${STM32_DIR}")"
+    fw_revision="$(extract_stm32_fw_revision)"
+
+    if [[ -z "${fw_revision}" ]]; then
+        fw_revision="unknown"
+    fi
 
     log "== STM32MP1 ICT FSBL =="
     log "source: ${STM32_DIR}"
     log "commit: ${commit} (${dirty})"
+    log "fw revision: ${fw_revision}"
     log "+ (cd ${STM32_DIR} && source env.sh && make clean && make)"
     if [[ "${DRY_RUN}" -eq 0 ]]; then
         (
@@ -186,6 +204,8 @@ build_stm32() {
             log "No STM32 FSBL artifact found after build: ${firmware_stm32}"
             exit 1
         fi
+        printf '%s\n' "${fw_revision}" > "${fw_revision_file}"
+        log "revision file: ${fw_revision_file}"
         copy_artifact "${STM32_COMPONENT}" "${firmware_stm32}" "${commit}" "${dirty}"
     fi
 }
@@ -194,10 +214,14 @@ install_stm32() {
     build_stm32
 
     local firmware_stm32="${STM32_DIR}/build/fsbl.stm32"
+    local firmware_rev="${STM32_DIR}/stm32mp1_rev"
     log "+ sudo install -D -m 0644 ${firmware_stm32} ${MTF_DIR}/fsbl.stm32"
+    log "+ sudo install -D -m 0644 ${firmware_rev} ${MTF_DIR}/stm32mp1_rev"
     if [[ "${DRY_RUN}" -eq 0 ]]; then
         sudo install -D -m 0644 "${firmware_stm32}" "${MTF_DIR}/fsbl.stm32"
+        sudo install -D -m 0644 "${firmware_rev}" "${MTF_DIR}/stm32mp1_rev"
         log "installed: ${MTF_DIR}/fsbl.stm32"
+        log "installed: ${MTF_DIR}/stm32mp1_rev"
     fi
 }
 

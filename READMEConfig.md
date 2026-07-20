@@ -44,6 +44,8 @@ The ICT SRAM image is normally:
   "tfInterface": "enp1s0",
   "vendorSite": "s5",
   "skipBatteryTest": false,
+  "coinCellMinVoltageNew": 3.0,
+  "coinCellMinVoltageUsed": 2.9,
   "skipTestpointCheck": false,
   "skipRS485test": false,
   "productName": "mnplus",
@@ -63,6 +65,8 @@ Use values appropriate to the installed fixture, product, and production site. T
 - `fwDir` and `layoutFilePath`: firmware and flash-layout paths below `mtfDir`.
 - `mtfDir`: shared fixture firmware and log directory; use `/var/m1mtf`.
 - `programmingCommand`: absolute path to the STM32CubeProgrammer CLI executable.
+- `coinCellMinVoltageNew`: minimum coin-cell voltage for `--cellBatTol new`.
+- `coinCellMinVoltageUsed`: minimum coin-cell voltage for `--cellBatTol used`.
 - `skipTestpointCheck`, `skipRS485test`, `skipBatteryTest`, and `forceEppromOverwrite`: production-test behavior controls.
 
 Some deployments also store service credentials or production passwords in this file. Do not copy those values into source control, logs, or documentation. Apply host access controls appropriate to the users and services that must run `m1tfc`.
@@ -91,7 +95,12 @@ sudo test -x /home/lenel/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/ST
       "strikeReg": [],
       "ddrVoltageM1": {},
       "ddrVoltageMnp": {},
-      "coinCellBattery": {}
+      "coinCellBattery": {
+        "name": "BatCellBat",
+        "minVoltageNew": 3.0,
+        "minVoltageAged": 2.9,
+        "scale": 1
+      }
     }
   ]
 }
@@ -115,7 +124,12 @@ For a new fixture, create `/etc/m1platform/calibration.json` with this starter s
       "strikeReg": [],
       "ddrVoltageM1": {},
       "ddrVoltageMnp": {},
-      "coinCellBattery": {}
+      "coinCellBattery": {
+        "name": "BatCellBat",
+        "minVoltageNew": 3.0,
+        "minVoltageAged": 2.9,
+        "scale": 1
+      }
     }
   ]
 }
