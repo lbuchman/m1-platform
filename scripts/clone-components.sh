@@ -10,18 +10,19 @@ FAILED_COMPONENTS=()
 
 usage() {
     cat <<'EOF'
-Usage: scripts/clone-components.sh [options]
+Usage: scripts/clone-components.sh [options] [git|http]
 
 Clone all split component repositories into components/.
 
 Options:
-    --https      Use HTTPS clone URLs
-    --ssh        Use SSH clone URLs (default, auto-fallback to HTTPS on failure)
+    git, --ssh     Use SSH clone URLs (default, auto-fallback to HTTPS on failure)
+    http, --https  Use HTTPS clone URLs
   --update     Fast-forward pull existing component repos
   -h, --help   Show this help
 
 Examples:
   ./scripts/clone-components.sh
+  ./scripts/clone-components.sh http
   ./scripts/clone-components.sh --https
   ./scripts/clone-components.sh --update
 EOF
@@ -83,11 +84,11 @@ clone_or_update_component() {
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --https)
+        --https|http)
             CLONE_MODE="https"
             shift
             ;;
-        --ssh)
+        --ssh|git)
             CLONE_MODE="ssh"
             shift
             ;;
