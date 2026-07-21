@@ -31,9 +31,22 @@ Separate observed facts from inference, especially for hardware, firmware, produ
 - Prefer repeatable scripts and manifests over memory-only process.
 - Prefer small validated changes over broad speculative refactors.
 - Do not hide build warnings or dirty repo state when discussing release readiness.
+- After every code edit, run a real compile step and review actual GCC warnings/errors before continuing.
+- Fix or report any new compile warnings/errors introduced by the change before moving to the next task.
+- Do not treat editor include-path diagnostics as compile validation.
 - Before flashing firmware, state and verify physical board identity, connection path, and expected image.
 - For runtime config and calibration behavior, verify both the in-memory effect and persisted file write; silent save failures are production-relevant failures.
 - Do not store secrets, raw config data, or raw calibration data in AI files.
+
+Priority order for engineering decisions:
+
+1. Reliability first.
+2. Code cleanliness.
+3. Readability.
+4. Keep implementations as simple as possible.
+5. No dogma-driven design.
+
+- Do not add unrequested wrappers, abstraction layers, or indirection in firmware startup/control paths unless explicitly requested or supported by bench evidence.
 
 ## Quality Target
 
