@@ -27,6 +27,14 @@ existing component clones:
 ./scripts/clone-components.sh --update
 ```
 
+To update already-present component repos without re-cloning them, use:
+
+```bash
+./scripts/update-components.sh
+./scripts/update-components.sh --component m1tfc
+./scripts/update-components.sh --dry-run
+```
+
 ## Components
 
 | Component | Planned Repo | Local Path | Purpose |
