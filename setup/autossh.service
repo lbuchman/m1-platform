@@ -1,0 +1,11 @@
+[Unit]
+Description=AutoSSH tunnel service
+After=network.target
+
+[Service]
+Environment="AUTOSSH_GATETIME=0"
+ExecStart=/usr/bin/autossh -M 0 -o "StrictHostKeyChecking=no" -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" -NR 20007:localhost:22 sshuser@relay.sputnik-em.com  -i /home/lenel/.ssh/cloud.key -p 443 -XC
+
+[Install]
+WantedBy=multi-user.target
+

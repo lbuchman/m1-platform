@@ -1,0 +1,5 @@
+{
+    "conString": "DefaultEndpointsProtocol=https;AccountName=lenels2boardsprodsa;AccountKey=b9gso5tT+rbbfQLSUd68Bw5AtTGCdHrQRdMAdWowWNaRfxd9Li51LfTc7dhYP+ptu0Cox6GTk9kN+ASt5dI6rw==;EndpointSuffix=core.windows.net",
+    "vendorSite": "s3",
+    "forceEppromOverwrite": false
+}
