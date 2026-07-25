@@ -80,6 +80,13 @@ This file records concise work history for AI-assisted platform work. Keep entri
 - Added `AI/verify-platform-state.sh` to validate complete AI context presence and confirm runtime config/calibration match after apply on another PC.
 - Improved snapshot checksum portability by generating `AI/runtime/SHA256SUMS` with runtime-relative filenames.
 - Added durable retrieval anchors so new AI sessions must discover fixture diagram context through `AI/state.md`, `AI/metadata.md`, and `AI/README.md` startup guidance.
+- Added explicit diagram continuation contract and handoff checklist so next agents can extend the mnplus fixture diagram without rediscovery.
+- Diagram continuation acceptance criteria for next revision:
+	- add relay/control ownership and control-signal path,
+	- add measurement/observation points,
+	- add pass/fail and fault indication path,
+	- add safety/interlock behavior notes,
+	- add connector/pin-map summary tied to diagram blocks.
 
 ## Next Work
 

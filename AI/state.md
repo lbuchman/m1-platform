@@ -63,6 +63,27 @@ Cross-PC portable restore is standardized through the root `AI/` folder:
 - Fixture electrical and operation baseline for mnplus UUT is documented in `doc/design-doc/system-diagrams/mnplus-fixture-electrical-operation-diagram.md`.
 - When fixture mechanics, power path, PoE routing, pogo-pin contact, or bench operation sequence are discussed, treat that file as required source context.
 
+## Diagram Continuation Contract
+
+Source of truth:
+
+- `doc/design-doc/system-diagrams/mnplus-fixture-electrical-operation-diagram.md`
+
+Currently confirmed scope (implemented in diagram):
+
+- Mechanical closure flow: cover, mounting alignment, board press, pogo-pin contact.
+- Primary power path: back-panel `120V AC` -> main switch -> internal PSU -> `12V` and `5V` rails.
+- Secondary PoE power/data path: switched `120V AC` -> `48V` PSU -> relay -> PoE injector power input; SAM-E switch Ethernet output -> PoE injector Ethernet input; PoE injector output -> UUT via pogo-pin path.
+- Back-panel interface path: USB-B -> USB switch, Ethernet jack -> SAM-E switch.
+
+Not yet captured (required next revision items):
+
+- Controller ownership and control-signal routing (relay enable source and control authority).
+- Measurement and observation points (where voltage/current/state are verified during bring-up and test).
+- Pass/fail and fault indication path (what asserts failure, what surfaces failure, and where logs/status are exposed).
+- Safety and interlock behavior (power-off conditions, cover/open interlock behavior if present).
+- External/internal connector and pin-map summary tied to diagram blocks.
+
 ## REST Command State
 
 - REST server source path: `components/m1-rest-server`.
