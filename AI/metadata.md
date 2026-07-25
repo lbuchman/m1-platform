@@ -76,6 +76,11 @@ Mercury firmware Ethernet defaults observed on bench:
 - TCP terminal: port `23`.
 - UDP terminal: port `4111`.
 
+## Authoritative Design Docs
+
+- Fixture electrical and operation reference: `doc/design-doc/system-diagrams/mnplus-fixture-electrical-operation-diagram.md`.
+- Use this diagram as the first reference for fixture box mechanics, primary/secondary power flow, back-panel interfaces, and PoE-to-UUT routing.
+
 ## Remote Development Notes
 
 - VS Code is connected through Remote-SSH.

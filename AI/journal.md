@@ -79,6 +79,7 @@ This file records concise work history for AI-assisted platform work. Keep entri
 - Updated AI restore documentation so importing the full `AI/` directory can carry metadata, state, journal context, and runtime calibration/config state.
 - Added `AI/verify-platform-state.sh` to validate complete AI context presence and confirm runtime config/calibration match after apply on another PC.
 - Improved snapshot checksum portability by generating `AI/runtime/SHA256SUMS` with runtime-relative filenames.
+- Added durable retrieval anchors so new AI sessions must discover fixture diagram context through `AI/state.md`, `AI/metadata.md`, and `AI/README.md` startup guidance.
 
 ## Next Work
 
