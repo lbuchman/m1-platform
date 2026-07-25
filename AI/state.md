@@ -58,6 +58,11 @@ Cross-PC portable restore is standardized through the root `AI/` folder:
 - `AI/apply-platform-state.sh` restores those files on a target PC.
 - `AI/state.md`, `AI/metadata.md`, `AI/journal.md`, and `AI/calibration.md` remain the durable non-runtime context set that must travel with runtime snapshots.
 
+## Critical Fixture Docs
+
+- Fixture electrical and operation baseline for mnplus UUT is documented in `doc/design-doc/system-diagrams/mnplus-fixture-electrical-operation-diagram.md`.
+- When fixture mechanics, power path, PoE routing, pogo-pin contact, or bench operation sequence are discussed, treat that file as required source context.
+
 ## REST Command State
 
 - REST server source path: `components/m1-rest-server`.
