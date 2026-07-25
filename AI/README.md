@@ -13,8 +13,8 @@ Do not store secrets, private keys, cloud tokens, raw config contents, or raw ca
 | `journal.md` | Chronological work log and next work items |
 | `calibration.md` | AI working rules for this repo: diagnostic style, platform frame, quality target, and constraints |
 | `capture-platform-state.sh` | Export active runtime config and calibration from `/etc/m1platform` into `AI/runtime/` |
-| `apply-platform-state.sh` | Apply `AI/runtime/config.json` and `AI/runtime/calibration.json` back into `/etc/m1platform` |
-| `verify-platform-state.sh` | Verify AI context files, snapshot integrity, and applied runtime checksum match |
+| `apply-platform-state.sh` | AI-only apply: validate and report snapshot content without writing host runtime files |
+| `verify-platform-state.sh` | Verify AI context file presence and snapshot integrity within `AI/runtime/` only |
 | `runtime/` | Portable runtime snapshot folder for cross-PC restore |
 
 ## How To Use
@@ -27,13 +27,13 @@ At the start of a new AI session:
 4. Read the latest entries in `AI/journal.md` for what changed recently.
 5. Read `AI/calibration.md` before making decisions that affect build, release, hardware, firmware, production, or recovery behavior.
 
-For cross-PC runtime-state restore (including calibration):
+For cross-PC AI-state transfer:
 
 1. On source PC, run `AI/capture-platform-state.sh`.
 2. Copy the full `AI/` folder to the target PC.
 3. On target PC, run `AI/apply-platform-state.sh`.
 4. On target PC, run `AI/verify-platform-state.sh`.
-5. Confirm the verify script reports both config and calibration as matched.
+5. Confirm the verify script reports snapshot integrity and AI context checks as passed.
 
 When work changes the platform state:
 
@@ -51,4 +51,4 @@ When work changes the platform state:
 - Prefer references to file paths over copying large file contents.
 - Never copy raw secrets, raw runtime config, or raw calibration data into AI notes.
 
-Portable runtime snapshots in `AI/runtime/` are an explicit exception used for controlled state transfer between trusted engineering PCs.
+Portable runtime snapshots in `AI/runtime/` are for AI context continuity and integrity checks. In AI-only mode, restore tooling must not mutate host runtime files.
