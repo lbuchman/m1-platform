@@ -85,6 +85,12 @@ Use fast-forward-only git updates when a fresh build from current remotes is nee
 
 The script copies built snap artifacts into `artifacts/snaps/<timestamp>/` and writes a small `build-manifest.txt` with component names, source commits, dirty/clean state, and artifact names. The General Ubuntu cloud client is a production snap requirement, but it is not included in this build script until `components/m1-cloud-client` has snap packaging.
 
+## Fast Smoke Test Checklist
+
+Run the post-install and pre-release smoke checks in:
+
+- `doc/fast-smoke-test-checklist.md`
+
 ## Platform Firmware Builds
 
 Use `scripts/build_fw.sh` from the platform root to build and stage firmware

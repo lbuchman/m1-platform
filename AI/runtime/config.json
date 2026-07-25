@@ -1,0 +1,18 @@
+{
+  "conString": "DefaultEndpointsProtocol=https;AccountName=lenels2boardsprodsa;AccountKey=b9gso5tT+rbbfQLSUd68Bw5AtTGCdHrQRdMAdWowWNaRfxd9Li51LfTc7dhYP+ptu0Cox6GTk9kN+ASt5dI6rw==;EndpointSuffix=core.windows.net",
+  "tfInterface": "enp1s0",
+  "vendorSite": "s5",
+  "skipBatteryTest": false,
+  "skipTestpointCheck": false,
+  "skipRS485test": false,
+  "productName": "mnplus",
+  "forceEppromOverwrite": false,
+  "fwDir": "stm32mp15-lenels2-mnp",
+  "layoutFilePath": "flashlayout_st-ls2m1c-image-core/optee/FlashLayout_emmc_stm32mp151f-ls2m1c-optee.tsv",
+  "productionPassword": "1221",
+  "debugPassword": "3443",
+  "mtfDir": "/var/m1mtf",
+  "programmingCommand": "/home/lenel/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI",
+  "coinCellMinVoltageNew": 3.0,
+  "coinCellMinVoltageUsed": 2.9
+}
