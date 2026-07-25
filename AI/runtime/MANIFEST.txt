@@ -1,0 +1,5 @@
+Captured: 2026-07-25T00:17:06Z
+Source config: /etc/m1platform/config.json
+Source calibration: /etc/m1platform/calibration.json
+Host: mnptestf5
+User: lenel
