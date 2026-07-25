@@ -1,0 +1,152 @@
+<mxfile host="app.diagrams.net" modified="2026-07-24T21:30:00.000Z" agent="Copilot" version="21.0.0" type="device">
+  <diagram id="mnplus-fixture-diagram" name="mnplus Fixture Architecture">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="mnplus Fixture Electrical &amp; System Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#15323D;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Subgraph: Back Panel -->
+        <mxCell id="group-backpanel" value="Back Panel External Interfaces" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E6F2F5;strokeColor=#83AFB9;fontStyle=1;fontSize=14;fontColor=#15323D;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="240" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="node-ac" value="120V AC Input" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#176B87;fontStyle=1;" vertex="1" parent="group-backpanel">
+          <mxGeometry x="30" y="50" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="node-sw" value="Main Power Switch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#176B87;fontStyle=1;" vertex="1" parent="group-backpanel">
+          <mxGeometry x="30" y="130" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="node-eth" value="Ethernet Jack" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#176B87;fontStyle=1;" vertex="1" parent="group-backpanel">
+          <mxGeometry x="30" y="210" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="node-usbb" value="USB-B Jack" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#176B87;fontStyle=1;" vertex="1" parent="group-backpanel">
+          <mxGeometry x="130" y="210" width="80" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge-ac-sw" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#176B87;strokeWidth=2;" edge="1" parent="group-backpanel" source="node-ac" target="node-sw">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Subgraph: Power Subsystem -->
+        <mxCell id="group-power" value="Power Distribution Subsystem" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E6F2F5;strokeColor=#83AFB9;fontStyle=1;fontSize=14;fontColor=#15323D;" vertex="1" parent="1">
+          <mxGeometry x="320" y="80" width="300" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="node-psu-main" value="Main PSU&#10;(12V &amp; 5V DC)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#176B87;fontStyle=1;" vertex="1" parent="group-power">
+          <mxGeometry x="20" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="node-psu-48v" value="48V DC PSU&#10;(120V AC to 48V DC)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#176B87;fontStyle=1;" vertex="1" parent="group-power">
+          <mxGeometry x="160" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="node-dc12" value="12V DC Rail" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#0288D1;fontStyle=1;" vertex="1" parent="group-power">
+          <mxGeometry x="20" y="150" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="node-dc5" value="5V DC Rail" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#0288D1;fontStyle=1;" vertex="1" parent="group-power">
+          <mxGeometry x="20" y="210" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="node-relay" value="48V Relay Control" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;fontStyle=1;" vertex="1" parent="group-power">
+          <mxGeometry x="160" y="180" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge-main-dc12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#0288D1;strokeWidth=2;" edge="1" parent="group-power" source="node-psu-main" target="node-dc12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-main-dc5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#0288D1;strokeWidth=2;" edge="1" parent="group-power" source="node-psu-main" target="node-dc5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-48v-relay" value="48V DC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#E65100;strokeWidth=2;fontSize=10;" edge="1" parent="group-power" source="node-psu-48v" target="node-relay">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Edges from Switch to PSUs -->
+        <mxCell id="edge-sw-main" value="120V AC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#176B87;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="node-sw" target="node-psu-main">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-sw-48v" value="120V AC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#176B87;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="node-sw" target="node-psu-48v">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Subgraph: Controllers & Test Boards -->
+        <mxCell id="group-controllers" value="Fixture Controllers &amp; Test Boards" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EDF7F2;strokeColor=#79AB95;fontStyle=1;fontSize=14;fontColor=#15323D;" vertex="1" parent="1">
+          <mxGeometry x="660" y="80" width="320" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="node-m1tb" value="M1 Test Board" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#177451;fontStyle=1;fontSize=14;" vertex="1" parent="group-controllers">
+          <mxGeometry x="30" y="50" width="260" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="node-mtb" value="Mercury Test Board" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#177451;fontStyle=1;fontSize=14;" vertex="1" parent="group-controllers">
+          <mxGeometry x="30" y="170" width="260" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Power to controllers -->
+        <mxCell id="edge-dc12-m1tb" value="12V DC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#0288D1;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="node-dc12" target="node-m1tb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-dc12-mtb" value="12V DC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#0288D1;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="node-dc12" target="node-mtb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Control signal to Relay -->
+        <mxCell id="edge-m1tb-relay" value="Control Signal" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#E65100;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="node-m1tb" target="node-relay">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Subgraph: Data & Power Injection -->
+        <mxCell id="group-interface" value="Data &amp; Power Injection Subsystem" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FFF8E7;strokeColor=#D49B6A;fontStyle=1;fontSize=14;fontColor=#15323D;" vertex="1" parent="1">
+          <mxGeometry x="40" y="420" width="580" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="node-usbhub" value="Internal USB Hub" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A85616;fontStyle=1;" vertex="1" parent="group-interface">
+          <mxGeometry x="30" y="50" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="node-same" value="SAM-E 3-Port&#10;Ethernet Switch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A85616;fontStyle=1;" vertex="1" parent="group-interface">
+          <mxGeometry x="30" y="160" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="node-poe" value="Ethernet Power Injector" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A85616;fontStyle=1;" vertex="1" parent="group-interface">
+          <mxGeometry x="320" y="160" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Connections inside/across Interface Subsystem -->
+        <mxCell id="edge-usbb-hub" value="USB Data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#A85616;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="node-usbb" target="node-usbhub">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-m1tb-hub" value="USB Data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#A85616;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="node-m1tb" target="node-usbhub">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-eth-same" value="Ethernet Data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#A85616;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="node-eth" target="node-same">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-same-poe" value="Ethernet Data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#A85616;strokeWidth=2;fontSize=10;" edge="1" parent="group-interface" source="node-same" target="node-poe">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-same-mtb" value="Ethernet Cable" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#A85616;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="node-same" target="node-mtb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-relay-poe" value="Switched 48V DC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#E65100;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="node-relay" target="node-poe">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Subgraph: UUT Board -->
+        <mxCell id="group-uut" value="UUT Board" style="swimlane;whiteSpace=wrap;html=1;fillColor=#FDF8F3;strokeColor=#D49B6A;fontStyle=1;fontSize=14;fontColor=#15323D;" vertex="1" parent="1">
+          <mxGeometry x="660" y="420" width="320" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="node-mnplus" value="mnplus Target Board" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A85616;fontStyle=1;fontSize=16;" vertex="1" parent="group-uut">
+          <mxGeometry x="30" y="80" width="260" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Connections to UUT over pogo-pins -->
+        <mxCell id="edge-poe-uut" value="pogo-pins (PoE)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#A85616;strokeWidth=3;fontSize=11;fontStyle=1;" edge="1" parent="1" source="node-poe" target="node-mnplus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-m1tb-uut" value="Power &amp; Testing Harness (pogo-pins)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#177451;strokeWidth=3;fontSize=11;fontStyle=1;" edge="1" parent="1" source="node-m1tb" target="node-mnplus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-mtb-uut" value="pogo-pins" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#177451;strokeWidth=3;fontSize=11;fontStyle=1;" edge="1" parent="1" source="node-mtb" target="node-mnplus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
