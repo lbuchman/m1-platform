@@ -3,7 +3,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUNTIME_DIR="$SCRIPT_DIR/runtime"
-TARGET_DIR="/etc/m1platform"
 
 require_file() {
   local file="$1"
@@ -16,13 +15,17 @@ require_file() {
 require_file "$RUNTIME_DIR/config.json"
 require_file "$RUNTIME_DIR/calibration.json"
 
-sudo install -d -m 755 "$TARGET_DIR"
-sudo install -m 644 "$RUNTIME_DIR/config.json" "$TARGET_DIR/config.json"
-sudo install -m 644 "$RUNTIME_DIR/calibration.json" "$TARGET_DIR/calibration.json"
+echo "AI-only apply mode: no host runtime files will be modified."
+echo "Snapshot files available:"
+echo "- $RUNTIME_DIR/config.json"
+echo "- $RUNTIME_DIR/calibration.json"
 
-echo "Apply complete. Updated files:"
-echo "- $TARGET_DIR/config.json"
-echo "- $TARGET_DIR/calibration.json"
+if [[ -f "$RUNTIME_DIR/MANIFEST.txt" ]]; then
+  echo "- $RUNTIME_DIR/MANIFEST.txt"
+fi
+if [[ -f "$RUNTIME_DIR/SHA256SUMS" ]]; then
+  echo "- $RUNTIME_DIR/SHA256SUMS"
+fi
 
-echo "Current checksums:"
-sha256sum "$TARGET_DIR/config.json" "$TARGET_DIR/calibration.json"
+echo "Snapshot checksums:"
+sha256sum "$RUNTIME_DIR/config.json" "$RUNTIME_DIR/calibration.json"
