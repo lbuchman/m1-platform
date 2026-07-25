@@ -1,73 +1,74 @@
 # mnplus Fixture Electrical and Operation Diagram
 
 ## Scope
-This diagram captures the fixture mechanics and primary power flow described so far.
+This document models the mnplus fixture primary AC/DC power distribution, M1 test board controller integration, Mercury test board integration, back-panel interface routing, secondary PoE power/data path, and pogo pin contact reliability rules.
 
 ## Electrical Block Diagram
 
 ```mermaid
 flowchart LR
-    AC[120V AC Input] --> SW[Back Panel Main Switch]
-    SW --> PSU[Internal Power Supply]
-    PSU --> DC12[12V DC Rail]
-    PSU --> DC5[5V DC Rail]
-    SW --> PSU48[120V AC to 48V DC Power Supply]
-    ETH[Back Panel Ethernet Jack]
-    USBB[Back Panel USB-B Standard Jack]
-
-    subgraph Fixture[Fixture Box]
-      PSU
-      DC12
-      DC5
-      PSU48
-      ETH
-      USBB
-      USBSW[USB Switch]
-      SAME[SAM-E 3-Port Ethernet Switch]
-      RELAY[48V Relay Control]
-      POE[Ethernet Power Injector]
-      POGO[Pogo Pin Bed on Base Plate]
-      MNT[Mounting Hardware]
-      COV[Hinged Cover]
-      UUT[UUT Board: mnplus]
+    subgraph BackPanel[Back Panel External Interfaces]
+        AC[120V AC Input] --> SW[Main Power Switch]
+        ETH[Ethernet Jack]
+        USBB[USB-B Standard Jack]
     end
 
-    USBB --> USBSW
-    ETH --> SAME
-    SAME -- Ethernet input --> POE
-    PSU48 --> RELAY
-    RELAY -- switched 48V DC --> POE
-    POE -- PoE output over pogo pins --> POGO
+    subgraph PowerSubsystem[Power Distribution Subsystem]
+        SW -- 120V AC --> PSU_MAIN[Main PSU: 12V & 5V DC]
+        SW -- 120V AC --> PSU_48V[120V AC to 48V DC PSU]
+        PSU_MAIN --> DC12[12V DC Rail]
+        PSU_MAIN --> DC5[5V DC Rail]
+        PSU_48V -- 48V DC --> RELAY[48V Relay Control]
+    end
 
-    COV -- closes and applies force --> UUT
-    UUT -- test points contact --> POGO
-    MNT -- aligns and secures --> UUT
+    subgraph Controller[Fixture Controllers & Test Boards]
+        M1TB[M1 Test Board]
+        MTB[Mercury Test Board]
+        DC12 --> M1TB
+        DC12 --> MTB
+        M1TB -- Control Signal --> RELAY
+    end
+
+    subgraph InterfaceSubsystem[Data & Power Injection Subsystem]
+        USBB -- USB Data --> USBHUB[Internal USB Hub]
+        M1TB -- USB Data --> USBHUB
+        ETH -- Ethernet Data --> SAME[SAM-E 3-Port Ethernet Switch]
+        SAME -- Ethernet Data --> POE[Ethernet Power Injector]
+        SAME -- Ethernet Data --> MTB
+        RELAY -- Switched 48V DC --> POE
+    end
+
+    subgraph UUT[UUT Board]
+        MNPLUS[mnplus Target Board]
+        POE -- pogo-pins --> MNPLUS
+        M1TB -- Power & Testing Harness over pogo-pins --> MNPLUS
+        MTB -- pogo-pins --> MNPLUS
+    end
 ```
 
-## Operation Sequence Diagram
+## Notes & Design Guidelines
 
-```mermaid
-flowchart TD
-    S1[Open Cover] --> S2[Place mnplus UUT on Fixture Plate]
-    S2 --> S3[Align with Mounting Hardware]
-    S3 --> S4[Close Cover]
-    S4 --> S5[Board Pressed Down]
-    S5 --> S6[Test Points Contact Pogo Pins]
-  S6 --> S7[Toggle Back Panel Switch ON]
-  S7 --> S8[120V AC Feeds Internal PSUs]
-  S8 --> S9[Main PSU Generates 12V DC and 5V DC]
-  S9 --> S10[48V PSU Generates 48V DC]
-  S10 --> S11[Enable Relay to Feed 48V to PoE Injector]
-  S11 --> S12[SAM-E Switch Feeds Ethernet to PoE Injector]
-  S12 --> S13[PoE Injector Feeds UUT over Pogo Pins]
-  S13 --> S14[Fixture Ready for Test Steps]
-```
+### Architectural Notes
+- Back-panel USB-B jack routes internally to the internal USB Hub.
+- M1 Test Board is wired to the internal USB Hub.
+- Back-panel Ethernet jack routes internally to the SAM-E 3-port Ethernet switch.
+- SAM-E Ethernet switch outputs connect to:
+  - Ethernet Power Injector
+  - Mercury Test Board (via Ethernet cable)
+- SAM-E Ethernet output and 48V DC (relay-switched) feed the Ethernet power injector.
+- Combined PoE output routes directly through pogo pins to the UUT board.
+- **M1 Test Board**:
+  - Powered by 12V DC rail from the main PSU.
+  - Wired to the internal USB Hub.
+  - Generates control signal to actuate the 48V PoE relay.
+  - Connects to UUT via testing harness over pogo pins to supply board power, perform interface tests, and measure voltage test-points.
+- **Mercury Test Board**:
+  - Powered by 12V DC rail from the main PSU.
+  - Connected via Ethernet cable to the SAM-E Ethernet switch.
+  - Wired to UUT via pogo pins.
 
-## Notes
-- This version models only the elements provided so far.
-- Back panel includes an Ethernet jack and USB-B standard jack.
-- USB-B jack routes to an internal USB switch.
-- Ethernet jack routes to an internal SAM-E 3-port Ethernet switch.
-- PoE injector receives Ethernet from the SAM-E switch and switched 48V DC through a relay.
-- PoE injector output goes to the UUT through pogo-pin connections.
-- Next revision can add controller, signal routing, measurements, and pass/fail indication.
+### Pogo Pin Contact Reliability Guidelines
+- **Fixed Hard-Stop Compression**: Ensures consistent pogo pin travel and prevents over-compression damage.
+- **Distributed Hold-Down**: Prevents PCB flexing under spring force.
+- **Contact Resistance**: Minimizes contact resistance variation for accurate voltage/current measurements.
+
