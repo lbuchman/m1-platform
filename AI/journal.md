@@ -88,6 +88,20 @@ This file records concise work history for AI-assisted platform work. Keep entri
 	- add safety/interlock behavior notes,
 	- add connector/pin-map summary tied to diagram blocks.
 
+## 2026-07-25
+
+- Converted all 8 controlled `.docx` documents under `doc/` to Markdown using `pandoc`, extracting embedded images into `doc/Images/` with document-prefixed filenames to avoid collisions; original `.docx` sources removed after conversion.
+- Streamlined `doc/` repository layout to match the target structure in `Architecture/Platform/Context/EVM_Architecture_Authoring_Context_2026-07-25.md`:
+	- Removed duplicate schematic PDFs from legacy `doc/schem/`; retained canonical copies under `Architecture/Hardware/*/Source-Schematics/`.
+	- Moved the two orphan UUT (product) schematics, M1-3200 and MNPlus V3, into new `Architecture/Hardware/UUT-Reference/{M1-3200,MNPlus-V3}/Source-Schematics/`, then removed `doc/schem/`.
+	- Merged `doc/pictures/` into `doc/Images/` and removed `doc/pictures/`; updated the image reference in the operator UI guide.
+	- Retired `doc/design-doc/`; moved the current `mnplus_design_review_v3.drawio` (consolidated fixture diagram, edited directly in draw.io desktop) into `Architecture/Platform/Source-Diagrams/`.
+	- Relocated `operator-ui-user-guide.md` to `Operations/` and `fast-smoke-test-checklist.md` to `Validation/`; removed superseded scratch diagram `doc/temp.md`.
+	- Removed the duplicate root `doc/EVM_ARCHITECTURE_COMPLETE_STATE_2026-07-25.md` (byte-identical to `Architecture/Platform/Context/EVM_Architecture_Authoring_Context_2026-07-25.md`).
+	- Renamed `doc/ICD/` to `doc/Interface-Control-Documents/` to avoid confusion with the `IDC` (Insulation Displacement Connector) term used inside those documents.
+	- Updated `doc/README.md` with the full current repository layout.
+- Updated stale `AI/README.md`, `AI/state.md`, and `AI/metadata.md` references from the deleted `doc/design-doc/system-diagrams/mnplus-fixture-electrical-operation-diagram.md` to the current `doc/Architecture/Platform/Source-Diagrams/mnplus_design_review_v3.drawio`.
+
 ## Next Work
 
 - Validate the newly built STM32MP1 FSBL on the fixture target, including DDR/SDRAM ICT behavior.

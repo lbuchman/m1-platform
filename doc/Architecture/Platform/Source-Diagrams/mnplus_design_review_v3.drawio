@@ -1,0 +1,283 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.16 Chrome/132.0.6834.196 Electron/34.2.0 Safari/537.36" version="26.0.16">
+  <diagram id="fixture-block-layout" name="Fixture Block Layout">
+    <mxGraphModel dx="1634" dy="1126" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="&lt;div style=&quot;color: rgb(0, 0, 0); font-weight: 400; text-align: start; font-family: &amp;quot;Segoe UI&amp;quot;; font-size: 14px; line-height: 20px;&quot;&gt;&lt;div class=&quot;SimpleCodeViewer__codeLine__ec4e106c SimpleCodeViewer__codeLineWrap__324485e9&quot; data-line-index=&quot;0&quot;&gt;&lt;div style=&quot;line-height: 20px;&quot;&gt;&lt;div class=&quot;SimpleCodeViewer__codeLine__ec4e106c SimpleCodeViewer__codeLineWrap__324485e9&quot; data-line-index=&quot;0&quot;&gt;M1/MNPlus Unified Engineering, Validation and Manufacturing Platform&lt;/div&gt;&lt;div class=&quot;SimpleCodeViewer__codeLine__ec4e106c SimpleCodeViewer__codeLineWrap__324485e9&quot; data-line-index=&quot;1&quot;&gt;(EVM)&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#0f172a;" parent="1" vertex="1">
+          <mxGeometry x="415" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="uut" value="UUT" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfeff;strokeColor=#155e75;fontStyle=1;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="620" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="fixture" value="" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#334155;fontStyle=1;fontSize=16;fontColor=#0f172a;" parent="1" vertex="1">
+          <mxGeometry y="230" width="1300" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_power" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#dc2626;fontStyle=1;dashed=1;" parent="fixture" vertex="1">
+          <mxGeometry x="10" y="20" width="1270" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_control" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;dashed=1;" parent="fixture" vertex="1">
+          <mxGeometry x="350" y="240" width="330" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_uut" value="UUT Interface" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#cffafe;strokeColor=#0891b2;fontStyle=1;dashed=1;" parent="fixture" vertex="1">
+          <mxGeometry x="700" y="240" width="300" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="mercury_board" value="Access Control Custom Test Board (Mercury)&lt;div&gt;Teensy 4.1&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#9a3412;fontStyle=1;" parent="fixture" vertex="1">
+          <mxGeometry x="760" y="275" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="m1_board" value="M1 Test Board (M1 Scope)&lt;div&gt;Teensy 4.1&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#9a3412;fontStyle=1;" parent="fixture" vertex="1">
+          <mxGeometry x="420" y="280" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="psu12" value="120VAC / 12VDC-5VDC&#xa;Power Supply" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#9a3412;fontStyle=1;" parent="fixture" vertex="1">
+          <mxGeometry x="30" y="35" width="260" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="psu48" value="AC/DC 48V Power Supply" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#9a3412;fontStyle=1;" parent="fixture" vertex="1">
+          <mxGeometry x="820" y="40" width="220" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="relay" value="Custom DC/DC SSR" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#9a3412;fontStyle=1;" parent="fixture" vertex="1">
+          <mxGeometry x="1090" y="50" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="same" value="SAM-E Board&lt;div&gt;Ethernet Switch&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#1d4ed8;fontStyle=1;" parent="fixture" vertex="1">
+          <mxGeometry x="1100" y="275" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="usbhub" value="USB Hub" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#1d4ed8;fontStyle=1;" parent="fixture" vertex="1">
+          <mxGeometry x="250" y="520" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="e-psu48-relay" value="48VDC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#9a3412;strokeWidth=2;fontSize=10;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.429;entryDx=0;entryDy=0;entryPerimeter=0;" parent="fixture" source="psu48" target="relay" edge="1">
+          <mxGeometry x="0.3333" y="15" relative="1" as="geometry">
+            <mxPoint x="1050" y="85" as="sourcePoint" />
+            <mxPoint x="1080" y="85" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-1" value="PoE Power&lt;div&gt;Injector&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#1d4ed8;fontStyle=1;" parent="fixture" vertex="1">
+          <mxGeometry x="1090" y="160" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-2" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" parent="fixture" target="uut_interface" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="530" y="280" as="sourcePoint" />
+            <mxPoint x="580" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-10" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="fixture" source="usbhub" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="430" y="400" as="sourcePoint" />
+            <mxPoint x="480" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-18" value="&lt;b&gt;Teensy USB Serial&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rotation=-50;" parent="H3IzjHBT9Q6uAZNhmDHZ-10" vertex="1" connectable="0">
+          <mxGeometry x="-0.1507" y="4" relative="1" as="geometry">
+            <mxPoint x="-3" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-11" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=-0.01;entryY=0.587;entryDx=0;entryDy=0;entryPerimeter=0;" parent="fixture" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="961.8" y="314.02" as="sourcePoint" />
+            <mxPoint x="1099.9999999999998" y="315.98" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-20" value="&lt;b&gt;Ethernet&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="H3IzjHBT9Q6uAZNhmDHZ-11" vertex="1" connectable="0">
+          <mxGeometry x="-0.1438" y="-2" relative="1" as="geometry">
+            <mxPoint x="19" y="-7" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-14" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.444;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="fixture" source="relay" target="H3IzjHBT9Q6uAZNhmDHZ-1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1160" y="140" as="sourcePoint" />
+            <mxPoint x="1210" y="90" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Sf-VtsORIFl4OTMnj8Zx-2" value="&lt;b&gt;48VDC&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="H3IzjHBT9Q6uAZNhmDHZ-14" vertex="1" connectable="0">
+          <mxGeometry x="-0.1805" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-15" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.442;exitY=0.019;exitDx=0;exitDy=0;exitPerimeter=0;" parent="fixture" source="same" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1130" y="290" as="sourcePoint" />
+            <mxPoint x="1180" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-16" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=1.003;entryY=0.376;entryDx=0;entryDy=0;entryPerimeter=0;" parent="fixture" target="uut_interface" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1270" y="200" as="sourcePoint" />
+            <mxPoint x="1320" y="150" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1280" y="190" />
+              <mxPoint x="1290" y="160" />
+              <mxPoint x="1290" y="-40" />
+              <mxPoint x="1290" y="-50" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-31" value="&lt;b&gt;POE&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="H3IzjHBT9Q6uAZNhmDHZ-16" vertex="1" connectable="0">
+          <mxGeometry x="0.8978" y="3" relative="1" as="geometry">
+            <mxPoint x="26" y="-13" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-17" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.528;exitY=1.026;exitDx=0;exitDy=0;exitPerimeter=0;" parent="fixture" source="psu12" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="370" y="370" as="sourcePoint" />
+            <mxPoint x="420" y="320" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="167" y="320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-19" value="&lt;b&gt;12.5V&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="H3IzjHBT9Q6uAZNhmDHZ-17" vertex="1" connectable="0">
+          <mxGeometry x="0.1483" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-21" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="fixture" target="mercury_board" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="640" y="310" as="sourcePoint" />
+            <mxPoint x="690" y="260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-28" value="&lt;b&gt;12.5V&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="H3IzjHBT9Q6uAZNhmDHZ-21" vertex="1" connectable="0">
+          <mxGeometry x="-0.1889" relative="1" as="geometry">
+            <mxPoint x="31" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-29" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.279;exitY=1.019;exitDx=0;exitDy=0;exitPerimeter=0;" parent="fixture" source="psu12" target="same" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1050" y="400" as="sourcePoint" />
+            <mxPoint x="1100" y="350" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="100" y="460" />
+              <mxPoint x="1100" y="450" />
+              <mxPoint x="1100" y="430" />
+              <mxPoint x="1100" y="410" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-30" value="&lt;b&gt;5V&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="H3IzjHBT9Q6uAZNhmDHZ-29" vertex="1" connectable="0">
+          <mxGeometry x="0.2836" y="2" relative="1" as="geometry">
+            <mxPoint x="263" y="-2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Sf-VtsORIFl4OTMnj8Zx-6" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.333;exitY=0.052;exitDx=0;exitDy=0;exitPerimeter=0;" parent="fixture" source="m1_board" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="360" y="80" as="sourcePoint" />
+            <mxPoint x="410" y="30" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Sf-VtsORIFl4OTMnj8Zx-10" value="USB&amp;nbsp;&lt;div&gt;Flash Drive&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="fixture" vertex="1">
+          <mxGeometry x="710" y="160" width="70" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="SnuABO6mpeWahow-l5n9-1" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.372;entryY=1.028;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="fixture" target="uut_interface">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="590" y="280" as="sourcePoint" />
+            <mxPoint x="640" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SnuABO6mpeWahow-l5n9-2" value="&lt;b&gt;Boot Target&lt;/b&gt;&lt;div&gt;&lt;b&gt;&amp;nbsp;Select&lt;/b&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="SnuABO6mpeWahow-l5n9-1">
+          <mxGeometry x="-0.2344" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="pc" value="Fanless PC&#xa;Headless" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfeff;strokeColor=#155e75;fontStyle=1;fontSize=14;" parent="1" vertex="1">
+          <mxGeometry x="570" y="860" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-3" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.847;entryY=0.983;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryPerimeter=0;" parent="1" source="mercury_board" target="uut_interface" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="860" y="460" as="sourcePoint" />
+            <mxPoint x="910" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-4" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="usbhub" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="520" y="950" as="sourcePoint" />
+            <mxPoint x="570" y="900" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="335" y="900" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-26" value="&lt;b&gt;USB&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="H3IzjHBT9Q6uAZNhmDHZ-4" vertex="1" connectable="0">
+          <mxGeometry x="0.3069" y="4" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-6" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.556;entryY=0.996;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" target="same" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="750" y="900" as="sourcePoint" />
+            <mxPoint x="800" y="850" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1200" y="900" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-27" value="&lt;b&gt;Ethernet&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="H3IzjHBT9Q6uAZNhmDHZ-6" vertex="1" connectable="0">
+          <mxGeometry x="-0.722" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-24" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" parent="1" edge="1" source="SnuABO6mpeWahow-l5n9-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="660" y="1040" as="sourcePoint" />
+            <mxPoint x="660" y="940" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-25" value="&lt;b&gt;Internet - Factory Factory managed Firewall and Access Control&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="H3IzjHBT9Q6uAZNhmDHZ-24" vertex="1" connectable="0">
+          <mxGeometry x="-0.2944" relative="1" as="geometry">
+            <mxPoint x="5" y="-19" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-32" value="Lever Switch&lt;div&gt;Status LED&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="350" y="200" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-34" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="usbhub" target="uut_interface" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="620" y="200" as="sourcePoint" />
+            <mxPoint x="670" y="150" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="660" y="790" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-35" value="USB DFU" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="H3IzjHBT9Q6uAZNhmDHZ-34" vertex="1" connectable="0">
+          <mxGeometry x="-0.7945" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-36" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0.586;entryY=0.998;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="usbhub" target="uut_interface" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="640" y="200" as="sourcePoint" />
+            <mxPoint x="690" y="150" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="690" y="803" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="H3IzjHBT9Q6uAZNhmDHZ-37" value="USB Serial Console" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="H3IzjHBT9Q6uAZNhmDHZ-36" vertex="1" connectable="0">
+          <mxGeometry x="-0.7284" y="2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="uut_interface" value="Pogo-Pins" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontStyle=1;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="520" y="160" width="290" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Sf-VtsORIFl4OTMnj8Zx-11" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.397;exitY=0.042;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" parent="1" source="Sf-VtsORIFl4OTMnj8Zx-10" edge="1" target="uut_interface">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="670" y="260" as="sourcePoint" />
+            <mxPoint x="720" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Sf-VtsORIFl4OTMnj8Zx-12" value="" style="shape=flexArrow;endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.527;exitY=-0.039;exitDx=0;exitDy=0;entryX=0.468;entryY=0.984;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;" parent="1" source="uut_interface" target="uut" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry">
+            <mxPoint x="570" y="230" as="sourcePoint" />
+            <mxPoint x="670" y="130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SnuABO6mpeWahow-l5n9-3" value="&lt;b&gt;Azure Cloud:&lt;/b&gt;&lt;div&gt;&lt;b&gt;- FW/SW updates&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;- Logs and Secrets&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;- Remote support&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;- AI future enhancements&lt;/b&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="570" y="990" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="SnuABO6mpeWahow-l5n9-11" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;ul style=&quot;flex-direction: column; display: flex;&quot;&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot; data-olk-copy-source=&quot;MailCompose&quot;&gt;Unified Engineering Technical Support Platform&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;Hardware-in-the-Loop (HIL) product validation and automation&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;M1 and ACM functional simulation and validation&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;Automated hardware, firmware, and software testing&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;Ethernet, Serial, USB, and PoE validation infrastructure&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;Firmware programming, provisioning, recovery, and regeneration&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;Failure analysis, diagnostics, and remote support&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;Cloud-connected updates, logs, secrets, and diagnostics&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;React-based operator interface&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;&lt;div role=&quot;presentation&quot;&gt;REST API automated test execution framework&lt;/div&gt;&lt;/li&gt;&lt;/ul&gt;&lt;div style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;ul style=&quot;flex-direction: column; display: flex;&quot;&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;End-to-end automated ACM ecosystem testing&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;OSDP reader simulation&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;Wiegand reader simulation&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;Reader power control&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;8 supervised input simulations&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;8 supervised output simulations&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;Door controller validation&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;Mercury controller validation&lt;/li&gt;&lt;li style=&quot;font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 11pt; align-self: start;&quot;&gt;I/O expansion board validation&lt;/li&gt;&lt;/ul&gt;&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="230" width="420" height="550" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

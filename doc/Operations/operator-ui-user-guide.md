@@ -2,7 +2,7 @@
 
 This guide covers normal operator use of the React-based M1 production test panel. It does not replace fixture loading, board handling, or site-specific safety procedures.
 
-![M1 Operator UI reference screen](pictures/ui.png)
+![M1 Operator UI reference screen](../Images/ui.png)
 
 ## Before You Start
 

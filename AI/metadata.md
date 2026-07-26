@@ -78,16 +78,16 @@ Mercury firmware Ethernet defaults observed on bench:
 
 ## Authoritative Design Docs
 
-- Fixture electrical and operation reference: `doc/design-doc/system-diagrams/mnplus-fixture-electrical-operation-diagram.md`.
+- Fixture electrical and operation reference: `doc/Architecture/Platform/Source-Diagrams/mnplus_design_review_v3.drawio`.
 - Use this diagram as the first reference for fixture box mechanics, primary/secondary power flow, back-panel interfaces, and PoE-to-UUT routing.
 
 ## Diagram Work Index
 
-- Primary artifact to continue: `doc/design-doc/system-diagrams/mnplus-fixture-electrical-operation-diagram.md`.
+- Primary artifact to continue: `doc/Architecture/Platform/Source-Diagrams/mnplus_design_review_v3.drawio`.
 - Mandatory context before editing or answering diagram questions:
 	- `AI/state.md` (see Diagram Continuation Contract)
 	- `AI/journal.md` (latest dated diagram entries)
-	- `doc/design-doc/system-diagrams/mnplus-fixture-electrical-operation-diagram.md` (current diagram content)
+	- `doc/Architecture/Platform/Source-Diagrams/mnplus_design_review_v3.drawio` (current diagram content)
 - Required output style for continuation work:
 	- Keep electrical and operation updates separated.
 	- Preserve explicit source-to-destination power and signal direction labels.

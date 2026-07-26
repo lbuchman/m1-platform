@@ -1,0 +1,9 @@
+
+The range for M-3200 and MNPlus Boards is
+
+OUI EUI-48 Address Block 58-FC-C8
+
+Range 00-00-00 through FF-FF-FF
+
+
+https://standards.ieee.org/products-programs/regauth/infocx/

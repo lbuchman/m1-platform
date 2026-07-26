@@ -60,14 +60,14 @@ Cross-PC portable restore is standardized through the root `AI/` folder:
 
 ## Critical Fixture Docs
 
-- Fixture electrical and operation baseline for mnplus UUT is documented in `doc/design-doc/system-diagrams/mnplus-fixture-electrical-operation-diagram.md`.
+- Fixture electrical and operation baseline for mnplus UUT is documented in `doc/Architecture/Platform/Source-Diagrams/mnplus_design_review_v3.drawio`.
 - When fixture mechanics, power path, PoE routing, pogo-pin contact, or bench operation sequence are discussed, treat that file as required source context.
 
 ## Diagram Continuation Contract
 
 Source of truth:
 
-- `doc/design-doc/system-diagrams/mnplus-fixture-electrical-operation-diagram.md`
+- `doc/Architecture/Platform/Source-Diagrams/mnplus_design_review_v3.drawio` (draw.io format; edit with draw.io desktop or diagrams.net)
 
 Currently confirmed scope (implemented in diagram):
 

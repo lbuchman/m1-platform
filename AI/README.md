@@ -26,7 +26,7 @@ At the start of a new AI session:
 3. Read `AI/metadata.md` for paths and repo structure.
 4. Read the latest entries in `AI/journal.md` for what changed recently.
 5. Read `AI/calibration.md` before making decisions that affect build, release, hardware, firmware, production, or recovery behavior.
-6. If the task involves fixture electrical/mechanical behavior, read `doc/design-doc/system-diagrams/mnplus-fixture-electrical-operation-diagram.md` before answering.
+6. If the task involves fixture electrical/mechanical behavior, read `doc/Architecture/Platform/Source-Diagrams/mnplus_design_review_v3.drawio` before answering.
 7. For diagram-continuation work, read `AI/state.md` section "Diagram Continuation Contract" and satisfy its "Not yet captured" list explicitly.
 
 For cross-PC AI-state transfer:
