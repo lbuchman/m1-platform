@@ -1,0 +1,10 @@
+Output: Pick and Place files
+Type  : Pick Place
+From  : Variant [[No Variations]] of PCB Document [M1-Test-Board.PcbDoc]
+   Generated File[Pick and Place files.csv]
+
+
+Files Generated   : 1
+Documents Printed : 0
+
+Finished Output Generation At 12:12:22 PM On 2/15/2023

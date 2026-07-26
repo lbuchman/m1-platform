@@ -1,0 +1,4 @@
+"Net","Name","X Coord","Y Coord","Side","Hole Size","Type"
+"NetDS5_2","J8-1","3825mil","1425mil","Bottom","40mil","Through hole"
+"NetBUZ1_2","BUZ1-2","757.271mil","3195.79mil","Bottom","40mil","Through hole"
+"+5V","BUZ1-1","757.271mil","3495mil","Bottom","40mil","Through hole"

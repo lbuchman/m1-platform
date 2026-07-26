@@ -1,0 +1,8 @@
+"Net","Name","X Coord","Y Coord","Side","Hole Size","Type"
+"NetJ1_4","J1-4","175mil","975mil","Bottom","40mil","Through hole"
+"GND","J1-3","175mil","875mil","Bottom","40mil","Through hole"
+"GND","J1-2","175mil","775mil","Bottom","40mil","Through hole"
+"NetJ1_1","J1-1","175mil","675mil","Bottom","40mil","Through hole"
+"NetDS5_1","J8-1","3830mil","730mil","Bottom","40mil","Through hole"
+"NetBUZ1_2","BUZ1-2","757.271mil","3195.79mil","Bottom","40mil","Through hole"
+"+5V","BUZ1-1","757.271mil","3495mil","Bottom","40mil","Through hole"
