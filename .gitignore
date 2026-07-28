@@ -12,3 +12,7 @@ stage/
 setup_deploy.tar
 setup_deploy.tar.gz
 
+# Local setup archives (too large for GitHub)
+setup/STMicroelectronics.txz
+setup/fixture_m1mtf_base.txz
+

@@ -6,7 +6,6 @@ Intended GitHub path:
 
 ```text
 git@github.com:lbuchman/m1-platform.git
-https://github.com/lbuchman/m1-platform
 ```
 
 The root repository does not replace the component repositories. It documents and organizes them so the full platform can be cloned, set up, released, and recovered as one system.
