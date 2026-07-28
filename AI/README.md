@@ -1,4 +1,4 @@
-V# AI Notes
+# AI Notes
 
 This directory stores repo-owned AI context for the M1 platform. Use these files to continue work across machines, models, and sessions without rediscovering platform facts.
 

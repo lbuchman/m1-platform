@@ -113,11 +113,11 @@ extract_stm32_fw_revision() {
 build_mercury() {
     if [[ ! -f "${MERCURY_DIR}/platformio.ini" ]]; then
         log "Missing Mercury PlatformIO project: ${MERCURY_DIR}"
-        exit 1
+        return 1
     fi
     if ! command -v pio >/dev/null 2>&1; then
         log "PlatformIO CLI 'pio' is required but was not found in PATH"
-        exit 1
+        return 1
     fi
 
     local commit
@@ -134,7 +134,7 @@ build_mercury() {
     if [[ "${DRY_RUN}" -eq 0 ]]; then
         if [[ ! -f "${firmware_hex}" ]]; then
             log "No Mercury firmware artifact found after build: ${firmware_hex}"
-            exit 1
+            return 1
         fi
         copy_artifact "${MERCURY_COMPONENT}" "${firmware_hex}" "${commit}" "${dirty}"
     fi
@@ -143,7 +143,7 @@ build_mercury() {
 build_fixture() {
     if [[ ! -f "${FIXTURE_DIR}/CMakeLists.txt" || ! -f "${FIXTURE_TOOLCHAIN_FILE}" ]]; then
         log "Missing fixture Teensy project: ${FIXTURE_DIR}"
-        exit 1
+        return 1
     fi
 
     local commit
@@ -163,7 +163,7 @@ build_fixture() {
         cmake --build "${FIXTURE_DIR}/build" -j"$(nproc)"
         if [[ ! -f "${fixture_hex}" ]]; then
             log "No fixture firmware artifact found after build: ${fixture_hex}"
-            exit 1
+            return 1
         fi
         copy_artifact "${FIXTURE_COMPONENT}" "${fixture_hex}" "${commit}" "${dirty}"
     fi
@@ -172,7 +172,7 @@ build_fixture() {
 build_stm32() {
     if [[ ! -f "${STM32_DIR}/env.sh" || ! -f "${STM32_DIR}/Makefile" ]]; then
         log "Missing STM32MP1 bare-metal project: ${STM32_DIR}"
-        exit 1
+        return 1
     fi
 
     local commit
@@ -202,7 +202,7 @@ build_stm32() {
         )
         if [[ ! -f "${firmware_stm32}" ]]; then
             log "No STM32 FSBL artifact found after build: ${firmware_stm32}"
-            exit 1
+            return 1
         fi
         printf '%s\n' "${fw_revision}" > "${fw_revision_file}"
         log "revision file: ${fw_revision_file}"
@@ -325,9 +325,21 @@ case "${COMMAND}" in
                 build_stm32
                 ;;
             all)
-                build_mercury
-                build_fixture
-                build_stm32
+                build_all_failed=0
+                if ! build_mercury; then
+                    build_all_failed=1
+                fi
+                if ! build_fixture; then
+                    build_all_failed=1
+                fi
+                if ! build_stm32; then
+                    build_all_failed=1
+                fi
+                if [[ "${build_all_failed}" -eq 1 ]]; then
+                    log ""
+                    log "One or more firmware builds failed."
+                    exit 1
+                fi
                 ;;
             *)
                 log "Unknown build target: ${TARGET}"

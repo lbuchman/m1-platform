@@ -15,6 +15,7 @@ CLEAN=0
 DRY_RUN=0
 ONLY=""
 ARTIFACT_DIR="${ROOT_DIR}/artifacts/snaps/$(date +%Y%m%d-%H%M%S)"
+FAILED_COMPONENTS=()
 
 usage() {
     cat <<'EOF'
@@ -128,7 +129,10 @@ build_component() {
         run_in_dir "${dir}" snapcraft clean
     fi
 
-    run_in_dir "${dir}" snapcraft pack
+    if ! run_in_dir "${dir}" snapcraft pack; then
+        log "snapcraft pack failed for ${component}"
+        return 1
+    fi
 
     if [[ "${DRY_RUN}" -eq 1 ]]; then
         return 0
@@ -209,11 +213,18 @@ for component in "${COMPONENTS[@]}"; do
     if [[ -n "${ONLY}" && "${component}" != "${ONLY}" ]]; then
         continue
     fi
-    build_component "${component}"
+    if ! build_component "${component}"; then
+        FAILED_COMPONENTS+=("${component}")
+    fi
 done
 
 log ""
 log "Done."
 if [[ "${DRY_RUN}" -eq 0 ]]; then
     log "Artifacts: ${ARTIFACT_DIR}"
+fi
+
+if [[ "${#FAILED_COMPONENTS[@]}" -gt 0 ]]; then
+    log "Failed components: ${FAILED_COMPONENTS[*]}"
+    exit 1
 fi
