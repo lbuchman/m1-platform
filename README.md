@@ -11,6 +11,42 @@ https://github.com/lbuchman/m1-platform
 
 The root repository does not replace the component repositories. It documents and organizes them so the full platform can be cloned, set up, released, and recovered as one system.
 
+## Deployment Guide
+
+See [DEPLOY.md](DEPLOY.md) for fixture deployment instructions, required inputs, examples, and troubleshooting.
+
+## Unified Engineering Technical Support Platform
+
+- Hardware-in-the-Loop (HIL) product validation and automation
+- M1 and ACM functional simulation and validation
+- Automated hardware, firmware, and software testing
+- Ethernet, Serial, USB, and PoE validation infrastructure
+- Firmware programming, provisioning, recovery, and regeneration
+- Failure analysis, diagnostics, and remote support
+- Cloud-connected updates, logs, secrets, and diagnostics
+- React-based operator interface
+- REST API automated test execution framework
+- OSDP reader simulation
+- Wiegand reader simulation
+- Reader power control
+- 8 supervised input simulations
+- 8 supervised output simulations
+- Door controller validation
+- Mercury controller validation
+- I/O expansion board validation
+- End-to-end automated Mercury ecosystem testing
+
+## Validation Capability Progression
+
+Reusable Validation Platform
+	-> Cycle Time Optimization
+	-> Structured Measurement Collection
+	-> Traceability and Data Retention
+	-> Fixture Normalization
+	-> Statistical Process Monitoring
+	-> Anomaly Detection
+	-> AI-Assisted Validation
+
 ## Bootstrap Components
 
 After cloning the platform root, populate `components/` with split repositories:
@@ -19,11 +55,10 @@ After cloning the platform root, populate `components/` with split repositories:
 ./scripts/clone-components.sh
 ```
 
-Use `--https` when SSH keys are not configured, and `--update` to fast-forward
+Cloning uses SSH git URLs (`git@github.com:...`). Use `--update` to fast-forward
 existing component clones:
 
 ```bash
-./scripts/clone-components.sh --https
 ./scripts/clone-components.sh --update
 ```
 

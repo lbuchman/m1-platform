@@ -53,7 +53,7 @@ The ICT SRAM image is normally:
   "fwDir": "stm32mp15-lenels2-mnp",
   "layoutFilePath": "flashlayout_st-ls2m1c-image-core/optee/FlashLayout_emmc_stm32mp151f-ls2m1c-optee.tsv",
   "mtfDir": "/var/m1mtf",
-  "programmingCommand": "/home/lenel/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI"
+  "programmingCommand": "/opt/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI"
 }
 ```
 
@@ -78,7 +78,7 @@ sudoedit /etc/m1platform/config.json
 sudo jq -e . /etc/m1platform/config.json >/dev/null
 sudo jq -e '{mtfDir, programmingCommand}' /etc/m1platform/config.json
 sudo test -r /var/m1mtf/fsbl.stm32
-sudo test -x /home/lenel/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI
+sudo test -x /opt/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI
 ```
 
 ## calibration.json
@@ -172,3 +172,42 @@ Executing ICT command /var/m1mtf/fsbl.stm32 ...
 ```
 
 A DFU timeout after this message is a fixture/boot-mode/programmer issue. If the log instead shows `/root/m1mtf/...`, `mtfDir` was not loaded from `/etc/m1platform/config.json`.
+
+## MAC Address Allocation
+
+The M1-3200 and MNPlus test fixtures share OUI EUI-48 block `58-FC-C8`.
+Each fixture station is assigned a dedicated 1,000,000-address block,
+starting at the base MAC below (the station's `STARTMAC`, see
+`setup/setup.sh` usage), to avoid UID collisions between stations.
+
+### M1-3200 Fixtures
+
+| Station    | Base MAC              |
+|------------|------------------------|
+| m1-3200-1  | 58:FC:C8:00:00:00      |
+| m1-3200-2  | 58:FC:C8:0F:42:40      |
+| m1-3200-3  | 58:FC:C8:1E:84:80      |
+| m1-3200-4  | 58:FC:C8:2D:C6:C0      |
+| m1-3200-5  | 58:FC:C8:3D:09:00      |
+| m1-3200-6  | 58:FC:C8:4C:4B:40      |
+| m1-3200-7  | 58:FC:C8:5B:8D:80      |
+| m1-3200-8  | 58:FC:C8:6A:CF:C0      |
+
+### MNPlus Fixtures
+
+| Station    | Base MAC              |
+|------------|------------------------|
+| mnplus-1   | 58:FC:C8:7A:12:00      |
+| mnplus-2   | 58:FC:C8:89:54:40      |
+| mnplus-3   | 58:FC:C8:98:96:80      |
+| mnplus-4   | 58:FC:C8:A7:D8:C0      |
+| mnplus-5   | 58:FC:C8:B7:1B:00      |
+| mnplus-6   | 58:FC:C8:C6:5D:40      |
+| mnplus-7   | 58:FC:C8:D5:9F:80      |
+| mnplus-8   | 58:FC:C8:E4:E1:C0      |
+
+> Verified `mnptestf5` UID base is `58:FC:C8:A7:D8:C0`, which falls in
+> the `mnplus-4` slot above — hostname numbers may not map 1:1 to slot
+> numbers. Confirm actual per-station assignments before relying on
+> this table for provisioning new fixtures.
+

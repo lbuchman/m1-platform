@@ -3,7 +3,12 @@ artifacts/
 
 # Snapcraft generated artifacts
 *.snap
+!setup/snaps/*.snap
 parts/
 prime/
 stage/
+
+# Deploy temporary artifacts
+setup_deploy.tar
+setup_deploy.tar.gz
 

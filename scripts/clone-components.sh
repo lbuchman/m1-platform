@@ -4,26 +4,21 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 COMPONENTS_DIR="${ROOT_DIR}/components"
-CLONE_MODE="ssh"
 DO_UPDATE=0
 FAILED_COMPONENTS=()
 
 usage() {
     cat <<'EOF'
-Usage: scripts/clone-components.sh [options] [git|http]
+Usage: scripts/clone-components.sh [options]
 
-Clone all split component repositories into components/.
+Clone all split component repositories into components/ using SSH git URLs.
 
 Options:
-    git, --ssh     Use SSH clone URLs (default, auto-fallback to HTTPS on failure)
-    http, --https  Use HTTPS clone URLs
   --update     Fast-forward pull existing component repos
   -h, --help   Show this help
 
 Examples:
   ./scripts/clone-components.sh
-  ./scripts/clone-components.sh http
-  ./scripts/clone-components.sh --https
   ./scripts/clone-components.sh --update
 EOF
 }
@@ -34,16 +29,8 @@ log() {
 
 clone_or_update_component() {
     local name="$1"
-    local ssh_url="$2"
-    local https_url="$3"
-    local repo_url
+    local repo_url="$2"
     local target_dir="${COMPONENTS_DIR}/${name}"
-
-    if [[ "${CLONE_MODE}" == "https" ]]; then
-        repo_url="${https_url}"
-    else
-        repo_url="${ssh_url}"
-    fi
 
     if [[ -d "${target_dir}/.git" ]]; then
         log "exists: ${target_dir}"
@@ -59,21 +46,6 @@ clone_or_update_component() {
         return
     fi
 
-    if [[ "${CLONE_MODE}" == "ssh" ]]; then
-        log "+ git clone ${repo_url} ${target_dir}"
-        if git clone "${repo_url}" "${target_dir}"; then
-            return
-        fi
-        log "SSH clone failed for ${name}; retrying with HTTPS"
-        log "+ git clone ${https_url} ${target_dir}"
-        if git clone "${https_url}" "${target_dir}"; then
-            return
-        fi
-        log "failed: ${name} (SSH and HTTPS clone failed)"
-        FAILED_COMPONENTS+=("${name}")
-        return
-    fi
-
     log "+ git clone ${repo_url} ${target_dir}"
     if git clone "${repo_url}" "${target_dir}"; then
         return
@@ -84,14 +56,6 @@ clone_or_update_component() {
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --https|http)
-            CLONE_MODE="https"
-            shift
-            ;;
-        --ssh|git)
-            CLONE_MODE="ssh"
-            shift
-            ;;
         --update)
             DO_UPDATE=1
             shift
@@ -110,37 +74,21 @@ done
 
 mkdir -p "${COMPONENTS_DIR}"
 
-clone_or_update_component "m1tfc" \
-    "git@github.com:lbuchman/m1tfc.git" \
-    "https://github.com/lbuchman/m1tfc.git"
+clone_or_update_component "m1tfc" "git@github.com:lbuchman/m1tfc.git"
 
-clone_or_update_component "m1testBoardFw" \
-    "git@github.com:lbuchman/m1testBoardFw.git" \
-    "https://github.com/lbuchman/m1testBoardFw.git"
+clone_or_update_component "m1testBoardFw" "git@github.com:lbuchman/m1testBoardFw.git"
 
-clone_or_update_component "mercury-testboard-fw" \
-    "git@github.com:lbuchman/mercury-testboard-fw.git" \
-    "https://github.com/lbuchman/mercury-testboard-fw.git"
+clone_or_update_component "mercury-testboard-fw" "git@github.com:lbuchman/mercury-testboard-fw.git"
 
-clone_or_update_component "stm32mp1-baremetal" \
-    "git@github.com:lbuchman/stm32mp1-baremetal.git" \
-    "https://github.com/lbuchman/stm32mp1-baremetal.git"
+clone_or_update_component "stm32mp1-baremetal" "git@github.com:lbuchman/stm32mp1-baremetal.git"
 
-clone_or_update_component "m1-rest-server" \
-    "git@github.com:lbuchman/m1-rest-server.git" \
-    "https://github.com/lbuchman/m1-rest-server.git"
+clone_or_update_component "m1-rest-server" "git@github.com:lbuchman/m1-rest-server.git"
 
-clone_or_update_component "m1-operator-ui" \
-    "git@github.com:lbuchman/m1-operator-ui.git" \
-    "https://github.com/lbuchman/m1-operator-ui.git"
+clone_or_update_component "m1-operator-ui" "git@github.com:lbuchman/m1-operator-ui.git"
 
-clone_or_update_component "tfcroncli" \
-    "git@github.com:lbuchman/tfcroncli.git" \
-    "https://github.com/lbuchman/tfcroncli.git"
+clone_or_update_component "tfcroncli" "git@github.com:lbuchman/tfcroncli.git"
 
-clone_or_update_component "m1-cloud-client" \
-    "git@github.com:lbuchman/m1-cloud-client.git" \
-    "https://github.com/lbuchman/m1-cloud-client.git"
+clone_or_update_component "m1-cloud-client" "git@github.com:lbuchman/m1-cloud-client.git"
 
 if [[ "${#FAILED_COMPONENTS[@]}" -gt 0 ]]; then
     log ""
