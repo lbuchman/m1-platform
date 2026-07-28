@@ -22,7 +22,7 @@ Snap software components:
 Firmware components:
 
 - M1 fixture Teensy firmware
-- M1 test board firmware (`components/m1testBoardFw`): CMake-based flow is known working. A PlatformIO Teensy 4.1 environment now exists in `platformio.ini` and preserves existing source layout (`system/`, `libs/`) and core compile-time defines. CMake build files remain intact for A/B comparison and rollback. PlatformIO config no longer references a host-specific Arduino library path.
+- M1 test board firmware (`components/m1testBoardFw`): CMake-based flow is known working. A PlatformIO Teensy 4.1 environment exists in `platformio.ini` and preserves existing source layout (`system/`, `libs/`) and core compile-time defines. CMake build files remain intact for A/B comparison and rollback. PlatformIO config no longer references a host-specific Arduino library path. Repo has a single branch, `main`, on `origin` (the former `master`, which held the real history, was force-merged onto `main` and deleted; the old stale single-commit `main` was discarded).
 - Mercury test board firmware: converted to a PlatformIO Teensy 4.1 Arduino project using `redDiamondsFixture/teensy` as the reference skeleton. Mercury-specific Ethernet, TCP terminal, UDP terminal, NTP, persistent config, and LED status support are restored in the PlatformIO project.
 - STM32MP1 bare-metal ICT firmware: target-side firmware used while SDRAM is under test. Linux must not run during this ICT path because it initializes and uses the test subject.
 - The STM32MP1 production FSBL builds from the component root `Makefile`; active source is in `src/`, headers/configuration in `include/`, vendor code in `third-party/`, and image tooling in `tools/`. It produces `build/fsbl.stm32` for bare-metal DDR/SDRAM ICT. A clean root build using the pinned Arm GNU toolchain passed on 2026-07-19 after restoring the historically renamed `STRIKE2_KICKER_POWER` symbol to its prior `GPIO::H` pin `3` assignment.
@@ -126,6 +126,7 @@ Important fact: `tfcroncli` uses `better-sqlite3` in `app/src/secrets.js`; SQLit
 - Root platform commit `160b07b` and REST server commit `a5459e7` are pushed to `origin/main`.
 - STM32MP1 ICT firmware is published in the private `lbuchman/stm32mp1-baremetal` repository; its archive-backed `main` branch is the default. Historical remote branches remain preserved.
 - M1TFC commit `70e221c`, Operator UI commit `64916a4`, and tfcroncli commit `543ac5b` exist locally. Those component repositories currently have no configured remote or upstream.
+- `m1testBoardFw` PlatformIO conversion (`platformio.ini`, `README.platformio.md`) is committed and pushed to `origin/main`. The former `master` branch (which held this history) was force-pushed onto `main` and then deleted on `origin`; the repo now has a single branch, `main`, matching the local `components/m1testBoardFw` clone.
 
 ## Current Target
 

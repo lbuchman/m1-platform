@@ -102,6 +102,16 @@ This file records concise work history for AI-assisted platform work. Keep entri
 	- Updated `doc/README.md` with the full current repository layout.
 - Updated stale `AI/README.md`, `AI/state.md`, and `AI/metadata.md` references from the deleted `doc/design-doc/system-diagrams/mnplus-fixture-electrical-operation-diagram.md` to the current `doc/Architecture/Platform/Source-Diagrams/mnplus_design_review_v3.drawio`.
 
+## 2026-07-28
+
+- Fixed `scripts/build-snaps.sh`: the build loop previously aborted the entire run (via `set -e`) the moment one component was missing `snap/snapcraft.yaml`; it now continues past a failed/missing component, tracks failures, and exits non-zero with a summary only after attempting all components. Hardened the `snapcraft pack` step to fail explicitly instead of risking a stale `.snap` being copied as a fresh artifact.
+- Fixed `scripts/build_fw.sh`: `build all` previously used `exit 1` inside `build_mercury`/`build_fixture`/`build_stm32`, so the first failing target (e.g. missing `pio`) stopped the whole run before other targets were attempted; functions now `return` instead of `exit`, and `all` attempts every target before failing.
+- Removed unused `scripts/install-snaps.sh` (no references elsewhere in the repo). Root repo pushed to `origin/main` at commit `a4c26db`.
+- Root-caused `clone-components.sh` reporting "Repository not found" for every missing component: `~/.ssh/config`'s `github.com` entry was pinned to `~/.ssh/id_rsa`, which GitHub had registered under a separate enterprise-managed account (`Leo-Buchman_HON`), not the `lbuchman` account that owns these repos. Corrected the `IdentityFile` to `~/.ssh/id_github`, which authenticates as `lbuchman`; all 8 components now clone successfully.
+- Added a global git rewrite (`git config --global url."git@github.com:".insteadOf "https://github.com/"`) so HTTPS GitHub clone URLs (including those PlatformIO's Library Manager uses for `lib_deps` in `components/mercury-testboard-fw/platformio.ini`) transparently use the working SSH identity instead of the broken Windows git-credential-manager path. Verified `scripts/build_fw.sh build mercury` now completes successfully end to end.
+- Corrected a prior journal/state inaccuracy: `components/m1testBoardFw`'s PlatformIO conversion (`platformio.ini`, `README.platformio.md`) was never lost, but it is committed and pushed only to the component's `master` branch on `origin`; GitHub's default branch for that repo is still misconfigured to `main` (a stale single-commit branch), so plain clones and `clone-components.sh` were checking out the wrong branch. Local `components/m1testBoardFw` clone switched to track `origin/master`. GitHub default branch setting still needs to be corrected upstream (requires repo Settings access, not just SSH).
+- Consolidated `lbuchman/m1testBoardFw` to a single branch: force-pushed `origin/master` (the real history, including the PlatformIO conversion) onto `main`, then deleted `origin/master`. Local clone reset to track `origin/main`; repo now has one branch matching remote default.
+
 ## Next Work
 
 - Validate the newly built STM32MP1 FSBL on the fixture target, including DDR/SDRAM ICT behavior.
