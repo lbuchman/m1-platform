@@ -52,17 +52,23 @@ get_snap() {
     local target_name="$2"
     local component="$3"
 
-    # 1. Look in setup/snaps/ (Checked-in artifacts)
-    local latest=$(ls -t setup/snaps/"$pattern"*.snap 2>/dev/null | head -n 1)
-    
-    # 2. Look in artifacts/ (Local build output)
-    if [ -z "$latest" ]; then
-        latest=$(ls -t artifacts/snaps/*/"$pattern"*.snap 2>/dev/null | head -n 1)
+    # 1. Look in setup/snaps/ (Checked-in artifacts) - exact filename match,
+    #    since these are already named to match target_name.
+    local latest=""
+    if [ -f "setup/snaps/$target_name" ]; then
+        latest="setup/snaps/$target_name"
     fi
 
-    # 3. Look in component dir
+    # 2. Look in artifacts/ (Local build output). Require '_' immediately
+    #    after the pattern so e.g. pattern "m1tfc" cannot match
+    #    "m1tfc-rest-server_0.1.0_amd64.snap".
     if [ -z "$latest" ]; then
-        latest=$(ls -t components/"$component"/"$pattern"*.snap 2>/dev/null | head -n 1)
+        latest=$(ls -t artifacts/snaps/*/"$pattern"_*.snap 2>/dev/null | head -n 1)
+    fi
+
+    # 3. Look in component dir (same boundary rule as above)
+    if [ -z "$latest" ]; then
+        latest=$(ls -t components/"$component"/"$pattern"_*.snap 2>/dev/null | head -n 1)
     fi
 
     if [ -f "$latest" ]; then
@@ -77,14 +83,22 @@ get_snap() {
 # m1client comes from tfcroncli
 get_snap "m1client" "m1client.snap" "tfcroncli" || echo "Warning: m1client snap missing"
 
-# m1tfd1 comes from m1tfd1 or m1tfc (aliased to m1tfc pattern)
-get_snap "m1tfd1" "m1tfd1.snap" "m1tfc" || get_snap "m1tfc" "m1tfd1.snap" "m1tfc" || echo "Warning: m1tfd1 snap missing"
+# m1tfc is the CLI/board-programming snap
+get_snap "m1tfc" "m1tfc.snap" "m1tfc" || echo "Warning: m1tfc snap missing"
+
+# m1tfc-rest-server comes from m1-rest-server
+get_snap "m1tfc-rest-server" "m1tfc-rest-server.snap" "m1-rest-server" || echo "Warning: m1tfc-rest-server snap missing"
+
+# gui-react comes from m1-operator-ui
+get_snap "gui-react" "gui-react.snap" "m1-operator-ui" || echo "Warning: gui-react snap missing"
 
 # Check if they reached the temp dir
-if [ ! -f "$TEMP_DEPLOY/m1client.snap" ] || [ ! -f "$TEMP_DEPLOY/m1tfd1.snap" ]; then
-    echo "Error: Required snaps (m1client, m1tfd1) could not be found or built."
-    exit 1
-fi
+for required_snap in m1client.snap m1tfc.snap m1tfc-rest-server.snap gui-react.snap; do
+    if [ ! -f "$TEMP_DEPLOY/$required_snap" ]; then
+        echo "Error: Required snap $required_snap could not be found or built."
+        exit 1
+    fi
+done
 
 ARCHIVE_PATH="$(mktemp -p "$SCRIPT_DIR" setup_deploy.XXXXXX.tar)"
 ARCHIVE_NAME="$(basename "$ARCHIVE_PATH")"
@@ -106,12 +120,13 @@ ARCHIVE_PATH=""
 
 echo "--- Step 3: Executing remote setup ---"
 ssh $SSH_OPTS lenel@$IP "
+    cleanup_remote() { rm -rf /home/lenel/setup_tmp '$REMOTE_ARCHIVE'; }
+    trap cleanup_remote EXIT
     set -e
-    mkdir -p /home/lenel/setup_tmp && 
-    cd /home/lenel/setup_tmp && 
+    mkdir -p /home/lenel/setup_tmp &&
+    cd /home/lenel/setup_tmp &&
     tar -xf '$REMOTE_ARCHIVE' && 
-    echo 'lenel' | sudo -S ./setup.sh $TYPE $NUM && 
-    rm -rf /home/lenel/setup_tmp '$REMOTE_ARCHIVE'
+    echo 'lenel' | sudo -S ./setup.sh $TYPE $NUM
 "
 
 echo "--- Step 5: Cleanup ---"

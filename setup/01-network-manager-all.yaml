@@ -1,18 +1,16 @@
-# Let NetworkManager manage all devices on this system
+# Ubuntu Server default backend is systemd-networkd (NetworkManager is not
+# installed by default on Server images, only on Desktop).
+# NOTE: this is a template. setup.sh auto-detects the real interface names on
+# the target machine (they vary between PCs) via `ip link` and substitutes
+# them in place of the __..._IF__ placeholders below before installing this
+# file to /etc/netplan.
 network:
   version: 2
-  renderer: NetworkManager
+  renderer: networkd
   ethernets:
-    enp0s31f6:
+    __ETH_DHCP_IF__:
       dhcp4: yes
-    enp1s0:
+    __ETH_STATIC_IF__:
       dhcp4: no
       optional: true
       addresses: [192.168.0.100/24]
-  wifis:
-    wlp1s0:
-      dhcp4: yes
-      dhcp6: no 
-      access-points:
-        "lenel5g":
-           password: "only4u2c"

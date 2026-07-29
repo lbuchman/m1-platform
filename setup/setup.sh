@@ -6,10 +6,10 @@ FIXTURE_NUM=$2   # e.g. 1, 2, 3..
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 cd "$SCRIPT_DIR"
 
-# Interface names may not match
+# Interface names vary between PCs; setup.sh auto-detects the real names via
+# `ip link` and substitutes them into the netplan template (see
+# 01-network-manager-all.yaml) instead of hardcoding them.
 # Mate disable screen timeout
-# sshd no password login
-# Interface names may not match so mkake sure netplan names are correct
 # sshd no password login
 # verify autossh service has correct port
 # disable power mng in the control centre
@@ -24,17 +24,48 @@ if [ -z "$TYPE" ] || [ -z "$FIXTURE_NUM" ]; then
    exit 1
 fi
 
+# Auto-detect real wired ethernet interface names on this machine (order-
+# matched to `ip link`, since names like enp0s31f6/enp1s0 vary by PC). First
+# wired interface found -> DHCP uplink, second wired interface found ->
+# static-IP test-fixture interface (also used as tfInterface below).
+ETH_DHCP_IF=""
+ETH_STATIC_IF=""
+for ifc in $(ip -o link show | awk -F': ' '{print $2}'); do
+    ifc=${ifc%%@*}
+    case "$ifc" in
+        lo|docker*|veth*|virbr*|br-*|wl*) continue ;;
+    esac
+    [ -d "/sys/class/net/$ifc/wireless" ] && continue
+    if [ -z "$ETH_DHCP_IF" ]; then
+        ETH_DHCP_IF="$ifc"
+    elif [ -z "$ETH_STATIC_IF" ]; then
+        ETH_STATIC_IF="$ifc"
+    fi
+done
+
+if [ -z "$ETH_DHCP_IF" ] || [ -z "$ETH_STATIC_IF" ]; then
+    echo "ERROR: could not detect two wired ethernet interfaces (found: ETH_DHCP_IF=$ETH_DHCP_IF ETH_STATIC_IF=$ETH_STATIC_IF)"
+    exit 1
+fi
+echo "Detected interfaces: dhcp-uplink=$ETH_DHCP_IF static-fixture=$ETH_STATIC_IF"
+
 # Calculate parameters based on type and fixture number
 if [ "$TYPE" = "m1" ]; then
     SSHPORT=$((20010 + FIXTURE_NUM))
     HOSTNAME="m1testf${FIXTURE_NUM}"
     TESTSTATION="p${FIXTURE_NUM}"
     idx=$((FIXTURE_NUM - 1))
+    PRODUCTNAME="m1-3200"
+    FWDIR="stm32mp15-lenels2-m1"
+    LAYOUTFILEPATH="flashlayout_st-ls2m1-image-core/optee/FlashLayout_emmc_stm32mp151f-ls2m1-optee.tsv"
 elif [ "$TYPE" = "mnp" ]; then
     SSHPORT=$((20020 + FIXTURE_NUM))
     HOSTNAME="mnptestf${FIXTURE_NUM}"
     TESTSTATION="s${FIXTURE_NUM}"
     idx=$((8 + FIXTURE_NUM - 1))
+    PRODUCTNAME="mnplus"
+    FWDIR="stm32mp15-lenels2-mnp"
+    LAYOUTFILEPATH="flashlayout_st-ls2m1c-image-core/optee/FlashLayout_emmc_stm32mp151f-ls2m1c-optee.tsv"
 else
     echo "Invalid type: $TYPE. Use 'm1' or 'mnp'."
     usage
@@ -47,7 +78,6 @@ STARTMAC=$(printf "58:FC:C8:%02X:%02X:%02X" $(( (offset >> 16) & 0xFF )) $(( (of
 
 echo "Config: TYPE=$TYPE FIXTURE=$FIXTURE_NUM SSHPORT=$SSHPORT HOSTNAME=$HOSTNAME TESTSTATION=$TESTSTATION STARTMAC=$STARTMAC"
 
-mkdir -p /var/m1mtf
 sudo DEBIAN_FRONTEND=noninteractive apt-get update -y
 sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y net-tools openssh-server
@@ -88,9 +118,17 @@ cp -f "$SCRIPT_DIR"/cloud.key "$SCRIPT_DIR"/id_rsa "$SCRIPT_DIR"/authorized_keys
 sudo chown lenel: .* -R /home/lenel/.ssh
 chmod 700 /home/lenel/.ssh
 sudo usermod -a -G dialout lenel
+
+# Passwordless sudo for lenel (fixture automation runs many unattended sudo commands)
+echo 'lenel ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/lenel-nopasswd > /dev/null
+sudo chmod 0440 /etc/sudoers.d/lenel-nopasswd
+sudo visudo -c
+
 sudo tar -xJf "$SCRIPT_DIR"/STMicroelectronics.txz -C /opt
 rm -f /etc/netplan/*
-cp -f "$SCRIPT_DIR"/01-network-manager-all.yaml /etc/netplan
+sed -e "s/__ETH_DHCP_IF__/$ETH_DHCP_IF/" \
+    -e "s/__ETH_STATIC_IF__/$ETH_STATIC_IF/" \
+    "$SCRIPT_DIR"/01-network-manager-all.yaml > /etc/netplan/01-network-manager-all.yaml
 sudo chown root:root /etc/netplan/01-network-manager-all.yaml
 sudo chmod 600 /etc/netplan/01-network-manager-all.yaml
 cp -f "$SCRIPT_DIR"/autossh.service /lib/systemd/system
@@ -99,7 +137,8 @@ sed -i 's/20007/'"${SSHPORT}"'/'  /lib/systemd/system/autossh.service
 
 # Initialize /var/m1mtf from base archive and set station UID
 mkdir -p /var/m1mtf
-sudo tar -xJf "$SCRIPT_DIR"/fixture_m1mtf_base.txz -C /var
+sudo tar -xzf "$SCRIPT_DIR"/fixture_m1mtf_base.tgz -C /var
+rm -rf /var/m1mtf/logs/* /var/m1mtf/m1cli/* /var/m1mtf/backup/*
 sqlite3 /var/m1mtf/tf.db << SQL
 CREATE TABLE IF NOT EXISTS records ( 
   vendorSerial TEXT PRIMARY KEY,
@@ -144,7 +183,9 @@ echo "10  4  * * *   root find /var/m1mtf/logs -type d -mtime +365 -delete" >> /
 echo "10  4  * * *   root find /var/m1mtf/m1cli -type f -mtime +365 -delete" >> /etc/crontab
 
 snap install --classic --dangerous  m1client.snap 
-snap install --classic --dangerous  m1tfd1.snap
+snap install --classic --dangerous  m1tfc.snap
+snap install --classic --dangerous  m1tfc-rest-server.snap
+snap install --dangerous  gui-react.snap
 
 # Install configs to system-wide location /etc/m1platform
 sudo mkdir -p /etc/m1platform
@@ -153,15 +194,15 @@ sudo mkdir -p /etc/m1platform
 cat << EOF > /etc/m1platform/config.json
 {
   "conString": "DefaultEndpointsProtocol=https;AccountName=lenels2boardsprodsa;AccountKey=b9gso5tT+rbbfQLSUd68Bw5AtTGCdHrQRdMAdWowWNaRfxd9Li51LfTc7dhYP+ptu0Cox6GTk9kN+ASt5dI6rw==;EndpointSuffix=core.windows.net",
-  "tfInterface": "enp1s0",
+  "tfInterface": "${ETH_STATIC_IF}",
   "vendorSite": "${TESTSTATION}",
   "skipBatteryTest": false,
   "skipTestpointCheck": false,
   "skipRS485test": false,
-  "productName": "${TYPE}plus",
+  "productName": "${PRODUCTNAME}",
   "forceEppromOverwrite": false,
-  "fwDir": "stm32mp15-lenels2-mnp",
-  "layoutFilePath": "flashlayout_st-ls2m1c-image-core/optee/FlashLayout_emmc_stm32mp151f-ls2m1c-optee.tsv",
+  "fwDir": "${FWDIR}",
+  "layoutFilePath": "${LAYOUTFILEPATH}",
   "productionPassword": "1221",
   "debugPassword": "3443",
   "mtfDir": "/var/m1mtf",
@@ -185,20 +226,16 @@ cat << EOF > /etc/m1platform/calibration.json
       "coinCellBattery": {
         "name": "BatCellBat",
         "minVoltageNew": 3.0,
-        "minVoltageUsed": 2.9
+        "minVoltageAged": 2.9,
+        "scale": 1
       }
     }
   ]
 }
 EOF
 
+cp "$SCRIPT_DIR"/public.key /etc/m1platform/
 sudo chown lenel: -R /etc/m1platform
-
-# Also copy to snap writable area for the UI/REST server
-cp /etc/m1platform/config.json /etc/m1platform/calibration.json /var/snap/m1tfd1/current/
-cp "$SCRIPT_DIR"/public.key /var/snap/m1tfd1/current/
-
-sed -i 's/20007/'"${SSHPORT}"'/'  /var/snap/m1tfd1/current/config.json
 
 #### $TESTSTATION
 
