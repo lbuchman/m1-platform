@@ -13,7 +13,6 @@ cd "$SCRIPT_DIR"
 # sshd no password login
 # verify autossh service has correct port
 # disable power mng in the control centre
-# change Imagemagic policy in /etc
 
 usage() {
         echo "usage: $0 <m1|mnp> <fixtureNumber>"
@@ -83,6 +82,17 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y net-tools openssh-server
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y sqlite3 arp-scan curl python3-pip autossh ethtool imagemagick libusb-1.0-0 cron
 sudo chmod 4755  /usr/sbin/arp-scan
+
+# Relax ImageMagick's default "path" policy that blocks reading draw commands
+# from a file ("convert ... -draw @file.txt ..."), used by label generation.
+# Ubuntu's stock policy.xml disables this via pattern="@*" for security on
+# general-purpose/multi-tenant systems; this fixture is a trusted, closed
+# appliance, so comment out just that one rule (idempotent - already-wrapped
+# lines won't match again).
+for policy in /etc/ImageMagick-6/policy.xml /etc/ImageMagick-7/policy.xml; do
+    [ -f "$policy" ] || continue
+    sudo sed -i -E 's#(<policy domain="path" rights="none" pattern="@\*"[[:space:]]*/>)#<!-- \1 -->#' "$policy"
+done
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y pipx
 sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install --force brother_ql || sudo PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx upgrade brother_ql
 for app in brother_ql brother_ql_analyse brother_ql_create brother_ql_debug brother_ql_info brother_ql_print; do
