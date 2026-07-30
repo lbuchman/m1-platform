@@ -80,8 +80,14 @@ echo "Config: TYPE=$TYPE FIXTURE=$FIXTURE_NUM SSHPORT=$SSHPORT HOSTNAME=$HOSTNAM
 sudo DEBIAN_FRONTEND=noninteractive apt-get update -y
 sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y net-tools openssh-server
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y sqlite3 arp-scan curl python3-pip autossh ethtool imagemagick libusb-1.0-0 cron
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y sqlite3 arp-scan curl python3-pip autossh ethtool imagemagick libusb-1.0-0 libusb-0.1-4 cron
 sudo chmod 4755  /usr/sbin/arp-scan
+
+# teensy_loader_cli: headless Teensy flashing tool used by m1testBoardFw/
+# mercury-testboard-fw (upload_protocol = teensy-cli), needs libusb-0.1-4.
+sudo cp -f "$SCRIPT_DIR"/teensy_loader_cli /usr/sbin/teensy_loader_cli
+sudo chown root:root /usr/sbin/teensy_loader_cli
+sudo chmod 755 /usr/sbin/teensy_loader_cli
 
 # Relax ImageMagick's default "path" policy that blocks reading draw commands
 # from a file ("convert ... -draw @file.txt ..."), used by label generation.
