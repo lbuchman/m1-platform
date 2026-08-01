@@ -26,6 +26,22 @@ Recommended service name: **`m1-factory-hub`**. "Factory Server" refers to the p
 | DB backup | Fixture cron (`m1client backupdb`) uploads SQLite `tf.db` to `backup` container. |
 | MAC addresses | `setup.sh` computes a static `58:FC:C8:%02X:%02X:%02X` block per fixture from `idx * 1_000_000`, seeded once into the local `UID` table at provisioning. No central registry, no collision detection. |
 
+## `deployment` Container Contract (Azure Blob, current interim mechanism)
+
+Manual firmware releases are staged in the `deployment` Azure Blob container ahead of the on-prem migration above. This container **MUST** contain, at minimum:
+
+- `stm32mp15-lenels2-m1.txz` — M1 firmware image archive.
+- `stm32mp15-lenels2-mnp.txz` — MNP firmware image archive.
+- `manifestFile.json` — SAS URLs and SHA-512 hashes for both archives above (`m1firmware` / `mnpfirmware` entries).
+
+Each `.txz` archive **MUST** contain, at its root, a `VERSION` file — plain text, exactly **1 line**, containing the Artifactory-reported build revision string. Example:
+
+  ```
+  1.0.16 179 09/22/23 02eef93c27 M1B SandboxHost-638309047983092644
+  ```
+
+  Format: `<version> <build number> <build date MM/DD/YY> <short commit sha> <product> <build host>`.
+
 ## Proposed Architecture
 
 ```mermaid

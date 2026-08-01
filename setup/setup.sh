@@ -151,10 +151,70 @@ cp -f "$SCRIPT_DIR"/autossh.service /lib/systemd/system
 systemctl restart autossh
 sed -i 's/20007/'"${SSHPORT}"'/'  /lib/systemd/system/autossh.service
 
-# Initialize /var/m1mtf from base archive and set station UID
-mkdir -p /var/m1mtf
-sudo tar -xzf "$SCRIPT_DIR"/fixture_m1mtf_base.tgz -C /var
-rm -rf /var/m1mtf/logs/* /var/m1mtf/m1cli/* /var/m1mtf/backup/*
+# Initialize /var/m1mtf and populate firmware from the Azure `deployment`
+# container. The manifest is downloaded first so the firmware download URL
+# and expected sha512 always come from the manifest, never hardcoded here.
+mkdir -p /var/m1mtf /var/m1mtf/logs /var/m1mtf/m1cli /var/m1mtf/backup /var/m1mtf/synclogs
+
+MANIFEST_URL=$(node -e "console.log(require('/etc/m1platform/config.json').firmwareManifestUrl)")
+if [ -z "$MANIFEST_URL" ] || [ "$MANIFEST_URL" = "undefined" ]; then
+    echo "ERROR: firmwareManifestUrl missing from /etc/m1platform/config.json"
+    exit 1
+fi
+
+MANIFEST_TMP=$(mktemp)
+curl -fsSL -o "$MANIFEST_TMP" "$MANIFEST_URL"
+
+if [ "$TYPE" = "m1" ]; then
+    MANIFEST_KEY="m1firmware"
+else
+    MANIFEST_KEY="mnpfirmware"
+fi
+
+FW_URL=$(node -e "
+const fs = require('fs');
+const manifest = JSON.parse(fs.readFileSync('$MANIFEST_TMP', 'utf8'));
+const entry = manifest.find((e) => e.filetype === '$MANIFEST_KEY');
+if (!entry) { process.exit(1); }
+console.log(entry.filename);
+")
+FW_SHA512=$(node -e "
+const fs = require('fs');
+const manifest = JSON.parse(fs.readFileSync('$MANIFEST_TMP', 'utf8'));
+const entry = manifest.find((e) => e.filetype === '$MANIFEST_KEY');
+if (!entry) { process.exit(1); }
+console.log(entry.hash);
+")
+rm -f "$MANIFEST_TMP"
+
+if [ -z "$FW_URL" ] || [ -z "$FW_SHA512" ]; then
+    echo "ERROR: manifest entry '$MANIFEST_KEY' not found in firmware manifest"
+    exit 1
+fi
+
+FW_TMP=$(mktemp --suffix=.txz)
+curl -fsSL -o "$FW_TMP" "$FW_URL"
+
+FW_ACTUAL_SHA512=$(sha512sum "$FW_TMP" | awk '{print $1}')
+if [ "$FW_ACTUAL_SHA512" != "$FW_SHA512" ]; then
+    echo "ERROR: firmware sha512 mismatch (expected $FW_SHA512, got $FW_ACTUAL_SHA512)"
+    rm -f "$FW_TMP"
+    exit 1
+fi
+
+rm -rf "/var/m1mtf/${FWDIR}"
+tar -xJf "$FW_TMP" -C /var/m1mtf
+rm -f "$FW_TMP"
+
+# Install the STM32MP1 ICT FSBL, staged alongside setup.sh in the deploy
+# payload (see deploy.sh, which copies it from artifacts/ before packaging).
+if [ -f "$SCRIPT_DIR"/fsbl.stm32 ]; then
+    cp -f "$SCRIPT_DIR"/fsbl.stm32 /var/m1mtf/fsbl.stm32
+else
+    echo "ERROR: $SCRIPT_DIR/fsbl.stm32 not found in deploy payload"
+    exit 1
+fi
+
 sqlite3 /var/m1mtf/tf.db << SQL
 CREATE TABLE IF NOT EXISTS records ( 
   vendorSerial TEXT PRIMARY KEY,
@@ -224,7 +284,12 @@ cat << EOF > /etc/m1platform/config.json
   "mtfDir": "/var/m1mtf",
   "programmingCommand": "/opt/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI",
   "coinCellMinVoltageNew": 3.0,
-  "coinCellMinVoltageUsed": 2.9
+  "coinCellMinVoltageUsed": 2.9,
+  "firmwareManifest": {
+    "mnp": "https://lenels2boardsprodsa.blob.core.windows.net/deployment/stm32mp15-lenels2-mnp.txz?sp=r&st=2026-08-01T05:08:12Z&se=2036-08-01T13:23:12Z&spr=https&sv=2026-02-06&sr=b&sig=eEowJn3pTFMuo9%2B9TwIbcFQ%2BXJXCygh7WlZfzyDvbQA%3D",
+    "m1": "https://lenels2boardsprodsa.blob.core.windows.net/deployment/stm32mp15-lenels2-m1.txz?sp=r&st=2026-08-01T05:09:51Z&se=2036-08-01T13:24:51Z&spr=https&sv=2026-02-06&sr=b&sig=kK4xGIGbqCr%2BHeqWlATkmo0%2FffRu5VeXlyAV%2Ff983xk%3D"
+  },
+  "firmwareManifestUrl": "https://lenels2boardsprodsa.blob.core.windows.net/deployment/manifestFile.json?sv=2020-12-06&sr=b&sp=r&st=2026-08-01T06%3A06%3A46Z&se=2036-07-29T06%3A11%3A46Z&spr=https&sig=WO%2FutY%2FvANqwU%2FXxol95l1pT1u%2FfzqU%2FMhqfWfVZpx8%3D"
 }
 EOF
 

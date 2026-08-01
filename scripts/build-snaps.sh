@@ -14,7 +14,7 @@ UPDATE=0
 CLEAN=0
 DRY_RUN=0
 ONLY=""
-ARTIFACT_DIR="${ROOT_DIR}/artifacts/snaps/$(date +%Y%m%d-%H%M%S)"
+ARTIFACT_DIR="${ROOT_DIR}/artifacts/snaps"
 FAILED_COMPONENTS=()
 
 usage() {
@@ -27,7 +27,7 @@ Options:
   --update              Fetch and fast-forward each component repo before build.
   --clean               Run snapcraft clean before each build.
   --component NAME      Build only one component.
-  --output-dir PATH     Copy built snaps to PATH. Default: artifacts/snaps/<timestamp>.
+    --output-dir PATH     Copy built snaps to PATH. Default: artifacts/snaps.
   --dry-run             Print actions without changing files or building.
   --list                List buildable snap components.
   -h, --help            Show this help.
@@ -125,6 +125,10 @@ build_component() {
     log "source: ${dir}"
     log "commit: ${commit} (${dirty})"
 
+    if [[ "${DRY_RUN}" -eq 0 ]]; then
+        find "${dir}" -maxdepth 1 -type f -name '*.snap' -delete
+    fi
+
     if [[ "${CLEAN}" -eq 1 ]]; then
         run_in_dir "${dir}" snapcraft clean
     fi
@@ -208,6 +212,13 @@ if ! command -v snapcraft >/dev/null 2>&1; then
 fi
 
 log "Output directory: ${ARTIFACT_DIR}"
+
+if [[ "${DRY_RUN}" -eq 0 ]]; then
+    mkdir -p "${ARTIFACT_DIR}"
+    find "${ARTIFACT_DIR}" -maxdepth 1 -type f -name '*.snap' -delete
+    rm -f "${ARTIFACT_DIR}/build-manifest.txt"
+    find "${ROOT_DIR}"/components -mindepth 2 -maxdepth 2 -type f -name '*.snap' -delete
+fi
 
 for component in "${COMPONENTS[@]}"; do
     if [[ -n "${ONLY}" && "${component}" != "${ONLY}" ]]; then

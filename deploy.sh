@@ -39,6 +39,16 @@ TEMP_DEPLOY=$(mktemp -d)
 # (individual snaps will be copied to the root of TEMP_DEPLOY by get_snap)
 find setup -maxdepth 1 ! -name "snaps" ! -name "setup" -exec cp -r {} "$TEMP_DEPLOY/" \;
 
+# Stage the latest built STM32MP1 ICT FSBL into the deploy payload root, so
+# remote setup.sh can install it to /var/m1mtf/fsbl.stm32 from $SCRIPT_DIR.
+LATEST_FSBL=$(ls -t "$SCRIPT_DIR"/artifacts/firmware/stm32mp1-baremetal/*/fsbl.stm32 2>/dev/null | head -n 1)
+if [ -z "$LATEST_FSBL" ]; then
+    echo "Error: no built fsbl.stm32 found under artifacts/firmware/stm32mp1-baremetal/*/"
+    exit 1
+fi
+echo "Using FSBL: $LATEST_FSBL"
+cp "$LATEST_FSBL" "$TEMP_DEPLOY/fsbl.stm32"
+
 # Include repository build artifacts in the unpacked deploy root so setup.sh
 # can access them from its working directory.
 if [ -d "$SCRIPT_DIR/artifacts" ]; then

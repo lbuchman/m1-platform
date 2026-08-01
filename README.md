@@ -14,6 +14,87 @@ The root repository does not replace the component repositories. It documents an
 
 See [DEPLOY.md](DEPLOY.md) for fixture deployment instructions, required inputs, examples, and troubleshooting.
 
+## Firmware Deployment Container (Azure Blob `deployment`)
+
+Manual firmware releases are staged in the `deployment` Azure Blob container. See [doc/Architecture/Software/cloud-backend-migration-design.md](doc/Architecture/Software/cloud-backend-migration-design.md) for the full contract (required files, per-archive `VERSION` file format).
+
+Requirements:
+
+- A `manifestFile.json` is **required** in the container alongside the firmware archives.
+- The [azcopy](https://learn.microsoft.com/azure/storage/common/storage-use-azcopy-v10) tool is **required** to upload/list blobs (no `az` CLI dependency).
+
+### Installing `azcopy`
+
+**Ubuntu / Linux:**
+
+```bash
+cd /tmp
+curl -fsSL -o azcopy.tar.gz https://aka.ms/downloadazcopy-v10-linux
+mkdir -p azcopy_extract
+tar -xzf azcopy.tar.gz -C azcopy_extract --strip-components=1
+sudo install -m 755 azcopy_extract/azcopy /usr/local/bin/azcopy
+azcopy --version
+```
+
+**Windows:**
+
+1. Download the Windows build from [https://aka.ms/downloadazcopy-v10-windows](https://aka.ms/downloadazcopy-v10-windows).
+2. Extract the ZIP file.
+3. Move `azcopy.exe` to a folder on your `PATH` (e.g. `C:\Tools\azcopy\`), or run it using its full path.
+4. Verify with:
+
+```powershell
+azcopy --version
+```
+
+### `manifestFile.json` Format
+
+`manifestFile.json` is a JSON array. Each entry describes one uploaded artifact:
+
+```json
+[
+  {
+    "filetype": "m1firmware",
+    "filename": "<SAS URL to stm32mp15-lenels2-m1.txz>",
+    "hash": "<sha512 of the file>"
+  },
+  {
+    "filetype": "mnpfirmware",
+    "filename": "<SAS URL to stm32mp15-lenels2-mnp.txz>",
+    "hash": "<sha512 of the file>"
+  }
+]
+```
+
+Fields:
+
+- `filetype`: artifact identifier (`m1firmware`, `mnpfirmware`, etc.).
+- `filename`: full blob URL, including a SAS token if the blob is not public.
+- `hash`: SHA-512 hex digest of the local file, used to verify integrity after download.
+
+Compute the hash with:
+
+```bash
+sha512sum <file>.txz
+```
+
+The container **MUST** always contain both `.txz` firmware archives and a `manifestFile.json` describing them.
+
+Firmware publishing is handled through the m1-cloud-client workflow.
+
+Before running `scripts/publish-fw.sh`, build artifacts first:
+
+```bash
+./scripts/build_fw.sh build all --output-dir artifacts/publish/firmware
+./scripts/build-snaps.sh --output-dir artifacts/snaps
+```
+
+Then publish using existing artifacts only:
+
+```bash
+./scripts/publish-fw.sh
+```
+
 ## Unified Engineering Technical Support Platform
 
 - Hardware-in-the-Loop (HIL) product validation and automation
@@ -117,7 +198,7 @@ Use fast-forward-only git updates when a fresh build from current remotes is nee
 ./scripts/build-snaps.sh --update
 ```
 
-The script copies built snap artifacts into `artifacts/snaps/<timestamp>/` and writes a small `build-manifest.txt` with component names, source commits, dirty/clean state, and artifact names. The General Ubuntu cloud client is a production snap requirement, but it is not included in this build script until `components/m1-cloud-client` has snap packaging.
+The script copies built snap artifacts into `artifacts/snaps/` and writes a small `build-manifest.txt` with component names, source commits, dirty/clean state, and artifact names. Existing `.snap` files in that output directory are cleared before each run so only the current run's snaps remain. The General Ubuntu cloud client is a production snap requirement, but it is not included in this build script until `components/m1-cloud-client` has snap packaging.
 
 ## Fast Smoke Test Checklist
 
