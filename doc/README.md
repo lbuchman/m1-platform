@@ -14,6 +14,7 @@ This package is the controlled documentation baseline for the M1/MNPlus Unified 
 - EVM Twenty-Year Sustainment Plan
 - M1 Operator UI Guide (`Operations/`)
 - Fast Smoke Test Checklist (`Validation/`)
+- Cloud deployment documentation, including board firmware storage / Azure `firmware` container contents (`Cloud-Deployment/`)
 
 ## Included engineering sources
 
@@ -38,7 +39,7 @@ doc/
 │   │   └── Source-Diagrams/    (draw.io sources)
 │   ├── Hardware/
 │   │   ├── M1-Test-Board/                  (spec + Source-Schematics/)
-│   │   ├── Mercury-Controller-Test-Board/   (spec + Source-Schematics/)
+│   │   ├── Mercury-Controller-Test-Board/   (aka ACM Board; spec + Source-Schematics/)
 │   │   └── UUT-Reference/                  (M1-3200, MNPlus-V3 product schematics)
 │   ├── Firmware/    (reserved)
 │   └── Software/    (reserved)
@@ -47,6 +48,7 @@ doc/
 ├── Operations/      (operator UI guide)
 ├── Validation/      (fast smoke test checklist)
 ├── Sustainment/     (Twenty-Year Sustainment Plan)
+├── Cloud-Deployment/ (cloud deployment docs: Azure storage containers, and other cloud files used by the platform)
 ├── Interface-Control-Documents/  (reserved: pogo-pin maps, IDC interface spec, reader interfaces)
 └── Images/          (all diagrams/photos/document-extracted images)
 ```

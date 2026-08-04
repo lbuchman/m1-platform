@@ -161,7 +161,7 @@ To update already-present component repos without re-cloning them, use:
 | REST server | `git@github.com:lbuchman/m1-rest-server.git` | `components/m1-rest-server` | REST API around fixture commands and status |
 | Operator UI | `git@github.com:lbuchman/m1-operator-ui.git` | `components/m1-operator-ui` | React production/debug operator interface |
 | Fixture PC cloud client (`tfcroncli`, test fixture cron CLI) | `git@github.com:lbuchman/tfcroncli.git` | `components/tfcroncli` | Fixture PC cloud communication, logs, secrets, nightly FW/SW updates |
-| General Ubuntu cloud client | `git@github.com:lbuchman/m1-cloud-client.git` | `components/m1-cloud-client` | General Ubuntu cloud log/update client |
+| General Ubuntu cloud client | `git@github.com:lbuchman/m1-cloud-client.git` | `components/m1-cloud-client` | Admin CLI (`m1cli uploadfw`) to upload UUT firmware and platform snap packages to Azure Cloud storage |
 
 ## Production Snaps
 
@@ -173,7 +173,8 @@ These platform components are production snap packages:
 | REST server | `components/m1-rest-server` | `components/m1-rest-server/snap/snapcraft.yaml` |
 | Operator UI | `components/m1-operator-ui` | `components/m1-operator-ui/snap/snapcraft.yaml` |
 | Fixture PC cloud client (`tfcroncli`, test fixture cron CLI) | `components/tfcroncli` | `components/tfcroncli/snap/snapcraft.yaml` |
-| General Ubuntu cloud client | `components/m1-cloud-client` | production snap required; snap packaging still needs to be added in the split repo |
+
+`m1-cloud-client` is not part of this list: it is an admin-only CLI run from an engineer's workstation to upload firmware/snap releases to Azure Cloud storage, not a fixture-side service, so it has no production snap packaging requirement.
 
 Production snap packages should use Node 24.
 
@@ -198,7 +199,7 @@ Use fast-forward-only git updates when a fresh build from current remotes is nee
 ./scripts/build-snaps.sh --update
 ```
 
-The script copies built snap artifacts into `artifacts/snaps/` and writes a small `build-manifest.txt` with component names, source commits, dirty/clean state, and artifact names. Existing `.snap` files in that output directory are cleared before each run so only the current run's snaps remain. The General Ubuntu cloud client is a production snap requirement, but it is not included in this build script until `components/m1-cloud-client` has snap packaging.
+The script copies built snap artifacts into `artifacts/snaps/<timestamp>/` and writes a small `build-manifest.txt` with component names, source commits, dirty/clean state, and artifact names. `m1-cloud-client` is an admin-only CLI (not deployed to fixtures) used to upload firmware/snap releases to Azure Cloud storage, so it has no production snap packaging and is not included in this build script.
 
 ## Fast Smoke Test Checklist
 
