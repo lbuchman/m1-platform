@@ -18,7 +18,6 @@ SNAP_COMPONENTS=(
     "m1tfc"
     "m1-rest-server"
     "m1-operator-ui"
-    "m1-cloud-client"
     "tfcroncli"
 )
 
@@ -26,9 +25,6 @@ SNAP_COMPONENTS=(
 TEENSY_LOADER_CLI="${TEENSY_LOADER_CLI:-/home/lenel/arduino-1.8.19/hardware/tools/teensy_loader_cli}"
 TEENSY_LOADER_ATTEMPTS="${TEENSY_LOADER_ATTEMPTS:-3}"
 TEENSY_LOADER_TIMEOUT_SECONDS="${TEENSY_LOADER_TIMEOUT_SECONDS:-25}"
-
-# Runtime
-MTF_DIR="/var/m1mtf"
 
 # Build options
 COMMAND="build"
@@ -39,6 +35,7 @@ UPDATE=0
 CLEAN=0
 DRY_RUN=0
 FAILED_ARTIFACTS=()
+MANIFEST_CHECK_FAILED=0
 
 usage() {
     cat <<'EOF'
@@ -56,11 +53,7 @@ Commands:
       m1tfc             Build m1tfc snap only
       m1-rest-server    Build m1-rest-server snap only
       m1-operator-ui    Build m1-operator-ui snap only
-      m1-cloud-client   Build m1-cloud-client snap only
       tfcroncli         Build tfcroncli snap only
-
-  install-stm32
-    Build STM32MP1 ICT FSBL and install to /var/m1mtf/
 
   program-teensy [acm|m1tb]
     Build and upload Teensy firmware via USB (libusb)
@@ -72,7 +65,6 @@ Options:
   --update              Fetch and fast-forward component repos before build.
   --clean               Run snapcraft clean before each snap build.
   --output-dir PATH     Copy artifacts to PATH instead of artifacts/.
-  --mtf-dir PATH        STM32 fixture runtime directory (default: /var/m1mtf).
 
   --dry-run             Print actions without building or installing.
   --list                List buildable snap components.
@@ -127,27 +119,20 @@ update_manifest() {
 
     if [[ "${DRY_RUN}" -eq 0 ]]; then
         if [[ ! -f "${manifest_path}" ]]; then
-            printf '[]\n' | jq \
-                --arg component "${component}" \
-                --arg filename "${filename}" \
-                --arg commit "${commit}" \
-                --arg type "${artifact_type}" \
-                --arg sha512 "${sha512}" \
-                --arg timestamp "${timestamp}" \
-                '. += [{"component": $component, "filename": $filename, "commit": $commit, "type": $type, "sha512": $sha512, "timestamp": $timestamp}]' \
-                > "${manifest_path}"
-        else
-            jq \
-                --arg component "${component}" \
-                --arg filename "${filename}" \
-                --arg commit "${commit}" \
-                --arg type "${artifact_type}" \
-                --arg sha512 "${sha512}" \
-                --arg timestamp "${timestamp}" \
-                '. += [{"component": $component, "filename": $filename, "commit": $commit, "type": $type, "sha512": $sha512, "timestamp": $timestamp}]' \
-                "${manifest_path}" > "${manifest_path}.tmp"
-            mv "${manifest_path}.tmp" "${manifest_path}"
+            printf '[]\n' > "${manifest_path}"
         fi
+
+        jq \
+            --arg component "${component}" \
+            --arg filename "${filename}" \
+            --arg commit "${commit}" \
+            --arg type "${artifact_type}" \
+            --arg sha512 "${sha512}" \
+            --arg timestamp "${timestamp}" \
+            'map(select(.component != $component)) + [{"component": $component, "filename": $filename, "commit": $commit, "type": $type, "sha512": $sha512, "timestamp": $timestamp}]' \
+            "${manifest_path}" > "${manifest_path}.tmp"
+        mv "${manifest_path}.tmp" "${manifest_path}"
+
         log "manifest: ${manifest_path}"
     fi
 }
@@ -192,6 +177,81 @@ extract_stm32_fw_revision() {
         return
     fi
     sed -n 's/.*fwRev[[:space:]]*=[[:space:]]*(char\*)[[:space:]]*"\([^"]*\)".*/\1/p' "${source_file}" | head -n 1
+}
+
+validate_manifest() {
+    local artifacts_dir="${ARTIFACT_DIR:-${ROOT_DIR}/artifacts}"
+    local manifest_path="${artifacts_dir}/manifestFile.json"
+    local failed=0
+    local entry_index=0
+
+    if [[ ! -f "${manifest_path}" ]]; then
+        log "Manifest validation error: missing ${manifest_path}"
+        return 1
+    fi
+
+    if ! jq -e 'type == "array"' "${manifest_path}" >/dev/null 2>&1; then
+        log "Manifest validation error: manifest must be a JSON array: ${manifest_path}"
+        return 1
+    fi
+
+    while IFS=$'\t' read -r component filename sha512; do
+        entry_index=$((entry_index + 1))
+
+        if [[ -z "${component}" || -z "${filename}" || -z "${sha512}" ]]; then
+            log "Manifest validation error: entry ${entry_index} missing component/filename/sha512"
+            failed=1
+            continue
+        fi
+
+        if [[ ! -d "${ROOT_DIR}/components/${component}" ]]; then
+            log "Manifest validation error: entry ${entry_index} references unknown component '${component}'"
+            failed=1
+            continue
+        fi
+
+        if [[ ! "${sha512}" =~ ^[0-9a-fA-F]{128}$ ]]; then
+            log "Manifest validation error: entry ${entry_index} has invalid sha512 format for ${filename}"
+            failed=1
+            continue
+        fi
+
+        local artifact_path="${artifacts_dir}/${filename}"
+        if [[ ! -f "${artifact_path}" ]]; then
+            log "Manifest validation error: missing artifact file ${artifact_path}"
+            failed=1
+            continue
+        fi
+
+        local actual_sha512
+        actual_sha512=$(sha512sum "${artifact_path}" | awk '{print $1}')
+        if [[ "${actual_sha512}" != "${sha512}" ]]; then
+            log "Manifest validation error: sha512 mismatch for ${filename}"
+            log "  expected: ${sha512}"
+            log "  actual:   ${actual_sha512}"
+            failed=1
+        fi
+    done < <(jq -r '.[] | [(.component // ""), (.filename // ""), (.sha512 // "")] | @tsv' "${manifest_path}")
+
+    if [[ "${entry_index}" -eq 0 ]]; then
+        log "Manifest validation error: manifest has no entries"
+        failed=1
+    fi
+
+    while IFS= read -r component_dir; do
+        [[ -n "${component_dir}" ]] || continue
+        if ! jq -e --arg component "${component_dir}" 'map(.component == $component) | any' "${manifest_path}" >/dev/null 2>&1; then
+            log "Manifest validation error: missing component entry for ${component_dir}"
+            failed=1
+        fi
+    done < <(find "${ROOT_DIR}/components" -mindepth 1 -maxdepth 1 -type d -not -name '.*' -printf '%f\n' | sort)
+
+    if [[ "${failed}" -ne 0 ]]; then
+        return 1
+    fi
+
+    log "Manifest validation: OK (${entry_index} entries)"
+    return 0
 }
 
 # ===== FIRMWARE BUILDS =====
@@ -306,20 +366,6 @@ build_all_firmware() {
         FAILED_ARTIFACTS+=("stm32mp1-baremetal")
     fi
     return $failed
-}
-
-install_stm32() {
-    build_stm32
-    local firmware_stm32="${STM32_DIR}/build/fsbl.stm32"
-    local firmware_rev="${STM32_DIR}/stm32mp1_rev"
-    log "+ sudo install -D -m 0644 ${firmware_stm32} ${MTF_DIR}/fsbl.stm32"
-    log "+ sudo install -D -m 0644 ${firmware_rev} ${MTF_DIR}/stm32mp1_rev"
-    if [[ "${DRY_RUN}" -eq 0 ]]; then
-        sudo install -D -m 0644 "${firmware_stm32}" "${MTF_DIR}/fsbl.stm32"
-        sudo install -D -m 0644 "${firmware_rev}" "${MTF_DIR}/stm32mp1_rev"
-        log "installed: ${MTF_DIR}/fsbl.stm32"
-        log "installed: ${MTF_DIR}/stm32mp1_rev"
-    fi
 }
 
 program_teensy() {
@@ -500,7 +546,7 @@ if [[ $# -gt 0 && "${1}" != -* ]]; then
     
     # If COMMAND is not a known top-level command, treat it as a build TARGET
     case "${COMMAND}" in
-        build|install-stm32|program-teensy)
+        build|program-teensy)
             # Recognized top-level command
             ;;
         *)
@@ -538,15 +584,6 @@ while [[ $# -gt 0 ]]; do
             fi
             shift 2
             ;;
-        --mtf-dir)
-            MTF_DIR="${2:-}"
-            if [[ -z "${MTF_DIR}" ]]; then
-                log "Missing value for --mtf-dir"
-                exit 2
-            fi
-            shift 2
-            ;;
-
         --dry-run)
             DRY_RUN=1
             shift
@@ -572,19 +609,27 @@ case "${COMMAND}" in
     build)
         # parse: build [firmware|snaps|TARGET]
         case "${TARGET}" in
-            "")
+            ""|all)
                 # build all
-                build_all_firmware
-                build_all_snaps
+                if ! build_all_firmware; then
+                    :
+                fi
+                if ! build_all_snaps; then
+                    :
+                fi
                 ;;
             firmware)
                 # build firmware [TARGET]
                 # TARGET is in next positional arg, but we already shifted
-                build_all_firmware
+                if ! build_all_firmware; then
+                    :
+                fi
                 ;;
             snaps)
                 # build snaps [COMPONENT]
-                build_all_snaps
+                if ! build_all_snaps; then
+                    :
+                fi
                 ;;
             acm|fixture|stm32mp1)
                 # Firmware target shorthand
@@ -594,7 +639,7 @@ case "${COMMAND}" in
                     stm32mp1) build_stm32 || FAILED_ARTIFACTS+=("stm32mp1-baremetal") ;;
                 esac
                 ;;
-            m1tfc|m1-rest-server|m1-operator-ui|m1-cloud-client|tfcroncli)
+            m1tfc|m1-rest-server|m1-operator-ui|tfcroncli)
                 # Snap component shorthand
                 build_one_snap "${TARGET}" || FAILED_ARTIFACTS+=("${TARGET}")
                 ;;
@@ -604,9 +649,6 @@ case "${COMMAND}" in
                 exit 2
                 ;;
         esac
-        ;;
-    install-stm32)
-        install_stm32
         ;;
     program-teensy)
         program_teensy
@@ -618,6 +660,12 @@ case "${COMMAND}" in
         ;;
 esac
 
+if [[ "${DRY_RUN}" -eq 0 && "${COMMAND}" == "build" ]]; then
+    if ! validate_manifest; then
+        MANIFEST_CHECK_FAILED=1
+    fi
+fi
+
 log ""
 log "Done."
 if [[ "${DRY_RUN}" -eq 0 && "${COMMAND}" == "build" ]]; then
@@ -626,6 +674,13 @@ fi
 
 if [[ "${#FAILED_ARTIFACTS[@]}" -gt 0 ]]; then
     log "Failed artifacts: ${FAILED_ARTIFACTS[*]}"
+fi
+
+if [[ "${MANIFEST_CHECK_FAILED}" -ne 0 ]]; then
+    log "Manifest validation failed."
+fi
+
+if [[ "${#FAILED_ARTIFACTS[@]}" -gt 0 || "${MANIFEST_CHECK_FAILED}" -ne 0 ]]; then
     exit 1
 fi
 

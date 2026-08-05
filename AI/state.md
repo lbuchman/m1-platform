@@ -17,7 +17,6 @@ Snap software components:
 - REST server
 - Operator UI
 - Fixture PC cloud client (`tfcroncli`, test fixture cron CLI)
-- General Ubuntu cloud client (`m1-cloud-client`)
 
 Firmware components:
 

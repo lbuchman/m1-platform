@@ -117,7 +117,6 @@ This file records concise work history for AI-assisted platform work. Keep entri
 - Validate the newly built STM32MP1 FSBL on the fixture target, including DDR/SDRAM ICT behavior.
 - Configure remotes/upstreams for M1TFC, Operator UI, and tfcroncli, then push their local commits.
 - Finish `tfcroncli` clean snap build under Node 24.
-- Add or plan snap packaging for `m1-cloud-client`.
 - Add release manifests for expected snap and firmware versions.
 - Add installed-state tooling for snap metadata and hardware-read firmware versions.
 - Add fixture PC install and recovery documentation.

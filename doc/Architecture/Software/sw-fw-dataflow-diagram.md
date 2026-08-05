@@ -1,6 +1,6 @@
 # SW / FW Data Flow and Top-Level Architecture
 
-This diagram shows the top-level data flow across the fixture's software and firmware components, with the UUT (unit under test) at the top. The fixture interface boards sit between the PC and the UUT since that is the actual signal path (PC commands the boards, boards drive the UUT); this keeps every arrow a short, uncrossed hop instead of long lines looping back over each other. `m1-cloud-client` is out of scope — it is not part of the fixture test data path.
+This diagram shows the top-level data flow across the fixture's software and firmware components, with the UUT (unit under test) at the top. The fixture interface boards sit between the PC and the UUT since that is the actual signal path (PC commands the boards, boards drive the UUT); this keeps every arrow a short, uncrossed hop instead of long lines looping back over each other.
 
 ```mermaid
 flowchart BT
@@ -60,5 +60,4 @@ flowchart BT
 
 ## Out of Scope
 
-- `m1-cloud-client` — not part of the fixture test data path (cloud/update/secrets client, separate concern).
 - `tfcroncli` — cron-scheduled cloud-update function, not fixture test operation related.

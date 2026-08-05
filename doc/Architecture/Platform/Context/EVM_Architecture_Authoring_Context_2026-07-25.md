@@ -672,7 +672,6 @@ Observed components:
 
 ```text
 components/
-├── m1-cloud-client/
 ├── m1-operator-ui/
 ├── m1-rest-server/
 ├── m1testBoardFw/

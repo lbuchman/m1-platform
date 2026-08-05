@@ -266,10 +266,22 @@ snap install --dangerous  gui-react.snap
 # Install configs to system-wide location /etc/m1platform
 sudo mkdir -p /etc/m1platform
 
+# conString comes from azureStorage.json, staged into the deploy payload by
+# deploy.sh; it is never hardcoded here and never committed to the repo.
+if [ ! -f "$SCRIPT_DIR/azureStorage.json" ]; then
+    echo "ERROR: $SCRIPT_DIR/azureStorage.json not found"
+    exit 1
+fi
+CON_STRING=$(node -e "console.log(require('$SCRIPT_DIR/azureStorage.json').conString)")
+if [ -z "$CON_STRING" ] || [ "$CON_STRING" = "undefined" ]; then
+    echo "ERROR: conString missing from $SCRIPT_DIR/azureStorage.json"
+    exit 1
+fi
+
 # Create config.json on target
 cat << EOF > /etc/m1platform/config.json
 {
-  "conString": "DefaultEndpointsProtocol=https;AccountName=lenels2boardsprodsa;AccountKey=b9gso5tT+rbbfQLSUd68Bw5AtTGCdHrQRdMAdWowWNaRfxd9Li51LfTc7dhYP+ptu0Cox6GTk9kN+ASt5dI6rw==;EndpointSuffix=core.windows.net",
+  "conString": "${CON_STRING}",
   "tfInterface": "${ETH_STATIC_IF}",
   "vendorSite": "${TESTSTATION}",
   "skipBatteryTest": false,

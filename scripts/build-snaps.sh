@@ -7,7 +7,6 @@ COMPONENTS=(
     "m1tfc"
     "m1-rest-server"
     "m1-operator-ui"
-    "m1-cloud-client"
     "tfcroncli"
 )
 
@@ -37,7 +36,6 @@ Buildable components:
   m1tfc
   m1-rest-server
   m1-operator-ui
-  m1-cloud-client
   tfcroncli
 EOF
 }
@@ -138,6 +136,8 @@ update_manifest() {
         log "manifest: ${manifest_path}"
     fi
 }
+
+build_component() {
     local component="$1"
     local dir="${ROOT_DIR}/components/${component}"
     local snapcraft_yaml="${dir}/snap/snapcraft.yaml"

@@ -138,10 +138,6 @@ clone_or_update_component "tfcroncli" \
     "git@github.com:lbuchman/tfcroncli.git" \
     "https://github.com/lbuchman/tfcroncli.git"
 
-clone_or_update_component "m1-cloud-client" \
-    "git@github.com:lbuchman/m1-cloud-client.git" \
-    "https://github.com/lbuchman/m1-cloud-client.git"
-
 if [[ "${#FAILED_COMPONENTS[@]}" -gt 0 ]]; then
     log ""
     log "Missing or inaccessible repos: ${FAILED_COMPONENTS[*]}"

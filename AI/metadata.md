@@ -20,7 +20,6 @@ components/stm32mp1-baremetal
 components/m1-rest-server
 components/m1-operator-ui
 components/tfcroncli
-components/m1-cloud-client
 ```
 
 ACM firmware in `components/acm-testboard-fw` is a PlatformIO Teensy 4.1 project converted from the old CMake tree. `git@github.com:lbuchman/redDiamondsFixture.git` subdirectory `teensy/` is the reference skeleton and shared-module pattern.

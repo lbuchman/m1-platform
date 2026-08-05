@@ -1,5 +1,6 @@
 components/
 artifacts/
+azureStorage.json
 
 # Snapcraft generated artifacts
 *.snap

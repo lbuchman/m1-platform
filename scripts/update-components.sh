@@ -59,7 +59,6 @@ components=(
     "m1-rest-server"
     "m1-operator-ui"
     "tfcroncli"
-    "m1-cloud-client"
 )
 
 if [[ -n "${SELECTED_COMPONENT}" ]]; then

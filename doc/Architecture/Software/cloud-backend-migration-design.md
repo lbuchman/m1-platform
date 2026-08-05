@@ -2,7 +2,7 @@
 
 ## Goal
 
-Replace the current Azure Blob Storage based system (`tfcroncli`/`m1client` on the fixture, `m1-cloud-client`/`m1CloudClient` for admins) with a **local, on-prem physical PC in the factory** ("Factory Server") that the team fully controls. This is a hard requirement, not just a preference: production lines must be **self-contained** and must keep running even if internet/cloud connectivity is down — nothing on the primary production path (logs, secrets, firmware updates, MAC allocation) may depend on reaching the internet. The new backend must:
+Replace the current Azure Blob Storage based system (`tfcroncli`/`m1client` on the fixture, `scripts/publish-fw.sh` for admins) with a **local, on-prem physical PC in the factory** ("Factory Server") that the team fully controls. This is a hard requirement, not just a preference: production lines must be **self-contained** and must keep running even if internet/cloud connectivity is down — nothing on the primary production path (logs, secrets, firmware updates, MAC allocation) may depend on reaching the internet. The new backend must:
 
 1. Store logs, retrievable **by board serial number** (today only retrievable by date-prefix/fixture).
 2. Store secrets, retrievable **by board serial number** (same limitation today).
@@ -14,7 +14,7 @@ Replace the current Azure Blob Storage based system (`tfcroncli`/`m1client` on t
 
 ## Naming
 
-Recommended service name: **`m1-factory-hub`**. "Factory Server" refers to the physical on-prem PC (the hardware); `m1-factory-hub` is the Node/Express service that runs on it, following the existing `m1-<role>` naming convention (`m1-rest-server`, `m1-operator-ui`, `m1-cloud-client`). "Hub" reflects its role as the single central point every fixture talks to for logs, secrets, firmware, and MAC allocation. Alternatives considered: `m1-mes-server` (accurate — this is effectively a small Manufacturing Execution System — but a less familiar term), `m1-depot` (evokes storage but undersells the MAC-allocation/coordination role). The rest of this doc uses `m1-factory-hub`.
+Recommended service name: **`m1-factory-hub`**. "Factory Server" refers to the physical on-prem PC (the hardware); `m1-factory-hub` is the Node/Express service that runs on it, following the existing `m1-<role>` naming convention (`m1-rest-server`, `m1-operator-ui`). "Hub" reflects its role as the single central point every fixture talks to for logs, secrets, firmware, and MAC allocation. Alternatives considered: `m1-mes-server` (accurate — this is effectively a small Manufacturing Execution System — but a less familiar term), `m1-depot` (evokes storage but undersells the MAC-allocation/coordination role). The rest of this doc uses `m1-factory-hub`.
 
 ## Current State (for reference)
 
@@ -22,7 +22,7 @@ Recommended service name: **`m1-factory-hub`**. "Factory Server" refers to the p
 | --- | --- |
 | Logs | Fixture cron (`m1client synclogs`) uploads `.txz` archives to `<product>-logs-<site>` Azure container. Retrieval only by date-prefix, no serial index. |
 | Secrets | Fixture cron (`m1client syncsecrets`) uploads a CSV of RSA-encrypted, base32-encoded secrets to `<product>-secrets` container. |
-| Firmware | Admin tool `m1CloudClient uploadfw` pushes files + `manifestFile.json` to `firmware` container; fixture cron (`m1client update`) polls and downloads. |
+| Firmware | Admin tool `scripts/publish-fw.sh` pushes files + `manifestFile.json` to `firmware` container; fixture cron (`m1client update`) polls and downloads. |
 | DB backup | Fixture cron (`m1client backupdb`) uploads SQLite `tf.db` to `backup` container. |
 | MAC addresses | `setup.sh` computes a static `58:FC:C8:%02X:%02X:%02X` block per fixture from `idx * 1_000_000`, seeded once into the local `UID` table at provisioning. No central registry, no collision detection. |
 
@@ -73,7 +73,7 @@ flowchart LR
         end
 
         subgraph ADMIN["Engineer workstation"]
-            CLI["m1-cloud-client (m1CloudClient)<br/>uploadfw / getsecrets / getlogs"]:::admin
+            CLI["scripts/publish-fw.sh<br/>publish firmware/snap artifacts"]:::admin
         end
 
         MTFC -->|HTTPS + API key, LAN only\nreal-time board/secret/mac calls| API
@@ -171,7 +171,7 @@ Plain filesystem on the Factory Server (`/data/logs/<serial>/...`, `/data/firmwa
 | GET | `/api/mac?serial=` | Look up a board's assigned MAC. |
 | GET | `/api/firmware/manifest?product=` | Replaces Azure `manifestFile.json` fetch — fixture's `update` command polls this. |
 | GET | `/api/firmware/:file` | Download a firmware/snap file. |
-| POST | `/api/firmware` | Admin publishes a new release (replaces `m1CloudClient uploadfw`). |
+| POST | `/api/firmware` | Admin publishes a new release (replaces `scripts/publish-fw.sh`). |
 | POST | `/api/boards` | `m1tfc` records/updates a board's test result in real time (ICT/functional pass, flash programmed, etc.) — replaces the local `records` table. |
 | GET | `/api/boards?serial=` | Look up a board's current test/status record (e.g., to resume or re-test). |
 | GET | `/health` | Health check (same base-response contract pattern already used in `m1-rest-server`). |
@@ -203,7 +203,7 @@ The fixture host already runs Ubuntu Server + Node.js (via the `m1client`/`tfcro
 
 | Area | Change |
 | --- | --- |
-| `tfcroncli/app/package.json` & `m1-cloud-client/package.json` | Remove `azure-storage`, `@azure/storage-blob`. No new HTTP dependency needed — Node 20+ (already the baseline per `m1-rest-server`'s `engines`) has built-in `fetch`, `FormData`, and `Blob`, sufficient for multipart uploads/downloads. |
+| `tfcroncli/app/package.json` | Remove `azure-storage`, `@azure/storage-blob`. No new HTTP dependency needed — Node 20+ (already the baseline per `m1-rest-server`'s `engines`) has built-in `fetch`, `FormData`, and `Blob`, sufficient for multipart uploads/downloads. |
 | `azureOp.js` | Replaced by a new `httpOp.js` with the same exported function shapes (`syncFiles`, `checkFilesHash`, `getHash512FromFile` — the hash helper is pure local logic and doesn't change) so `m1client.js`'s command bodies barely change, just the transport underneath. |
 | `/etc/m1platform/config.json` | `conString` field replaced by `apiBaseUrl` + `apiKey`. `setup.sh`'s config-writing heredoc needs updating accordingly. |
 | `better-sqlite3` (and the local `tf.db`/`records`/`UID`/`Perm` schema) | **Removed entirely.** No local database on the fixture at all — `m1tfc` calls `m1-factory-hub` directly for board test-result records, secret submission, and MAC allocation instead of writing to local SQLite and syncing later. This also drops a native module (`better-sqlite3` requires compilation) from every fixture install. |
@@ -218,7 +218,7 @@ The fixture host already runs Ubuntu Server + Node.js (via the `m1client`/`tfcro
 ## Migration Plan (staged)
 
 1. Procure/set up the Factory Server (physical PC on the factory LAN) with MySQL + `m1-factory-hub` + filesystem storage, and the same `autossh` remote-support service already used on fixtures; implement and test all endpoints above in isolation.
-2. Add `httpOp.js` to `tfcroncli`/`m1-cloud-client` for firmware `update` (behind the same interface as `azureOp.js`), and add the direct `m1tfc` → `m1-factory-hub` calls for boards/secrets/mac-allocate (replacing the local `records`/`UID` table reads/writes in `m1tfc`). Update `config.json`/`setup.sh` to point at the Factory Server's LAN address. Pilot on one fixture before wider rollout.
+2. Add `httpOp.js` to `tfcroncli` for firmware `update` (behind the same interface as `azureOp.js`), and add the direct `m1tfc` → `m1-factory-hub` calls for boards/secrets/mac-allocate (replacing the local `records`/`UID` table reads/writes in `m1tfc`). Update `config.json`/`setup.sh` to point at the Factory Server's LAN address. Pilot on one fixture before wider rollout.
 3. Cut fixtures over fixture-by-fixture (`update` retargeted; local SQLite removed; `m1tfc` now calls the Hub directly).
 4. Move MAC allocation to the central API last — highest process risk. Consider registering existing static allocations into `mac_allocations` first (for visibility) before fixtures start requesting *new* MACs from the pool.
 5. Stand up the daily conditional Azure backup job on the Factory Server (independent ops script, see below).

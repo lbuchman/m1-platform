@@ -23,7 +23,7 @@ In scope:
 
 Out of scope:
 
-- Cloud/update paths (m1-cloud-client, tfcroncli).
+- Cloud/update paths (tfcroncli).
 - Long-term reliability/aging tests.
 - EMI/EMC and environmental qualification.
 

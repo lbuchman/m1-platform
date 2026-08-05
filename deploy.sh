@@ -49,6 +49,15 @@ fi
 echo "Using FSBL: $LATEST_FSBL"
 cp "$LATEST_FSBL" "$TEMP_DEPLOY/fsbl.stm32"
 
+# azureStorage.json is not part of the repo (holds a live connection string);
+# it must exist locally next to deploy.sh and is staged into the payload so
+# setup.sh can read conString from it on the target.
+if [ ! -f "$SCRIPT_DIR/azureStorage.json" ]; then
+    echo "Error: azureStorage.json not found at $SCRIPT_DIR/azureStorage.json"
+    exit 1
+fi
+cp "$SCRIPT_DIR/azureStorage.json" "$TEMP_DEPLOY/azureStorage.json"
+
 # Include repository build artifacts in the unpacked deploy root so setup.sh
 # can access them from its working directory.
 if [ -d "$SCRIPT_DIR/artifacts" ]; then
