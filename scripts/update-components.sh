@@ -54,7 +54,7 @@ done
 components=(
     "m1tfc"
     "m1testBoardFw"
-    "mercury-testboard-fw"
+    "acm-testboard-fw"
     "stm32mp1-baremetal"
     "m1-rest-server"
     "m1-operator-ui"

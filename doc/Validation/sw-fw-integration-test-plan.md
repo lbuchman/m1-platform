@@ -5,7 +5,7 @@
 This document defines the integration test plan for the M1 fixture software and firmware stack:
 
 - PC layer: m1-operator-ui, m1-rest-server, m1tfc
-- Fixture firmware: m1testBoardFw, mercury-testboard-fw
+- Fixture firmware: m1testBoardFw, acm-testboard-fw
 - UUT firmware/runtime path: stm32mp1-baremetal over serial and USB/DFU flow
 
 The goal is to validate command routing, link ownership, protocol consistency, boot-mode control behavior, and operator-visible results.
@@ -42,14 +42,14 @@ Host:
 Hardware:
 
 - M1 Test Board running m1testBoardFw
-- Mercury Test Board running mercury-testboard-fw
+- Mercury Test Board running acm-testboard-fw
 - UUT with stm32mp1-baremetal and USB connection
 
 Connectivity:
 
 - Serial link A: m1tfc <-> m1testBoardFw
 - Serial link B: m1tfc <-> UUT serial header (independent of link A)
-- UDP link: m1tfc <-> mercury-testboard-fw
+- UDP link: m1tfc <-> acm-testboard-fw
 - USB link: PC <-> UUT (DFU/SSD workflow)
 
 Tooling:
@@ -125,13 +125,13 @@ TC-LINK-001 (P0) Dual serial independence
 
 TC-LINK-002 (P1) UDP channel availability
 
-- Objective: verify m1tfc command path to mercury-testboard-fw over UDP.
+- Objective: verify m1tfc command path to acm-testboard-fw over UDP.
 - Steps:
-  1. Send a mercury-targeted command.
+  1. Send a acm-testboard-fw-targeted command.
   2. Capture response and timing.
 - Expected:
   - Response returns over UDP.
-  - No fallback to serial for mercury path.
+  - No fallback to serial for acm path.
 
 ### 7.3 Protocol Consistency
 

@@ -21,7 +21,7 @@ This package is the controlled documentation baseline for the M1/MNPlus Unified 
 - EVM architecture diagram image and draw.io source (`Architecture/Platform/Source-Diagrams/`)
 - Current fixture design review diagram (`Architecture/Platform/Source-Diagrams/mnplus_design_review_v3.drawio`)
 - Engineering bench photograph, production fixture photographs, and all document-extracted images (`Images/`)
-- M1 Test Board and Mercury Controller Test Board schematic PDFs (`Architecture/Hardware/*/Source-Schematics/`)
+- M1 Test Board and ACM Controller Test Board schematic PDFs (`Architecture/Hardware/*/Source-Schematics/`)
 - M1-3200 and MNPlus-V3 UUT (product-under-test) reference schematics (`Architecture/Hardware/UUT-Reference/`)
 - Full architecture authoring context (`Architecture/Platform/Context/`)
 

@@ -5,7 +5,7 @@
 This plan covers the end-to-end `COMMISSION` flow started from the React operator UI and executed through:
 
 - `m1-operator-ui` -> `m1-rest-server` -> `m1tfc`
-- Fixture firmware paths (`m1testBoardFw`, `mercury-testboard-fw` where applicable)
+- Fixture firmware paths (`m1testBoardFw`, `acm-testboard-fw` where applicable)
 - UUT interfaces used by each command
 
 This document is intentionally code-grounded. Firmware runtime `help` remains the authoritative command/protocol reference.

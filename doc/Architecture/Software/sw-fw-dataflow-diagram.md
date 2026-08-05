@@ -17,7 +17,7 @@ flowchart BT
     end
 
     M1FW["m1testBoardFw"]:::fixfw
-    MERFW["mercury-testboard-fw"]:::fixfw
+    ACMFW["acm-testboard-fw"]:::fixfw
 
     subgraph UUT["UUT - stm32mp1-baremetal FW or Linux"]
         direction LR
@@ -29,11 +29,11 @@ flowchart BT
 
     TFC -->|Serial| M1FW
     TFC -->|Serial| UUT_SER
-    TFC -->|UDP| MERFW
+    TFC -->|UDP| ACMFW
     TFC -->|USB| UUT_USB
 
     M1FW -->|GPIO boot-select (1 pin) + GPIO/A-D test points| UUT_BOOT
-    MERFW -->|Access I/O| UUT_ACM
+    ACMFW -->|Access I/O| UUT_ACM
 ```
 
 ## Components
@@ -44,7 +44,7 @@ flowchart BT
 | `m1-rest-server` | `components/m1-rest-server` | Runs on the PC. Acts as a bridge between the React UI and `m1tfc`; it contains no test logic. |
 | `m1tfc` | `components/m1tfc` | Runs on the PC. Stands for M1 Test Fixture Control, owns the test workflow, and controls all hardware interfaces below. |
 | `m1testBoardFw` | `components/m1testBoardFw` | Firmware for the M1 Test Board. Connected to the PC over a dedicated serial link. Uses one GPIO boot-select control pin for UUT boot mode, and uses GPIO/A-D channels for fixture testing at UUT test points. |
-| `mercury-testboard-fw` | `components/mercury-testboard-fw` | Firmware for the Mercury Test Board. Connected to the PC over UDP. Exercises the UUT's access-control hardware. |
+| `acm-testboard-fw` | `components/acm-testboard-fw` | Firmware for the ACM Test Board. Connected to the PC over UDP. Exercises the UUT's access-control hardware. |
 | `stm32mp1-baremetal` | `components/stm32mp1-baremetal` | Firmware downloaded to the UUT with DFU helper flow and then run on bare metal. It is accessible via the UUT serial header, and `m1tfc` communicates with it over a dedicated serial link independent of the M1 Test Board link. |
 | UUT | — | Also has a direct USB link to the PC for DFU and SSD programming after the boot-select pins are set to the required boot target. |
 

@@ -3,9 +3,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-MERCURY_COMPONENT="mercury-testboard-fw"
-MERCURY_DIR="${ROOT_DIR}/components/${MERCURY_COMPONENT}"
-MERCURY_ENVIRONMENT="teensy41"
+ACM_COMPONENT="acm-testboard-fw"
+ACM_DIR="${ROOT_DIR}/components/${ACM_COMPONENT}"
+ACM_ENVIRONMENT="teensy41"
 FIXTURE_COMPONENT="m1testBoardFw"
 FIXTURE_DIR="${ROOT_DIR}/components/${FIXTURE_COMPONENT}"
 FIXTURE_TOOLCHAIN_FILE="${FIXTURE_DIR}/cross/arm-teensy41-gnueabihf.cmake"
@@ -16,42 +16,42 @@ STM32_COMPONENT="stm32mp1-baremetal"
 STM32_DIR="${ROOT_DIR}/components/${STM32_COMPONENT}"
 MTF_DIR="/var/m1mtf"
 COMMAND="build"
-TARGET="mercury"
+TARGET="all"
 ARTIFACT_DIR=""
 UPLOAD_PORT=""
 DRY_RUN=0
 
 usage() {
     cat <<'EOF'
-Usage: scripts/build_fw.sh [command] [target] [options]
+Usage: scripts/build-fw.sh [command] [target] [options]
 
 Commands:
-    build [mercury|fixture|stm32mp1|all]
-      Build firmware and copy release artifacts into artifacts/firmware/.
-      The default command is "build mercury" for backward compatibility.
+    build [acm|fixture|stm32mp1|all]
+      Build firmware and copy release artifacts into artifacts/.
+      The default command is "build all" to build all firmware components.
 
   install-stm32
       Build the STM32MP1 ICT FSBL and install fsbl.stm32 to /var/m1mtf/.
       The installed image is read by m1tfc for DFU/SRAM ICT programming.
 
-  program-mercury
-      Build and upload Mercury Teensy 4.1 firmware through PlatformIO. An
+  program-acm
+      Build and upload ACM Teensy 4.1 firmware through PlatformIO. An
       explicit --upload-port is required so two connected Teensys cannot be
       selected implicitly.
 
 Options:
-  --output-dir PATH     Copy build artifacts to PATH instead of artifacts/firmware/.
+  --output-dir PATH     Copy build artifacts to PATH instead of artifacts/.
   --mtf-dir PATH        STM32 fixture runtime directory (default: /var/m1mtf).
-  --upload-port PATH    Required by program-mercury; explicit Mercury USB port.
+  --upload-port PATH    Required by program-acm; explicit ACM USB port.
   --dry-run             Print actions without building, installing, or uploading.
   -h, --help            Show this help.
 
 Examples:
-  scripts/build_fw.sh
-    scripts/build_fw.sh build fixture
-  scripts/build_fw.sh build all
-  scripts/build_fw.sh install-stm32
-  scripts/build_fw.sh program-mercury --upload-port /dev/serial/by-id/usb-Teensyduino_USB_Serial_13167650-if00
+  scripts/build-fw.sh
+    scripts/build-fw.sh build fixture
+  scripts/build-fw.sh build all
+  scripts/build-fw.sh install-stm32
+  scripts/build-fw.sh program-acm --upload-port /dev/serial/by-id/usb-Teensyduino_USB_Serial_13167650-if00
 EOF
 }
 
@@ -68,21 +68,62 @@ run_in_dir() {
     fi
 }
 
+update_manifest() {
+    local manifest_path="$1"
+    local component="$2"
+    local filename="$3"
+    local commit="$4"
+    local artifact_type="$5"
+    local sha512="$6"
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+    if [[ "${DRY_RUN}" -eq 0 ]]; then
+        if [[ ! -f "${manifest_path}" ]]; then
+            # Create new manifest with first entry
+            printf '[]\n' | jq \
+                --arg component "${component}" \
+                --arg filename "${filename}" \
+                --arg commit "${commit}" \
+                --arg type "${artifact_type}" \
+                --arg sha512 "${sha512}" \
+                --arg timestamp "${timestamp}" \
+                '. += [{"component": $component, "filename": $filename, "commit": $commit, "type": $type, "sha512": $sha512, "timestamp": $timestamp}]' \
+                > "${manifest_path}"
+        else
+            # Append entry to existing manifest
+            jq \
+                --arg component "${component}" \
+                --arg filename "${filename}" \
+                --arg commit "${commit}" \
+                --arg type "${artifact_type}" \
+                --arg sha512 "${sha512}" \
+                --arg timestamp "${timestamp}" \
+                '. += [{"component": $component, "filename": $filename, "commit": $commit, "type": $type, "sha512": $sha512, "timestamp": $timestamp}]' \
+                "${manifest_path}" > "${manifest_path}.tmp"
+            mv "${manifest_path}.tmp" "${manifest_path}"
+        fi
+        log "manifest: ${manifest_path}"
+    fi
+}
+
 copy_artifact() {
     local component="$1"
     local artifact="$2"
     local commit="$3"
     local dirty="$4"
-    local destination="${ARTIFACT_DIR:-${ROOT_DIR}/artifacts/firmware/${component}/$(date +%Y%m%d-%H%M%S)}"
+    local output_filename="$5"
+    local destination="${ARTIFACT_DIR:-${ROOT_DIR}/artifacts}/${output_filename}"
+    local manifest_path="${ARTIFACT_DIR:-${ROOT_DIR}/artifacts}/manifestFile.json"
 
     log "+ install artifact ${artifact} -> ${destination}"
     if [[ "${DRY_RUN}" -eq 0 ]]; then
-        mkdir -p "${destination}"
-        cp -f "${artifact}" "${destination}/"
-        printf 'component=%s\ncommit=%s\nsource_state=%s\nartifact=%s\n' \
-            "${component}" "${commit}" "${dirty}" "$(basename "${artifact}")" > "${destination}/build-manifest.txt"
-        log "artifact: ${destination}/$(basename "${artifact}")"
-        log "manifest: ${destination}/build-manifest.txt"
+        mkdir -p "$(dirname "${destination}")"
+        cp -f "${artifact}" "${destination}"
+        log "artifact: ${destination}"
+        local sha512
+        sha512=$(sha512sum "${destination}" | awk '{print $1}')
+        update_manifest "${manifest_path}" "${component}" "${output_filename}" "${commit}" "firmware" "${sha512}"
     fi
 }
 
@@ -110,9 +151,9 @@ extract_stm32_fw_revision() {
     sed -n 's/.*fwRev[[:space:]]*=[[:space:]]*(char\*)[[:space:]]*"\([^"]*\)".*/\1/p' "${source_file}" | head -n 1
 }
 
-build_mercury() {
-    if [[ ! -f "${MERCURY_DIR}/platformio.ini" ]]; then
-        log "Missing Mercury PlatformIO project: ${MERCURY_DIR}"
+build_acm() {
+    if [[ ! -f "${ACM_DIR}/platformio.ini" ]]; then
+        log "Missing ACM PlatformIO project: ${ACM_DIR}"
         return 1
     fi
     if ! command -v pio >/dev/null 2>&1; then
@@ -122,50 +163,51 @@ build_mercury() {
 
     local commit
     local dirty
-    local firmware_hex="${MERCURY_DIR}/.pio/build/${MERCURY_ENVIRONMENT}/firmware.hex"
-    commit="$(component_revision "${MERCURY_DIR}")"
-    dirty="$(component_dirty_state "${MERCURY_DIR}")"
+    local firmware_hex="${ACM_DIR}/.pio/build/${ACM_ENVIRONMENT}/firmware.hex"
+    commit="$(component_revision "${ACM_DIR}")"
+    dirty="$(component_dirty_state "${ACM_DIR}")"
 
-    log "== Mercury test board firmware =="
-    log "source: ${MERCURY_DIR}"
+    log "== ACM Test Board firmware =="
+    log "source: ${ACM_DIR}"
     log "commit: ${commit} (${dirty})"
-    run_in_dir "${MERCURY_DIR}" pio run --environment "${MERCURY_ENVIRONMENT}"
+    run_in_dir "${ACM_DIR}" pio run --environment "${ACM_ENVIRONMENT}"
 
     if [[ "${DRY_RUN}" -eq 0 ]]; then
         if [[ ! -f "${firmware_hex}" ]]; then
-            log "No Mercury firmware artifact found after build: ${firmware_hex}"
+            log "No ACM firmware artifact found after build: ${firmware_hex}"
             return 1
         fi
-        copy_artifact "${MERCURY_COMPONENT}" "${firmware_hex}" "${commit}" "${dirty}"
+        copy_artifact "${ACM_COMPONENT}" "${firmware_hex}" "${commit}" "${dirty}" "acmfirmware.hex"
     fi
 }
 
 build_fixture() {
-    if [[ ! -f "${FIXTURE_DIR}/CMakeLists.txt" || ! -f "${FIXTURE_TOOLCHAIN_FILE}" ]]; then
-        log "Missing fixture Teensy project: ${FIXTURE_DIR}"
+    if [[ ! -f "${FIXTURE_DIR}/platformio.ini" ]]; then
+        log "Missing fixture PlatformIO project: ${FIXTURE_DIR}"
+        return 1
+    fi
+    if ! command -v pio >/dev/null 2>&1; then
+        log "PlatformIO CLI 'pio' is required but was not found in PATH"
         return 1
     fi
 
     local commit
     local dirty
-    local fixture_hex="${FIXTURE_DIR}/build/M1Teensy41.hex"
+    local fixture_hex="${FIXTURE_DIR}/.pio/build/teensy41/firmware.hex"
     commit="$(component_revision "${FIXTURE_DIR}")"
     dirty="$(component_dirty_state "${FIXTURE_DIR}")"
 
     log "== M1 fixture Teensy firmware =="
     log "source: ${FIXTURE_DIR}"
     log "commit: ${commit} (${dirty})"
-    log "+ cmake -S ${FIXTURE_DIR} -B ${FIXTURE_DIR}/build -DCMAKE_TOOLCHAIN_FILE=${FIXTURE_TOOLCHAIN_FILE} -DCMAKE_BUILD_TYPE=Release"
+    run_in_dir "${FIXTURE_DIR}" pio run --environment teensy41
+
     if [[ "${DRY_RUN}" -eq 0 ]]; then
-        cmake -S "${FIXTURE_DIR}" -B "${FIXTURE_DIR}/build" \
-            -DCMAKE_TOOLCHAIN_FILE="${FIXTURE_TOOLCHAIN_FILE}" \
-            -DCMAKE_BUILD_TYPE=Release
-        cmake --build "${FIXTURE_DIR}/build" -j"$(nproc)"
         if [[ ! -f "${fixture_hex}" ]]; then
             log "No fixture firmware artifact found after build: ${fixture_hex}"
             return 1
         fi
-        copy_artifact "${FIXTURE_COMPONENT}" "${fixture_hex}" "${commit}" "${dirty}"
+        copy_artifact "${FIXTURE_COMPONENT}" "${fixture_hex}" "${commit}" "${dirty}" "m1firmware.hex"
     fi
 }
 
@@ -206,7 +248,7 @@ build_stm32() {
         fi
         printf '%s\n' "${fw_revision}" > "${fw_revision_file}"
         log "revision file: ${fw_revision_file}"
-        copy_artifact "${STM32_COMPONENT}" "${firmware_stm32}" "${commit}" "${dirty}"
+        copy_artifact "${STM32_COMPONENT}" "${firmware_stm32}" "${commit}" "${dirty}" "stm32mp1_fsbl.stm32"
     fi
 }
 
@@ -225,14 +267,14 @@ install_stm32() {
     fi
 }
 
-program_mercury() {
+program_acm() {
     if [[ -z "${UPLOAD_PORT}" ]]; then
-        log "program-mercury requires --upload-port with the Mercury Teensy USB path"
+        log "program-acm requires --upload-port with the ACM Teensy USB path"
         exit 2
     fi
 
     if [[ ! -e "${UPLOAD_PORT}" ]]; then
-        log "Mercury upload port is not present: ${UPLOAD_PORT}"
+        log "ACM upload port is not present: ${UPLOAD_PORT}"
         exit 2
     fi
 
@@ -241,21 +283,21 @@ program_mercury() {
         exit 2
     fi
 
-    build_mercury
-    local firmware="${MERCURY_DIR}/.pio/build/${MERCURY_ENVIRONMENT}/firmware.hex"
+    build_acm
+    local firmware="${ACM_DIR}/.pio/build/${ACM_ENVIRONMENT}/firmware.hex"
     log "+ timeout ${TEENSY_LOADER_TIMEOUT_SECONDS}s ${TEENSY_LOADER_CLI} --mcu=TEENSY41 -w -s -v ${firmware}"
     if [[ "${DRY_RUN}" -eq 0 ]]; then
         local attempt=1
         while [[ "${attempt}" -le "${TEENSY_LOADER_ATTEMPTS}" ]]; do
-            log "Mercury flash attempt ${attempt}/${TEENSY_LOADER_ATTEMPTS}"
+            log "ACM flash attempt ${attempt}/${TEENSY_LOADER_ATTEMPTS}"
             if timeout "${TEENSY_LOADER_TIMEOUT_SECONDS}s" "${TEENSY_LOADER_CLI}" \
                 --mcu=TEENSY41 -w -s -v "${firmware}"; then
-                log "Mercury firmware programmed successfully"
+                log "ACM firmware programmed successfully"
                 return
             fi
             attempt=$((attempt + 1))
         done
-        log "Mercury programming failed after ${TEENSY_LOADER_ATTEMPTS} attempts"
+        log "ACM programming failed after ${TEENSY_LOADER_ATTEMPTS} attempts"
         exit 1
     fi
 }
@@ -315,8 +357,8 @@ done
 case "${COMMAND}" in
     build)
         case "${TARGET}" in
-            mercury)
-                build_mercury
+            acm)
+                build_acm
                 ;;
             fixture)
                 build_fixture
@@ -326,7 +368,7 @@ case "${COMMAND}" in
                 ;;
             all)
                 build_all_failed=0
-                if ! build_mercury; then
+                if ! build_acm; then
                     build_all_failed=1
                 fi
                 if ! build_fixture; then
@@ -351,8 +393,8 @@ case "${COMMAND}" in
     install-stm32)
         install_stm32
         ;;
-    program-mercury)
-        program_mercury
+    program-acm)
+        program_acm
         ;;
     *)
         log "Unknown command: ${COMMAND}"

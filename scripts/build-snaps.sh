@@ -7,6 +7,7 @@ COMPONENTS=(
     "m1tfc"
     "m1-rest-server"
     "m1-operator-ui"
+    "m1-cloud-client"
     "tfcroncli"
 )
 
@@ -14,7 +15,7 @@ UPDATE=0
 CLEAN=0
 DRY_RUN=0
 ONLY=""
-ARTIFACT_DIR="${ROOT_DIR}/artifacts/snaps"
+ARTIFACT_DIR="${ROOT_DIR}/artifacts"
 FAILED_COMPONENTS=()
 
 usage() {
@@ -27,7 +28,7 @@ Options:
   --update              Fetch and fast-forward each component repo before build.
   --clean               Run snapcraft clean before each build.
   --component NAME      Build only one component.
-    --output-dir PATH     Copy built snaps to PATH. Default: artifacts/snaps.
+    --output-dir PATH     Copy built snaps to PATH. Default: artifacts.
   --dry-run             Print actions without changing files or building.
   --list                List buildable snap components.
   -h, --help            Show this help.
@@ -36,6 +37,7 @@ Buildable components:
   m1tfc
   m1-rest-server
   m1-operator-ui
+  m1-cloud-client
   tfcroncli
 EOF
 }
@@ -98,7 +100,44 @@ git_fast_forward_update() {
     run git -C "${dir}" pull --ff-only
 }
 
-build_component() {
+update_manifest() {
+    local manifest_path="$1"
+    local component="$2"
+    local filename="$3"
+    local commit="$4"
+    local artifact_type="$5"
+    local sha512="$6"
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+    if [[ "${DRY_RUN}" -eq 0 ]]; then
+        if [[ ! -f "${manifest_path}" ]]; then
+            # Create new manifest with first entry
+            printf '[]\n' | jq \
+                --arg component "${component}" \
+                --arg filename "${filename}" \
+                --arg commit "${commit}" \
+                --arg type "${artifact_type}" \
+                --arg sha512 "${sha512}" \
+                --arg timestamp "${timestamp}" \
+                '. += [{"component": $component, "filename": $filename, "commit": $commit, "type": $type, "sha512": $sha512, "timestamp": $timestamp}]' \
+                > "${manifest_path}"
+        else
+            # Append entry to existing manifest
+            jq \
+                --arg component "${component}" \
+                --arg filename "${filename}" \
+                --arg commit "${commit}" \
+                --arg type "${artifact_type}" \
+                --arg sha512 "${sha512}" \
+                --arg timestamp "${timestamp}" \
+                '. += [{"component": $component, "filename": $filename, "commit": $commit, "type": $type, "sha512": $sha512, "timestamp": $timestamp}]' \
+                "${manifest_path}" > "${manifest_path}.tmp"
+            mv "${manifest_path}.tmp" "${manifest_path}"
+        fi
+        log "manifest: ${manifest_path}"
+    fi
+}
     local component="$1"
     local dir="${ROOT_DIR}/components/${component}"
     local snapcraft_yaml="${dir}/snap/snapcraft.yaml"
@@ -150,8 +189,11 @@ build_component() {
 
     mkdir -p "${ARTIFACT_DIR}"
     cp -f "${newest_snap}" "${ARTIFACT_DIR}/"
-    printf '%s %s %s %s\n' "${component}" "${commit}" "${dirty}" "$(basename "${newest_snap}")" >> "${ARTIFACT_DIR}/build-manifest.txt"
-    log "artifact: ${ARTIFACT_DIR}/$(basename "${newest_snap}")"
+    local snap_dest="${ARTIFACT_DIR}/$(basename "${newest_snap}")"
+    local sha512
+    sha512=$(sha512sum "${snap_dest}" | awk '{print $1}')
+    update_manifest "${ARTIFACT_DIR}/manifestFile.json" "${component}" "$(basename "${newest_snap}")" "${commit}" "snap" "${sha512}"
+    log "artifact: ${snap_dest}"
 }
 
 while [[ $# -gt 0 ]]; do
@@ -216,7 +258,6 @@ log "Output directory: ${ARTIFACT_DIR}"
 if [[ "${DRY_RUN}" -eq 0 ]]; then
     mkdir -p "${ARTIFACT_DIR}"
     find "${ARTIFACT_DIR}" -maxdepth 1 -type f -name '*.snap' -delete
-    rm -f "${ARTIFACT_DIR}/build-manifest.txt"
     find "${ROOT_DIR}"/components -mindepth 2 -maxdepth 2 -type f -name '*.snap' -delete
 fi
 

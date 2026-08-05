@@ -118,9 +118,9 @@ clone_or_update_component "m1testBoardFw" \
     "git@github.com:lbuchman/m1testBoardFw.git" \
     "https://github.com/lbuchman/m1testBoardFw.git"
 
-clone_or_update_component "mercury-testboard-fw" \
-    "git@github.com:lbuchman/mercury-testboard-fw.git" \
-    "https://github.com/lbuchman/mercury-testboard-fw.git"
+clone_or_update_component "acm-testboard-fw" \
+    "git@github.com:lbuchman/acm-testboard-fw.git" \
+    "https://github.com/lbuchman/acm-testboard-fw.git"
 
 clone_or_update_component "stm32mp1-baremetal" \
     "git@github.com:lbuchman/stm32mp1-baremetal.git" \

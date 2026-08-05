@@ -1,6 +1,6 @@
-# Mercury Test Board Firmware (Teensy) — RS485 Reader Investigation
+# ACM Test Board Firmware (Teensy) — RS485 Reader Investigation
 
-This file tracks the ongoing investigation into `components/mercury-testboard-fw` (Teensy 4.1) RS485 reader behavior. Keep entries factual; separate observed facts from inference per `AI/calibration.md`.
+This file tracks the ongoing investigation into `components/acm-testboard-fw` (Teensy 4.1) RS485 reader behavior. Keep entries factual; separate observed facts from inference per `AI/calibration.md`.
 
 ## Problem
 

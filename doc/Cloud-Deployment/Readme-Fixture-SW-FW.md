@@ -46,7 +46,7 @@ each entry containing `filetype`, `filename`, and a SHA-512 `hash`.
       "hash": "<sha-512 hash>"
     },
     {
-      "filetype": "mercury-test-board-boardfw",
+      "filetype": "acm-test-board-boardfw",
       "filename": "acmfirmware.hex",
       "hash": "<sha-512 hash>"
     },
@@ -75,7 +75,7 @@ Fixture's custom test-board firmware:
 
 - `m1testboardfw` — M1 test board (Teensy 4.1) firmware, built from
   `m1testBoardFw` (`firmware.hex`)
-- `mercury-test-board-boardfw` — Mercury test board firmware, built from
+- `acm-test-board-boardfw` — ACM test board firmware, built from
   `mercury-testboard-fw` (`acmfirmware.hex`)
 
 Target baremetal firmware:

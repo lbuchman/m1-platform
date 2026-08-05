@@ -84,7 +84,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -y sqlite3 arp-scan curl pyt
 sudo chmod 4755  /usr/sbin/arp-scan
 
 # teensy_loader_cli: headless Teensy flashing tool used by m1testBoardFw/
-# mercury-testboard-fw (upload_protocol = teensy-cli), needs libusb-0.1-4.
+# acm-testboard-fw (upload_protocol = teensy-cli), needs libusb-0.1-4.
 sudo cp -f "$SCRIPT_DIR"/teensy_loader_cli /usr/sbin/teensy_loader_cli
 sudo chown root:root /usr/sbin/teensy_loader_cli
 sudo chmod 755 /usr/sbin/teensy_loader_cli

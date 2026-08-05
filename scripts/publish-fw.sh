@@ -133,8 +133,8 @@ if command -v npm >/dev/null 2>&1; then
     npm_cmd="npm"
 fi
 
-FW_OUTPUT_DIR="${OUTPUT_DIR}/firmware"
-SNAP_OUTPUT_DIR="${ROOT_DIR}/artifacts/snaps"
+FW_OUTPUT_DIR="${ROOT_DIR}/artifacts"
+SNAP_OUTPUT_DIR="${ROOT_DIR}/artifacts"
 FIRMWARE_MANIFEST_PATH="${OUTPUT_DIR}/manifestFile.json"
 BOARDS_MANIFEST_PATH="${OUTPUT_DIR}/boardsManifest.json"
 
@@ -173,7 +173,7 @@ log "Snap output directory: ${SNAP_OUTPUT_DIR}"
 
 if [[ ! -d "${FW_OUTPUT_DIR}" ]]; then
     log "ERROR: firmware artifact directory missing: ${FW_OUTPUT_DIR}"
-    log "Run scripts/build_fw.sh first to populate firmware artifacts."
+    log "Run scripts/build-fw.sh first to populate firmware artifacts."
     exit 1
 fi
 
@@ -185,7 +185,7 @@ fi
 
 if ! find "${FW_OUTPUT_DIR}" -type f | grep -q .; then
     log "ERROR: firmware artifact directory is empty: ${FW_OUTPUT_DIR}"
-    log "Run scripts/build_fw.sh first to populate firmware artifacts."
+    log "Run scripts/build-fw.sh first to populate firmware artifacts."
     exit 1
 fi
 

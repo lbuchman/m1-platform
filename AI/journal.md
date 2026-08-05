@@ -8,7 +8,7 @@ This file records concise work history for AI-assisted platform work. Keep entri
 - Confirmed `/home/lenel/myGitHub/m1-platform-work` as staged platform root.
 - Added root README sections for components, production snaps, runtime configuration, snap builds, and root responsibilities.
 - Documented production snap set: M1TFC, REST server, Operator UI, Fixture PC cloud client (`tfcroncli`), General Ubuntu cloud client.
-- Documented firmware set: M1 fixture Teensy firmware, Mercury test board firmware, STM32MP1 bare-metal firmware.
+- Documented firmware set: M1 fixture Teensy firmware, ACM test board firmware, STM32MP1 bare-metal firmware.
 - Moved runtime config defaults from `/var/snap/m1tfc/current` to `/etc/m1platform` in M1TFC and REST server code paths.
 - Copied existing `/var/snap/m1tfc/current/config.json` and `calibration.json` to `/etc/m1platform/` on the current host.
 - Added root `scripts/build-snaps.sh` for the four currently packaged snaps.
@@ -20,10 +20,10 @@ This file records concise work history for AI-assisted platform work. Keep entri
 - Confirmed `tfcroncli` uses SQLite through `app/src/secrets.js`; SQLite is not an unused dependency.
 - Added root `AI/` directory for repo-owned AI state.
 - Reworked `AI/` into four files: `state.md`, `metadata.md`, `journal.md`, and `calibration.md`.
-- Converted Mercury test board firmware to a PlatformIO Teensy 4.1 project using `redDiamondsFixture/teensy` as the reference skeleton and shared-module pattern.
-- Restored Mercury PlatformIO firmware networking stack: NativeEthernet setup, TCP terminal, UDP terminal, NTP client, persistent network config, and LED status support.
-- Built and flashed Mercury firmware to the Mercury Teensy board after verifying board identity; latest build reports `FWVERSION=0.1`.
-- Validated Mercury Ethernet at `192.168.0.60`: ping succeeds, TCP port `23` accepts connections, `about`, `ifconfig`, `help`, and `getalldata` respond over TCP.
+- Converted ACM test board firmware to a PlatformIO Teensy 4.1 project using `redDiamondsFixture/teensy` as the reference skeleton and shared-module pattern.
+- Restored ACM PlatformIO firmware networking stack: NativeEthernet setup, TCP terminal, UDP terminal, NTP client, persistent network config, and LED status support.
+- Built and flashed ACM firmware to the ACM Teensy board after verifying board identity; latest build reports `FWVERSION=0.1`.
+- Validated ACM Ethernet at `192.168.0.60`: ping succeeds, TCP port `23` accepts connections, `about`, `ifconfig`, `help`, and `getalldata` respond over TCP.
 - Confirmed M1 fixture Teensy board ID read path through `getfwrev`; observed board ID `2` on the current bench fixture.
 - Tested M1TFC A/D calibration lookup by changing active board slot `2` TP305 scale in `/etc/m1platform/calibration.json`; ICT calibration run showed TP305 scaled value changing, proving calibration lookup is active.
 - Found calibration persistence issue: `saveCalibration()` suppresses write errors, and root-owned `/etc/m1platform/calibration.json` prevents normal-user calibration saves.
@@ -33,7 +33,7 @@ This file records concise work history for AI-assisted platform work. Keep entri
 ## 2026-07-19
 
 - Added `doc/operator-ui-user-guide.md`: operator workflow for the React test panel, including the existing `ui.png` reference image, production/debug mode behavior, run/re-test behavior, failure handling, debug controls, log behavior, and REST interfaces.
-- Added `doc/pictures/m1-fixture-and-mercury-test-architecture.svg`: software integration diagram covering React Operator UI, REST server, M1TFC, runtime files, Mercury TCP/UDP terminal access, and scheduled `tfcroncli`. The diagram explicitly labels documented communication interfaces and excludes fixture wiring/UUT hardware.
+- Added `doc/pictures/m1-fixture-and-acm-test-architecture.svg`: software integration diagram covering React Operator UI, REST server, M1TFC, runtime files, ACM TCP/UDP terminal access, and scheduled `tfcroncli`. The diagram explicitly labels documented communication interfaces and excludes fixture wiring/UUT hardware.
 - Confirmed `components/stm32mp1-baremetal` as a standalone local firmware repository imported from `M1Combined`; generated build output is excluded from the import.
 - Documented its ICT purpose: SDRAM is the test subject, so the STM32MP1 target must run bare-metal rather than Linux during SDRAM ICT.
 - Documented Arm GNU Toolchain `12.2.MPACBTI-Rel1` at `/opt/arm-gnu-toolchain-12.2.mpacbti-rel1-x86_64-arm-none-eabi` as the STM32MP1 bare-metal component-only compiler toolchain.
@@ -105,10 +105,10 @@ This file records concise work history for AI-assisted platform work. Keep entri
 ## 2026-07-28
 
 - Fixed `scripts/build-snaps.sh`: the build loop previously aborted the entire run (via `set -e`) the moment one component was missing `snap/snapcraft.yaml`; it now continues past a failed/missing component, tracks failures, and exits non-zero with a summary only after attempting all components. Hardened the `snapcraft pack` step to fail explicitly instead of risking a stale `.snap` being copied as a fresh artifact.
-- Fixed `scripts/build_fw.sh`: `build all` previously used `exit 1` inside `build_mercury`/`build_fixture`/`build_stm32`, so the first failing target (e.g. missing `pio`) stopped the whole run before other targets were attempted; functions now `return` instead of `exit`, and `all` attempts every target before failing.
+- Fixed `scripts/build-fw.sh`: `build all` previously used `exit 1` inside `build_mercury`/`build_fixture`/`build_stm32`, so the first failing target (e.g. missing `pio`) stopped the whole run before other targets were attempted; functions now `return` instead of `exit`, and `all` attempts every target before failing.
 - Removed unused `scripts/install-snaps.sh` (no references elsewhere in the repo). Root repo pushed to `origin/main` at commit `a4c26db`.
 - Root-caused `clone-components.sh` reporting "Repository not found" for every missing component: `~/.ssh/config`'s `github.com` entry was pinned to `~/.ssh/id_rsa`, which GitHub had registered under a separate enterprise-managed account (`Leo-Buchman_HON`), not the `lbuchman` account that owns these repos. Corrected the `IdentityFile` to `~/.ssh/id_github`, which authenticates as `lbuchman`; all 8 components now clone successfully.
-- Added a global git rewrite (`git config --global url."git@github.com:".insteadOf "https://github.com/"`) so HTTPS GitHub clone URLs (including those PlatformIO's Library Manager uses for `lib_deps` in `components/mercury-testboard-fw/platformio.ini`) transparently use the working SSH identity instead of the broken Windows git-credential-manager path. Verified `scripts/build_fw.sh build mercury` now completes successfully end to end.
+- Added a global git rewrite (`git config --global url."git@github.com:".insteadOf "https://github.com/"`) so HTTPS GitHub clone URLs (including those PlatformIO's Library Manager uses for `lib_deps` in `components/acm-testboard-fw/platformio.ini`) transparently use the working SSH identity instead of the broken Windows git-credential-manager path. Verified `scripts/build-fw.sh build acm` now completes successfully end to end.
 - Corrected a prior journal/state inaccuracy: `components/m1testBoardFw`'s PlatformIO conversion (`platformio.ini`, `README.platformio.md`) was never lost, but it is committed and pushed only to the component's `master` branch on `origin`; GitHub's default branch for that repo is still misconfigured to `main` (a stale single-commit branch), so plain clones and `clone-components.sh` were checking out the wrong branch. Local `components/m1testBoardFw` clone switched to track `origin/master`. GitHub default branch setting still needs to be corrected upstream (requires repo Settings access, not just SSH).
 - Consolidated `lbuchman/m1testBoardFw` to a single branch: force-pushed `origin/master` (the real history, including the PlatformIO conversion) onto `main`, then deleted `origin/master`. Local clone reset to track `origin/main`; repo now has one branch matching remote default.
 

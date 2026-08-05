@@ -85,8 +85,8 @@ Firmware publishing is handled through the m1-cloud-client workflow.
 Before running `scripts/publish-fw.sh`, build artifacts first:
 
 ```bash
-./scripts/build_fw.sh build all --output-dir artifacts/publish/firmware
-./scripts/build-snaps.sh --output-dir artifacts/snaps
+./scripts/build-fw.sh build all --output-dir artifacts/publish/firmware
+./scripts/build-snaps.sh --output-dir artifacts
 ```
 
 Then publish using existing artifacts only:
@@ -156,7 +156,7 @@ To update already-present component repos without re-cloning them, use:
 | --- | --- | --- | --- |
 | M1TFC | `git@github.com:lbuchman/m1tfc.git` | `components/m1tfc` | Fixture CLI, ICT, functional tests, hardware orchestration |
 | M1 fixture Teensy firmware | `git@github.com:lbuchman/m1testBoardFw.git` | `components/m1testBoardFw` | Teensy 4.1 firmware for M1 fixture boards |
-| Mercury test board firmware | `git@github.com:lbuchman/mercury-testboard-fw.git` | `components/mercury-testboard-fw` | PlatformIO Teensy firmware for Mercury test board, aligned to the `redDiamondsFixture/teensy` skeleton |
+| ACM test board firmware | `git@github.com:lbuchman/acm-testboard-fw.git` | `components/acm-testboard-fw` | PlatformIO Teensy firmware for ACM test board, aligned to the `redDiamondsFixture/teensy` skeleton |
 | STM32MP1 bare-metal ICT firmware | `git@github.com:lbuchman/stm32mp1-baremetal.git` | `components/stm32mp1-baremetal` | Bare-metal STM32MP1 firmware for ICT, including SDRAM test coverage unavailable when Linux owns the target |
 | REST server | `git@github.com:lbuchman/m1-rest-server.git` | `components/m1-rest-server` | REST API around fixture commands and status |
 | Operator UI | `git@github.com:lbuchman/m1-operator-ui.git` | `components/m1-operator-ui` | React production/debug operator interface |
@@ -199,7 +199,7 @@ Use fast-forward-only git updates when a fresh build from current remotes is nee
 ./scripts/build-snaps.sh --update
 ```
 
-The script copies built snap artifacts into `artifacts/snaps/<timestamp>/` and writes a small `build-manifest.txt` with component names, source commits, dirty/clean state, and artifact names. `m1-cloud-client` is an admin-only CLI (not deployed to fixtures) used to upload firmware/snap releases to Azure Cloud storage, so it has no production snap packaging and is not included in this build script.
+The script copies built snap artifacts into `artifacts/` and writes a small `build-manifest.txt` with component names, source commits, dirty/clean state, and artifact names. `m1-cloud-client` is an admin-only CLI (not deployed to fixtures) used to upload firmware/snap releases to Azure Cloud storage, so it has no production snap packaging and is not included in this build script.
 
 ## Fast Smoke Test Checklist
 
@@ -209,17 +209,17 @@ Run the post-install and pre-release smoke checks in:
 
 ## Platform Firmware Builds
 
-Use `scripts/build_fw.sh` from the platform root to build and stage firmware
+Use `scripts/build-fw.sh` from the platform root to build and stage firmware
 artifacts:
 
 ```bash
-./scripts/build_fw.sh                     # build Mercury firmware
-./scripts/build_fw.sh build fixture       # build M1 fixture Teensy firmware
-./scripts/build_fw.sh build stm32mp1      # build STM32MP1 ICT FSBL
-./scripts/build_fw.sh build all           # build both firmware components
+./scripts/build-fw.sh                     # build ACM firmware
+./scripts/build-fw.sh build fixture       # build M1 fixture Teensy firmware
+./scripts/build-fw.sh build stm32mp1      # build STM32MP1 ICT FSBL
+./scripts/build-fw.sh build all           # build both firmware components
 ```
 
-Build artifacts are copied to `artifacts/firmware/<component>/<timestamp>/`
+Build artifacts are copied to `artifacts/` directly.
 with a `build-manifest.txt` containing the source commit and dirty/clean state.
 Use `--output-dir PATH` to select another artifact directory or `--dry-run` to
 inspect a command without building, installing, or programming hardware.
@@ -233,7 +233,7 @@ The ICT command path reads the STM2 FSBL from `/var/m1mtf/fsbl.stm32`. Build and
 install the current STM32MP1 image with:
 
 ```bash
-./scripts/build_fw.sh install-stm32
+./scripts/build-fw.sh install-stm32
 ```
 
 This command builds `components/stm32mp1-baremetal/build/fsbl.stm32`, then uses
@@ -243,13 +243,13 @@ STM32MP1 component, the equivalent command is `make install`; use
 `MTF_DIR=PATH make install` only for a deliberately different fixture runtime
 directory.
 
-### Program Mercury Test Board
+### Program ACM Test Board
 
-Mercury test-board firmware is a PlatformIO Teensy 4.1 project. Build and
-upload it only through an explicit Mercury USB port:
+ACM test board firmware is a PlatformIO Teensy 4.1 project. Build and
+upload it only through an explicit ACM USB port:
 
 ```bash
-./scripts/build_fw.sh program-mercury \
+./scripts/build-fw.sh program-acm \
 	--upload-port /dev/serial/by-id/usb-Teensyduino_USB_Serial_13167650-if00
 ```
 

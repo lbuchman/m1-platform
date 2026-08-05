@@ -23,7 +23,7 @@ Firmware components:
 
 - M1 fixture Teensy firmware
 - M1 test board firmware (`components/m1testBoardFw`): CMake-based flow is known working. A PlatformIO Teensy 4.1 environment exists in `platformio.ini` and preserves existing source layout (`system/`, `libs/`) and core compile-time defines. CMake build files remain intact for A/B comparison and rollback. PlatformIO config no longer references a host-specific Arduino library path. Repo has a single branch, `main`, on `origin` (the former `master`, which held the real history, was force-merged onto `main` and deleted; the old stale single-commit `main` was discarded).
-- Mercury test board firmware: converted to a PlatformIO Teensy 4.1 Arduino project using `redDiamondsFixture/teensy` as the reference skeleton. Mercury-specific Ethernet, TCP terminal, UDP terminal, NTP, persistent config, and LED status support are restored in the PlatformIO project.
+- ACM test board firmware: converted to a PlatformIO Teensy 4.1 Arduino project using `redDiamondsFixture/teensy` as the reference skeleton. ACM-specific Ethernet, TCP terminal, UDP terminal, NTP, persistent config, and LED status support are restored in the PlatformIO project.
 - STM32MP1 bare-metal ICT firmware: target-side firmware used while SDRAM is under test. Linux must not run during this ICT path because it initializes and uses the test subject.
 - The STM32MP1 production FSBL builds from the component root `Makefile`; active source is in `src/`, headers/configuration in `include/`, vendor code in `third-party/`, and image tooling in `tools/`. It produces `build/fsbl.stm32` for bare-metal DDR/SDRAM ICT. A clean root build using the pinned Arm GNU toolchain passed on 2026-07-19 after restoring the historically renamed `STRIKE2_KICKER_POWER` symbol to its prior `GPIO::H` pin `3` assignment.
 
@@ -32,7 +32,7 @@ Firmware components:
 - Snap software actual version comes from installed snap metadata.
 - Firmware expected version comes from manifests, repo metadata, or image metadata.
 - Firmware actual version must be read from connected hardware through `m1tfc` or another hardware query path.
-- Mercury firmware has an `about` command returning JSON with `fw`, backed by `FWVERSION=0.1` in `components/mercury-testboard-fw/platformio.ini`.
+- ACM firmware has an `about` command returning JSON with `fw`, backed by `FWVERSION=0.1` in `components/acm-testboard-fw/platformio.ini`.
 - Latest Mercury runtime validation: Ethernet responds at `192.168.0.60`, TCP terminal listens on port `23`, and `about` over TCP returns firmware `0.1`.
 
 ## Runtime Configuration

@@ -41,9 +41,9 @@ find setup -maxdepth 1 ! -name "snaps" ! -name "setup" -exec cp -r {} "$TEMP_DEP
 
 # Stage the latest built STM32MP1 ICT FSBL into the deploy payload root, so
 # remote setup.sh can install it to /var/m1mtf/fsbl.stm32 from $SCRIPT_DIR.
-LATEST_FSBL=$(ls -t "$SCRIPT_DIR"/artifacts/firmware/stm32mp1-baremetal/*/fsbl.stm32 2>/dev/null | head -n 1)
+LATEST_FSBL=$(ls -t "$SCRIPT_DIR"/artifacts/stm32mp1_fsbl.stm32 2>/dev/null | head -n 1)
 if [ -z "$LATEST_FSBL" ]; then
-    echo "Error: no built fsbl.stm32 found under artifacts/firmware/stm32mp1-baremetal/*/"
+    echo "Error: no built fsbl.stm32 found at artifacts/stm32mp1_fsbl.stm32"
     exit 1
 fi
 echo "Using FSBL: $LATEST_FSBL"
@@ -73,7 +73,7 @@ get_snap() {
     #    after the pattern so e.g. pattern "m1tfc" cannot match
     #    "m1tfc-rest-server_0.1.0_amd64.snap".
     if [ -z "$latest" ]; then
-        latest=$(ls -t artifacts/snaps/*/"$pattern"_*.snap 2>/dev/null | head -n 1)
+        latest=$(ls -t artifacts/"$pattern"_*.snap 2>/dev/null | head -n 1)
     fi
 
     # 3. Look in component dir (same boundary rule as above)
