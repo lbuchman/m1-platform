@@ -30,7 +30,7 @@ The M1/MNPlus EVM is a reusable platform that supports engineering development, 
 
 - Programming, provisioning, recovery, and regeneration
 
-- Reusable M1 and Mercury simulation subsystems
+- Reusable M1 and ACM simulation subsystems
 
 - Cloud-connected updates, diagnostics, logs, secrets, and remote support
 
@@ -49,7 +49,7 @@ The M1/MNPlus EVM is a reusable platform that supports engineering development, 
 
   M1 Test Board                       M1-scope control, programming, recovery, measurements, boot selection, and product interface
 
-  Mercury Controller Test Board       Mercury/ACM simulation: readers, supervised inputs, relay/output validation, tamper and power-fault functions
+  ACM Controller Test Board       ACM/ACM simulation: readers, supervised inputs, relay/output validation, tamper and power-fault functions
 
   SAM-E Ethernet Subsystem            Local three-port Ethernet switching for test and PoE paths
 
@@ -90,11 +90,11 @@ The platform uses the same core architecture in two physical configurations. The
 
 - MNPlus platform, including the M1 and ACM functional scopes
 
-- Mercury controller families
+- ACM controller families
 
-- Mercury door controllers
+- ACM door controllers
 
-- Mercury I/O expansion boards
+- ACM I/O expansion boards
 
 - Elements end-to-end validation workflows
 
@@ -108,7 +108,7 @@ The platform uses the same core architecture in two physical configurations. The
 
 - M1 Test Board Hardware Specification
 
-- Mercury Controller Test Board Hardware Specification
+- ACM Controller Test Board Hardware Specification
 
 - Factory Production Fixture Assembly Guide
 

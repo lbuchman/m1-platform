@@ -212,7 +212,7 @@
         <mxCell id="zhnImcXhNiDmGjRM0Ika-2" value="PS 120AC&lt;div&gt;48V 1A&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="760" y="580.75" width="60" height="28.5" as="geometry" />
         </mxCell>
-        <mxCell id="zhnImcXhNiDmGjRM0Ika-3" value="Mercury Custorm&amp;nbsp;&lt;br&gt;Test Board" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+        <mxCell id="zhnImcXhNiDmGjRM0Ika-3" value="ACM Custorm&amp;nbsp;&lt;br&gt;Test Board" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="352" y="507.35" width="73.4" height="73.4" as="geometry" />
         </mxCell>
         <mxCell id="zhnImcXhNiDmGjRM0Ika-4" value="SAM-E&lt;div&gt;ETH Switch&lt;/div&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=none;strokeColor=#b85450;" parent="1" vertex="1">

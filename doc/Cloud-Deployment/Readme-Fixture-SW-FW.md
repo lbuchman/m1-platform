@@ -76,7 +76,7 @@ Fixture's custom test-board firmware:
 - `m1testboardfw` — M1 test board (Teensy 4.1) firmware, built from
   `m1testBoardFw` (`firmware.hex`)
 - `acm-test-board-boardfw` — ACM test board firmware, built from
-  `mercury-testboard-fw` (`acmfirmware.hex`)
+  `acm-testboard-fw` (`acmfirmware.hex`)
 
 Target baremetal firmware:
 

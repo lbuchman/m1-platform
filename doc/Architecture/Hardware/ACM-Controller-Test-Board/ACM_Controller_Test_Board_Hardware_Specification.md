@@ -1,6 +1,6 @@
-**Mercury Controller Test Board Hardware Specification**
+**ACM Controller Test Board Hardware Specification**
 
-*Reusable Mercury ecosystem simulation and validation subsystem*
+*Reusable ACM ecosystem simulation and validation subsystem*
 
 Version 1.0 \| July 25, 2026\
 Owner: Leo Buchman\
@@ -18,7 +18,7 @@ Status: Initial controlled draft
 
 # 1. Purpose
 
-The Mercury Controller Test Board provides reusable simulation and validation for Mercury controllers, door controllers, I/O boards, and the ACM scope used by MNPlus. The board was developed to support automated end-to-end Elements validation.
+The ACM Controller Test Board provides reusable simulation and validation for ACM controllers, door controllers, I/O boards, and the ACM scope used by MNPlus. The board was developed to support automated end-to-end Elements validation.
 
 # 2. Board Image
 
@@ -72,11 +72,11 @@ The schematic exposes Relay1 through Relay10 paths for validating controller out
 
 # 7. Supported Product Coverage
 
-- Mercury controller families
+- ACM controller families
 
-- Mercury door controllers
+- ACM door controllers
 
-- Mercury I/O expansion boards
+- ACM I/O expansion boards
 
 - MNPlus ACM scope
 
@@ -84,7 +84,7 @@ The schematic exposes Relay1 through Relay10 paths for validating controller out
 
 # 8. Current MNPlus Subset
 
-The current MNPlus fixture uses the subset required for ACM/MNPlus validation. Full Mercury capability can be exposed through a different plate, expanded pogo-pin mapping, and additional wiring. Core board redesign is not required.
+The current MNPlus fixture uses the subset required for ACM/MNPlus validation. Full ACM capability can be exposed through a different plate, expanded pogo-pin mapping, and additional wiring. Core board redesign is not required.
 
 # 9. Sustainment Data Required
 
@@ -104,4 +104,4 @@ The current MNPlus fixture uses the subset required for ACM/MNPlus validation. F
 
 # 10. Source Schematic
 
-See Source-Schematics/Mercury_Controller_Test_Board_Schematic.pdf in this package.
+See Source-Schematics/ACM_Controller_Test_Board_Schematic.pdf in this package.

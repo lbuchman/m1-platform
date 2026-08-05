@@ -58,7 +58,7 @@ Status: Initial controlled draft
 
 - Production pogo-pin connectivity through product-specific wiring
 
-# 3. Mercury / ACM-Scope Capabilities
+# 3. ACM / ACM-Scope Capabilities
 
 - Dual OSDP reader simulation
 
@@ -74,17 +74,17 @@ Status: Initial controlled draft
 
 - Power-fault simulation
 
-- Mercury controller validation
+- ACM controller validation
 
 - Door-controller validation
 
 - I/O expansion-board validation
 
-- End-to-end automated Mercury ecosystem testing
+- End-to-end automated ACM ecosystem testing
 
 # 4. Capability Versus Product Implementation
 
-A product fixture exposes the subset of platform capabilities required by that product. M1 and MNPlus use different physical plates and pogo-pin maps. Broader Mercury coverage requires a different plate, additional pogo-pin assignments, and additional wiring; the common Mercury simulation electronics remain unchanged.
+A product fixture exposes the subset of platform capabilities required by that product. M1 and MNPlus use different physical plates and pogo-pin maps. Broader ACM coverage requires a different plate, additional pogo-pin assignments, and additional wiring; the common ACM simulation electronics remain unchanged.
 
 # 5. Known Capability Boundaries
 

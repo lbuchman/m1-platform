@@ -41,11 +41,11 @@ The EVM is expected to remain supportable for approximately twenty years. The su
   ----------------------------------------------------------------------------------------------------------------------------------------------
   **Asset class**         **Examples**                                            **Required preservation**
   ----------------------- ------------------------------------------------------- --------------------------------------------------------------
-  Hardware design         M1 board, Mercury board, SAM-E, power, harnesses        Native CAD, libraries, BOM, manufacturing outputs
+  Hardware design         M1 board, ACM board, SAM-E, power, harnesses        Native CAD, libraries, BOM, manufacturing outputs
 
   Mechanical              Enclosure, plate, pogo bed, brackets                    CAD, STEP, DXF, drawings, materials
 
-  Firmware                M1 and Mercury test-board firmware                      Source, compiler/toolchain, build scripts, release binaries
+  Firmware                M1 and ACM test-board firmware                      Source, compiler/toolchain, build scripts, release binaries
 
   Software                React UI, REST server, Node.js executor, cloud client   Source, locked dependencies, install/deploy process
 

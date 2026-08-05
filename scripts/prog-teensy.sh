@@ -9,19 +9,22 @@ ARTIFACT_DIR="${ROOT_DIR}/artifacts"
 ACM_HEX="${ARTIFACT_DIR}/acmfirmware.hex"
 FIXTURE_HEX="${ARTIFACT_DIR}/m1firmware.hex"
 
-# Teensy loader
+# Teensy loader (on the remote host)
 TEENSY_LOADER_CLI="${TEENSY_LOADER_CLI:-/home/lenel/arduino-1.8.19/hardware/tools/teensy_loader_cli}"
 TEENSY_LOADER_ATTEMPTS="${TEENSY_LOADER_ATTEMPTS:-3}"
 TEENSY_LOADER_TIMEOUT_SECONDS="${TEENSY_LOADER_TIMEOUT_SECONDS:-25}"
+SSH_OPTS="-o StrictHostKeyChecking=accept-new"
 
 # Runtime
 DRY_RUN=0
 
 usage() {
     cat <<'EOF'
-Usage: scripts/prog-teensy.sh [acm|m1tb] [options]
+Usage: scripts/prog-teensy.sh [acm|m1tb] <host> [options]
 
-Upload prebuilt Teensy firmware from artifacts/ via USB (libusb)
+Upload prebuilt Teensy firmware from artifacts/ to a host via scp, then
+program it there via USB (libusb), since the Teensy is physically connected
+to that host.
 
 Board options:
   acm     Program ACM test board (artifacts/acmfirmware.hex)
@@ -29,14 +32,14 @@ Board options:
 
 Options:
   --dry-run             Print actions without uploading.
-  -h, --help            Show this help.
+  -h, --help             Show this help.
 
 Examples:
-  scripts/prog-teensy.sh m1tb
-    Upload artifacts/m1firmware.hex to Teensy device
+  scripts/prog-teensy.sh m1tb 192.168.1.50
+    Upload artifacts/m1firmware.hex to the Teensy device on that host
 
-  scripts/prog-teensy.sh acm
-    Upload artifacts/acmfirmware.hex to Teensy device
+  scripts/prog-teensy.sh acm 192.168.1.50
+    Upload artifacts/acmfirmware.hex to the Teensy device on that host
 EOF
 }
 
@@ -44,25 +47,12 @@ log() {
     printf '%s\n' "$*"
 }
 
-run_in_dir() {
-    local dir="$1"
-    shift
-    log "+ (cd ${dir} && $*)"
-    if [[ "${DRY_RUN}" -eq 0 ]]; then
-        (cd "${dir}" && "$@")
-    fi
-}
-
 program_teensy() {
     local board="${1:-}"
-    
-    if [[ -z "${board}" ]]; then
-        log "Error: board required (acm or m1tb)"
-        exit 2
-    fi
-    
-    if [[ ! -x "${TEENSY_LOADER_CLI}" ]]; then
-        log "Teensy loader CLI is not executable: ${TEENSY_LOADER_CLI}"
+    local host="${2:-}"
+
+    if [[ -z "${board}" || -z "${host}" ]]; then
+        log "Error: board and host required (acm|m1tb <host>)"
         exit 2
     fi
 
@@ -87,26 +77,38 @@ program_teensy() {
         exit 1
     fi
 
-    log "+ timeout ${TEENSY_LOADER_TIMEOUT_SECONDS}s ${TEENSY_LOADER_CLI} --mcu=TEENSY41 -w -s -v ${firmware}"
+    local remote_hex="/tmp/$(basename "${firmware}")"
+    log "+ scp ${SSH_OPTS} ${firmware} lenel@${host}:${remote_hex}"
+    local remote_cmd
+    remote_cmd="$(cat <<EOF
+set -e
+attempt=1
+while [ "\${attempt}" -le "${TEENSY_LOADER_ATTEMPTS}" ]; do
+    echo "Flash attempt \${attempt}/${TEENSY_LOADER_ATTEMPTS}"
+    if timeout ${TEENSY_LOADER_TIMEOUT_SECONDS}s "${TEENSY_LOADER_CLI}" --mcu=TEENSY41 -w -s -v "${remote_hex}"; then
+        echo "Teensy firmware programmed successfully"
+        rm -f "${remote_hex}"
+        exit 0
+    fi
+    attempt=\$((attempt + 1))
+done
+echo "Programming failed after ${TEENSY_LOADER_ATTEMPTS} attempts"
+rm -f "${remote_hex}"
+exit 1
+EOF
+)"
+
     if [[ "${DRY_RUN}" -eq 0 ]]; then
-        local attempt=1
-        while [[ "${attempt}" -le "${TEENSY_LOADER_ATTEMPTS}" ]]; do
-            log "Flash attempt ${attempt}/${TEENSY_LOADER_ATTEMPTS}"
-            if timeout "${TEENSY_LOADER_TIMEOUT_SECONDS}s" "${TEENSY_LOADER_CLI}" \
-                --mcu=TEENSY41 -w -s -v "${firmware}"; then
-                log "Teensy firmware programmed successfully"
-                return
-            fi
-            attempt=$((attempt + 1))
-        done
-        log "Programming failed after ${TEENSY_LOADER_ATTEMPTS} attempts"
-        exit 1
+        scp ${SSH_OPTS} "${firmware}" "lenel@${host}:${remote_hex}"
+        # shellcheck disable=SC2029
+        ssh ${SSH_OPTS} "lenel@${host}" "${remote_cmd}"
     fi
 }
 
 # ===== MAIN =====
 
 BOARD=""
+HOST=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -123,20 +125,25 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            log "Unknown option or board: $1"
-            usage
-            exit 2
+            if [[ -z "${HOST}" ]]; then
+                HOST="$1"
+                shift
+            else
+                log "Unknown option or argument: $1"
+                usage
+                exit 2
+            fi
             ;;
     esac
 done
 
-if [[ -z "${BOARD}" ]]; then
-    log "Error: board required (acm or m1tb)"
+if [[ -z "${BOARD}" || -z "${HOST}" ]]; then
+    log "Error: board and host required (acm|m1tb <host>)"
     usage
     exit 2
 fi
 
-program_teensy "${BOARD}"
+program_teensy "${BOARD}" "${HOST}"
 
 log ""
 log "Done."

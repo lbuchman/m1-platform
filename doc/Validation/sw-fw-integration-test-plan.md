@@ -18,7 +18,7 @@ In scope:
 - JSON command/response behavior on all three firmware targets.
 - Link separation and ownership by m1tfc.
 - UUT mode selection flow and DFU programming path.
-- Access-control path exercise through mercury-testboard-fw.
+- Access-control path exercise through acm-testboard-fw.
 - Error handling and operator feedback.
 
 Out of scope:
@@ -42,7 +42,7 @@ Host:
 Hardware:
 
 - M1 Test Board running m1testBoardFw
-- Mercury Test Board running acm-testboard-fw
+- ACM Test Board running acm-testboard-fw
 - UUT with stm32mp1-baremetal and USB connection
 
 Connectivity:
@@ -191,13 +191,13 @@ TC-DFU-001 (P0) USB/DFU programming path
 
 ### 7.5 Access-Control Path
 
-TC-ACM-001 (P1) Mercury access I/O exercise
+TC-ACM-001 (P1) ACM access I/O exercise
 
 - Objective: verify access-control hardware exercise path.
 - Steps:
-  1. Execute mercury test routine targeting access-control I/O.
+  1. Execute acm test routine targeting access-control I/O.
 - Expected:
-  - Command reaches mercury-testboard-fw over UDP.
+  - Command reaches acm-testboard-fw over UDP.
   - Expected access-control activity/telemetry observed.
 
 ### 7.6 Operator Experience and Results
@@ -249,7 +249,7 @@ TC-REC-001 (P1) Recover after transient link loss
 - Requirement: boot-mode control by GPIO pin -> TC-BOOT-001
 - Requirement: GPIO/A-D used for testing -> TC-BOOT-002
 - Requirement: USB/DFU programming path -> TC-DFU-001
-- Requirement: mercury access-control over UDP -> TC-ACM-001
+- Requirement: acm access-control over UDP -> TC-ACM-001
 
 ## 10. Reporting
 

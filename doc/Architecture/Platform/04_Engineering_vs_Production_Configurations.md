@@ -69,7 +69,7 @@ The engineering bench and production fixture are not different products. Both us
 
   M1 Test Board                   Used                        Used for M1 scope
 
-  Mercury Controller Test Board   As required by test scope   Used for ACM scope
+  ACM Controller Test Board   As required by test scope   Used for ACM scope
 
   Fixture plate                   M1-specific                 MNPlus-specific
 

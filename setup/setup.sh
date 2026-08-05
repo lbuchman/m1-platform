@@ -131,6 +131,9 @@ done
 mkdir -p /home/lenel/.ssh
 echo "cp -f cloud.key id_rsa authorized_keys /home/lenel/.ssh"
 cp -f "$SCRIPT_DIR"/cloud.key "$SCRIPT_DIR"/id_rsa "$SCRIPT_DIR"/authorized_keys /home/lenel/.ssh/
+# id_rsa.pub is never deployed: a stale .pub sidecar makes ssh offer the wrong
+# public key instead of deriving it from id_rsa, breaking auth silently.
+rm -f /home/lenel/.ssh/id_rsa.pub
 sudo chown lenel: .* -R /home/lenel/.ssh
 chmod 700 /home/lenel/.ssh
 sudo usermod -a -G dialout lenel

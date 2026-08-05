@@ -300,7 +300,7 @@ build_acm() {
     log "== ACM Test Board firmware =="
     log "source: ${ACM_DIR}"
     log "commit: ${commit}"
-    FW_REV="${commit}" run_in_dir "${ACM_DIR}" pio run --environment "${ACM_ENVIRONMENT}"
+    FW_FROM_BUILD_ALL="${FULL_BUILD}" FW_REV="${commit}" run_in_dir "${ACM_DIR}" pio run --environment "${ACM_ENVIRONMENT}"
 
     if [[ "${DRY_RUN}" -eq 0 ]]; then
         if [[ ! -f "${firmware_hex}" ]]; then
@@ -328,7 +328,7 @@ build_fixture() {
     log "== M1 fixture Teensy firmware =="
     log "source: ${FIXTURE_DIR}"
     log "commit: ${commit}"
-    FW_REV="${commit}" run_in_dir "${FIXTURE_DIR}" pio run --environment teensy41
+    FW_FROM_BUILD_ALL="${FULL_BUILD}" FW_REV="${commit}" run_in_dir "${FIXTURE_DIR}" pio run --environment teensy41
 
     if [[ "${DRY_RUN}" -eq 0 ]]; then
         if [[ ! -f "${fixture_hex}" ]]; then

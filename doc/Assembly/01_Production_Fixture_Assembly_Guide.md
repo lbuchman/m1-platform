@@ -38,7 +38,7 @@ This initial guide records the known production-fixture architecture and the fac
 
 - M1 Test Board
 
-- Mercury Controller Test Board
+- ACM Controller Test Board
 
 - SAM-E Ethernet switch
 
@@ -86,7 +86,7 @@ This initial guide records the known production-fixture architecture and the fac
 
 3\. Install terminal blocks, relay, PoE injector, USB hub, and SAM-E switch
 
-4\. Install M1 and Mercury test boards on approved standoffs
+4\. Install M1 and ACM test boards on approved standoffs
 
 5\. Install fanless PC and network/USB connections
 
@@ -122,7 +122,7 @@ This initial guide records the known production-fixture architecture and the fac
 
 - M1 Test Board self-test passed
 
-- Mercury Controller Test Board self-test passed
+- ACM Controller Test Board self-test passed
 
 - Pogo-pin continuity/contact verified
 

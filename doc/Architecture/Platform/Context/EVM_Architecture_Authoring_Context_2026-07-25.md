@@ -16,7 +16,7 @@ A future author or assistant should:
 1. Treat the product as a platform, not merely a test fixture.
 2. Start documentation at the platform level, then decompose into subsystems and implementations.
 3. Distinguish the engineering bench configuration from the production fixture configuration.
-4. Treat the M1 Test Board and Mercury Controller Test Board as reusable platform subsystems.
+4. Treat the M1 Test Board and ACM Controller Test Board as reusable platform subsystems.
 5. Use the actual design-source files and schematics as authoritative implementation references.
 6. Preserve the distinction between platform capability and the subset exposed by a product-specific plate, pogo-pin map, IDC connection, or wiring harness.
 7. Keep software, firmware, operations, assembly, manufacturing, validation, sustainment, and interface-control documentation in separate but coordinated sections.
@@ -28,7 +28,7 @@ A future author or assistant should:
 
 ## 2. Executive Summary
 
-The EVM is a reusable, multidisciplinary engineering platform supporting the complete product lifecycle across M1, MNPlus, ACM, and the broader Mercury controller ecosystem.
+The EVM is a reusable, multidisciplinary engineering platform supporting the complete product lifecycle across M1, MNPlus, ACM, and the broader ACM controller ecosystem.
 
 The platform supports:
 
@@ -79,7 +79,7 @@ Those terms may describe an implementation or use case, but not the entire platf
 ### 3.3 Preferred subsystem names
 
 - **M1 Test Board**
-- **Mercury Controller Test Board**
+- **ACM Controller Test Board**
 - **SAM-E Ethernet Subsystem**
 - **Platform Host / Headless PC**
 - **Production Fixture Interface**
@@ -88,9 +88,9 @@ Those terms may describe an implementation or use case, but not the entire platf
 ### 3.4 Scope labels in the platform diagram
 
 - **M1 Test Board (M1 Scope) — Teensy 4.1**
-- **Mercury Test Board (ACM Scope) — Teensy 4.1**
+- **ACM Test Board (ACM Scope) — Teensy 4.1**
 
-The labels explain why two Teensy-based boards exist. “ACM Scope” describes how the Mercury board is used within the current MNPlus implementation; the board's full capability is much broader than ACM-only support.
+The labels explain why two Teensy-based boards exist. “ACM Scope” describes how the ACM board is used within the current MNPlus implementation; the board's full capability is much broader than ACM-only support.
 
 ---
 
@@ -182,7 +182,7 @@ The individual technologies are components or “bricks.” The EVM architecture
 - Fanless headless PC.
 - USB hub.
 - M1 Test Board.
-- Mercury Controller Test Board.
+- ACM Controller Test Board.
 - SAM-E three-port Ethernet switch.
 - PoE power injector.
 - 48 VDC power supply.
@@ -202,7 +202,7 @@ The individual technologies are components or “bricks.” The EVM architecture
 - Cloud client.
 - CLI utilities.
 - M1 Test Board firmware.
-- Mercury Controller Test Board firmware.
+- ACM Controller Test Board firmware.
 - STM32MP1 firmware and bare-metal support components.
 
 ### 6.3 Primary communications
@@ -349,13 +349,13 @@ In the engineering bench configuration:
 
 ---
 
-## 9. Mercury Controller Test Board
+## 9. ACM Controller Test Board
 
 ### 9.1 Platform role
 
-The Mercury Controller Test Board is a reusable Mercury ecosystem simulation and validation subsystem.
+The ACM Controller Test Board is a reusable ACM ecosystem simulation and validation subsystem.
 
-The board was developed for end-to-end automated testing supporting Elements, a cloud solution. The board provides broad coverage across Mercury controllers and related products, not merely the limited ACM subset used by the current MNPlus fixture.
+The board was developed for end-to-end automated testing supporting Elements, a cloud solution. The board provides broad coverage across ACM controllers and related products, not merely the limited ACM subset used by the current MNPlus fixture.
 
 ### 9.2 Controller and communications
 
@@ -406,7 +406,7 @@ The platform can use these channels to verify controller relay activations and s
 
 ### 9.7 Product coverage
 
-- Mercury controller lines.
+- ACM controller lines.
 - Door controllers.
 - I/O expansion boards.
 - ACM-related functions within MNPlus.
@@ -414,15 +414,15 @@ The platform can use these channels to verify controller relay activations and s
 
 ### 9.8 Platform capability versus current implementation
 
-The current MNPlus deployment uses only the subset of Mercury capabilities required for ACM/MNPlus validation.
+The current MNPlus deployment uses only the subset of ACM capabilities required for ACM/MNPlus validation.
 
-Using broader Mercury functionality requires:
+Using broader ACM functionality requires:
 
 - A different product-specific fixture plate.
 - More or differently mapped pogo pins.
 - Additional wiring.
 
-This is an implementation variation, not a redesign of the core Mercury Controller Test Board.
+This is an implementation variation, not a redesign of the core ACM Controller Test Board.
 
 ### 9.9 Documentation required
 
@@ -449,7 +449,7 @@ This is an implementation variation, not a redesign of the core Mercury Controll
 - LenelS2 product manufactured in Saline.
 - Three-port Ethernet switching within the platform.
 - Receives a dedicated 5 V rail from the main power supply.
-- Connects the Mercury Test Board, PoE injector/UUT path, and host/network path as configured.
+- Connects the ACM Test Board, PoE injector/UUT path, and host/network path as configured.
 
 ### 10.2 COVID redesign history
 
@@ -521,7 +521,7 @@ Documentation should retain:
 
 - Host PC connects to local network infrastructure.
 - SAM-E provides local switching.
-- Mercury Controller Test Board uses Ethernet for test/control functions.
+- ACM Controller Test Board uses Ethernet for test/control functions.
 - PoE injector combines Ethernet and 48 VDC for the UUT.
 
 ### 12.2 USB
@@ -607,7 +607,7 @@ The draw.io diagram is considered architecture-review ready after these updates:
 
 - Title changed from a generic fixture layout to an EVM platform title.
 - M1 Test Board labeled with M1 scope.
-- Mercury Test Board labeled with ACM scope.
+- ACM Test Board labeled with ACM scope.
 - Headless PC included.
 - Azure/cloud block included.
 - Power rails shown, including the 5 V SAM-E rail.
@@ -634,7 +634,7 @@ Recommended compressed capability list:
 - REST API and Node.js automated test-execution framework.
 - Common platform architecture supporting multiple products and product families.
 
-Mercury capabilities:
+ACM capabilities:
 
 - OSDP reader simulation.
 - Wiegand reader simulation.
@@ -642,14 +642,14 @@ Mercury capabilities:
 - Eight supervised-input simulations.
 - Relay/output validation.
 - Door-controller validation.
-- Mercury-controller validation.
+- ACM-controller validation.
 - I/O expansion-board validation.
-- End-to-end automated Mercury ecosystem testing.
+- End-to-end automated ACM ecosystem testing.
 
 Notes:
 
 - The current MNPlus implementation uses the subset required for M1/MNPlus validation.
-- Additional Mercury capabilities can be utilized through product-specific plates, pogo-pin mappings, and wiring configurations.
+- Additional ACM capabilities can be utilized through product-specific plates, pogo-pin mappings, and wiring configurations.
 
 ---
 
@@ -676,7 +676,7 @@ components/
 ├── m1-rest-server/
 ├── m1testBoardFw/
 ├── m1tfc/
-├── mercury-testboard-fw/
+├── acm-testboard-fw/
 ├── stm32mp1-baremetal/
 └── tfcroncli/
 ```
@@ -695,7 +695,7 @@ doc/
 │   ├── Platform/
 │   ├── Hardware/
 │   │   ├── M1-Test-Board/
-│   │   ├── Mercury-Controller-Test-Board/
+│   │   ├── ACM-Controller-Test-Board/
 │   │   ├── SAM-E-Subsystem/
 │   │   ├── Power/
 │   │   ├── Network-and-PoE/
@@ -723,7 +723,7 @@ doc/
 ### 16.2 Architecture / Hardware
 
 - M1 Test Board Hardware Specification.
-- Mercury Controller Test Board Hardware Specification.
+- ACM Controller Test Board Hardware Specification.
 - SAM-E subsystem description.
 - Power Architecture.
 - Network and PoE Architecture.
@@ -733,7 +733,7 @@ doc/
 ### 16.3 Firmware — future
 
 - M1 Test Board Firmware Architecture.
-- Mercury Controller Test Board Firmware Architecture.
+- ACM Controller Test Board Firmware Architecture.
 - Firmware interfaces.
 - Build and release process.
 
@@ -836,7 +836,7 @@ Suggested sections:
 5. Network and PoE architecture.
 6. USB and serial architecture.
 7. M1 Test Board role.
-8. Mercury Controller Test Board role.
+8. ACM Controller Test Board role.
 9. Engineering direct-access interface.
 10. Production fixture interface.
 11. Product-specific adaptations.
@@ -862,7 +862,7 @@ Suggested sections:
 12. Manufacturing artifacts.
 13. Sustainment requirements.
 
-### Document 4 — Mercury Controller Test Board Hardware Specification
+### Document 4 — ACM Controller Test Board Hardware Specification
 
 Suggested sections:
 
@@ -1043,7 +1043,7 @@ Recommended process:
 ### Schematics
 
 - M1 Test Board schematic PDF.
-- Mercury Controller Test Board schematic PDF.
+- ACM Controller Test Board schematic PDF.
 - M1-3200 product schematic PDF.
 - MNPlus product schematic PDF.
 
@@ -1060,7 +1060,7 @@ Recommended process:
 - Operator UI.
 - REST server.
 - M1 board firmware.
-- Mercury board firmware.
+- ACM board firmware.
 - STM32MP1 bare-metal work.
 - Test framework.
 - CLI automation.
@@ -1076,7 +1076,7 @@ Recommended process:
 - Platform Capabilities.
 - Hardware Architecture.
 - M1 Test Board spec.
-- Mercury Controller Test Board spec.
+- ACM Controller Test Board spec.
 - Factory assembly package.
 - Sustainment foundations.
 
@@ -1097,7 +1097,7 @@ Those areas should already have reserved directory locations so future documents
 2. The production enclosure is one implementation of the platform.
 3. Engineering and production use the same core architecture but different interface layers.
 4. M1 and MNPlus require different plates/pogo mappings because the physical boards differ.
-5. The Mercury board has much broader capability than the ACM subset used in MNPlus.
+5. The ACM board has much broader capability than the ACM subset used in MNPlus.
 6. The M1 Test Board provides direct IDC engineering connectivity as well as production-interface support.
 7. The 5 V SAM-E rail must be shown in the power architecture.
 8. Draw.io section/background boxes must never become electrical endpoints.
@@ -1133,7 +1133,7 @@ Those areas should already have reserved directory locations so future documents
 2. EVM Hardware Architecture.
 3. Engineering vs Production Configurations.
 4. M1 Test Board Hardware Specification.
-5. Mercury Controller Test Board Hardware Specification.
+5. ACM Controller Test Board Hardware Specification.
 6. Production Fixture Assembly Guide.
 7. Wiring and Interface Package.
 8. Factory Acceptance Test.
@@ -1151,7 +1151,7 @@ Those areas should already have reserved directory locations so future documents
 2. The architecture was designed at system level before implementation.
 3. The platform unifies engineering, QA, manufacturing, recovery, and support.
 4. The M1 Test Board encapsulates M1-specific control and validation.
-5. The Mercury Controller Test Board is a reusable Mercury ecosystem simulator.
+5. The ACM Controller Test Board is a reusable ACM ecosystem simulator.
 6. Product-specific plates, pogo maps, IDC connections, and wiring expose selected platform capabilities.
 7. The headless PC provides the application, automation, cloud, recovery, and remote-support layer.
 8. The SAM-E and PoE subsystems provide controlled network and power infrastructure.

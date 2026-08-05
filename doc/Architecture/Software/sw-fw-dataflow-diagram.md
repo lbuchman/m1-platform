@@ -52,11 +52,11 @@ flowchart BT
 
 1. The operator uses `m1-operator-ui` in a browser, and the UI calls `m1-rest-server` through an HTTP REST API.
 2. `m1-rest-server` forwards commands to `m1tfc`, which owns all test sequencing and logic. Neither the UI nor the REST layer communicates with hardware directly.
-3. `m1tfc` is the sole owner of the hardware links. It opens three independent command channels: serial to the M1 Test Board (`m1testBoardFw`), a separate direct serial link to the UUT firmware (`stm32mp1-baremetal`), and UDP to the Mercury Test Board (`mercury-testboard-fw`).
+3. `m1tfc` is the sole owner of the hardware links. It opens three independent command channels: serial to the M1 Test Board (`m1testBoardFw`), a separate direct serial link to the UUT firmware (`stm32mp1-baremetal`), and UDP to the ACM Test Board (`acm-testboard-fw`).
 4. `m1tfc` also uses a direct USB link to the UUT for DFU-mode firmware and SSD programming.
 5. `m1testBoardFw` sets UUT boot mode with one GPIO boot-select control pin (normal boot, DFU for SSD programming, or download-and-execute of `stm32mp1-baremetal`). GPIO/A-D channels are used for fixture test-point measurements, not for firmware download.
-6. `mercury-testboard-fw` exercises the UUT access-control hardware.
-7. All three firmware targets use the same command/response model: `m1tfc` sends a command, and the firmware returns JSON (`status`, `error`, plus optional data). `mercury-testboard-fw` carries the same JSON framing over UDP instead of serial.
+6. `acm-testboard-fw` exercises the UUT access-control hardware.
+7. All three firmware targets use the same command/response model: `m1tfc` sends a command, and the firmware returns JSON (`status`, `error`, plus optional data). `acm-testboard-fw` carries the same JSON framing over UDP instead of serial.
 
 ## Out of Scope
 

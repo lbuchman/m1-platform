@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1500" height="900" viewBox="0 0 1500 900" role="img" aria-labelledby="title desc">
   <title id="title">M1 manufacturing test platform software integration</title>
-  <desc id="desc">Software and hardware integration architecture for the M1 manufacturing test platform. React Operator UI communicates with the M1TFC REST server over HTTP. The REST server invokes M1TFC. M1TFC controls the M1 Test Board and Mercury Test Board via USB Hub and SAM-E Ethernet switch, delivering power, PoE, interface testing, and voltage measurements to the mnplus UUT over pogo pins.</desc>
+  <desc id="desc">Software and hardware integration architecture for the M1 manufacturing test platform. React Operator UI communicates with the M1TFC REST server over HTTP. The REST server invokes M1TFC. M1TFC controls the M1 Test Board and ACM Test Board via USB Hub and SAM-E Ethernet switch, delivering power, PoE, interface testing, and voltage measurements to the mnplus UUT over pogo pins.</desc>
   <defs>
     <marker id="blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#176b87"/></marker>
     <marker id="green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#177451"/></marker>
@@ -19,7 +19,7 @@
 
   <rect width="1500" height="900" fill="#f7faf9"/>
   <text x="55" y="55" class="title">M1 Manufacturing Test Platform: System Architecture</text>
-  <text x="55" y="84" class="sub">Complete software and hardware integration view for M1 Test Board, Mercury, and mnplus UUT.</text>
+  <text x="55" y="84" class="sub">Complete software and hardware integration view for M1 Test Board, ACM, and mnplus UUT.</text>
 
   <!-- OPERATOR WORKSTATION -->
   <text x="55" y="132" class="lane">OPERATOR WORKSTATION</text>
@@ -73,7 +73,7 @@
   <rect x="1030" y="152" width="415" height="382" rx="6" fill="#fdf8f3" stroke="#d49b6a" stroke-width="2"/>
 
   <rect x="1060" y="196" width="355" height="110" rx="5" fill="#fff" stroke="#a85616" stroke-width="2"/>
-  <text x="1080" y="230" class="box">Mercury Test Board</text>
+  <text x="1080" y="230" class="box">ACM Test Board</text>
   <text x="1080" y="255" class="role">12V DC Input</text>
   <text x="1080" y="280" class="body">Ethernet Cable -> SAM-E Switch</text>
 
@@ -82,7 +82,7 @@
   <text x="1080" y="400" class="role">Unit Under Test</text>
   <text x="1080" y="425" class="body">PoE Input (over pogo-pins)</text>
   <text x="1080" y="450" class="body">M1 Power & Harness (over pogo-pins)</text>
-  <text x="1080" y="475" class="body">Mercury Connection (over pogo-pins)</text>
+  <text x="1080" y="475" class="body">ACM Connection (over pogo-pins)</text>
 
   <path d="M700 425 H1060" fill="none" stroke="#a85616" stroke-width="3" marker-end="url(#orange)"/>
   <path d="M960 425 H1060" fill="none" stroke="#177451" stroke-width="3" marker-end="url(#green)"/>
@@ -104,5 +104,5 @@
   <path d="M485 704 H1000" fill="none" stroke="#177451" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#green)"/>
 
   <rect x="55" y="838" width="1390" height="1" fill="#b9c8c9"/>
-  <text x="55" y="865" class="small">Reflects full hardware and software architecture including M1 Test Board, Mercury Test Board, SAM-E Ethernet switch, USB Hub, 48V PoE Relay, and mnplus UUT pogo-pin interfaces.</text>
+  <text x="55" y="865" class="small">Reflects full hardware and software architecture including M1 Test Board, ACM Test Board, SAM-E Ethernet switch, USB Hub, 48V PoE Relay, and mnplus UUT pogo-pin interfaces.</text>
 </svg>

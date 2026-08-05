@@ -9,7 +9,7 @@ This package is the controlled documentation baseline for the M1/MNPlus Unified 
 - EVM Hardware Architecture
 - Engineering vs Production Configurations
 - M1 Test Board Hardware Specification
-- Mercury Controller Test Board Hardware Specification
+- ACM Controller Test Board Hardware Specification
 - Production Fixture Assembly Guide
 - EVM Twenty-Year Sustainment Plan
 - M1 Operator UI Guide (`Operations/`)
@@ -39,7 +39,7 @@ doc/
 │   │   └── Source-Diagrams/    (draw.io sources)
 │   ├── Hardware/
 │   │   ├── M1-Test-Board/                  (spec + Source-Schematics/)
-│   │   ├── Mercury-Controller-Test-Board/   (aka ACM Board; spec + Source-Schematics/)
+│   │   ├── ACM-Controller-Test-Board/   (aka ACM Board; spec + Source-Schematics/)
 │   │   └── UUT-Reference/                  (M1-3200, MNPlus-V3 product schematics)
 │   ├── Firmware/    (reserved)
 │   └── Software/    (reserved)

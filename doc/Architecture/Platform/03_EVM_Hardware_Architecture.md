@@ -52,7 +52,7 @@ This document defines the physical hardware architecture of the EVM. Detailed so
 
 - SAM-E provides local Ethernet switching
 
-- Mercury Controller Test Board participates in network-based testing
+- ACM Controller Test Board participates in network-based testing
 
 - PoE injector combines Ethernet and controlled 48 VDC
 
@@ -67,7 +67,7 @@ This document defines the physical hardware architecture of the EVM. Detailed so
   ----------------------------------- ---------------------------------------------------------------------------------------------------------------------------------
   M1 Test Board                       M1-scope control, target power, boot selection, measurements, programming/recovery, direct IDC and production interface support
 
-  Mercury Controller Test Board       Reader simulation, supervised-input simulation, relay/output validation, tamper/power-fault simulation
+  ACM Controller Test Board       Reader simulation, supervised-input simulation, relay/output validation, tamper/power-fault simulation
 
   SAM-E                               Three-port Ethernet switching and test-network distribution
 
@@ -92,4 +92,4 @@ This document defines the physical hardware architecture of the EVM. Detailed so
 
 - M1 Test Board schematic: Architecture/Hardware/M1-Test-Board/Source-Schematics/M1_Test_Board_Schematic.pdf
 
-- Mercury Controller Test Board schematic: Architecture/Hardware/Mercury-Controller-Test-Board/Source-Schematics/Mercury_Controller_Test_Board_Schematic.pdf
+- ACM Controller Test Board schematic: Architecture/Hardware/ACM-Controller-Test-Board/Source-Schematics/ACM_Controller_Test_Board_Schematic.pdf
