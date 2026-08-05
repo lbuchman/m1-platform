@@ -11,6 +11,7 @@ FIXTURE_HEX="${ARTIFACT_DIR}/m1firmware.hex"
 
 # Teensy loader (on the remote host)
 TEENSY_LOADER_CLI="${TEENSY_LOADER_CLI:-/home/lenel/arduino-1.8.19/hardware/tools/teensy_loader_cli}"
+TEENSY_REBOOT="${TEENSY_REBOOT:-$(dirname "${TEENSY_LOADER_CLI}")/teensy_reboot}"
 TEENSY_LOADER_ATTEMPTS="${TEENSY_LOADER_ATTEMPTS:-3}"
 TEENSY_LOADER_TIMEOUT_SECONDS="${TEENSY_LOADER_TIMEOUT_SECONDS:-25}"
 SSH_OPTS="-o StrictHostKeyChecking=accept-new"
@@ -85,10 +86,40 @@ set -e
 attempt=1
 while [ "\${attempt}" -le "${TEENSY_LOADER_ATTEMPTS}" ]; do
     echo "Flash attempt \${attempt}/${TEENSY_LOADER_ATTEMPTS}"
-    if timeout ${TEENSY_LOADER_TIMEOUT_SECONDS}s "${TEENSY_LOADER_CLI}" --mcu=TEENSY41 -w -s -v "${remote_hex}"; then
-        echo "Teensy firmware programmed successfully"
-        rm -f "${remote_hex}"
-        exit 0
+    if [[ "${board}" == "acm" ]]; then
+        # ACM: try soft reboot path first, then direct bootloader flash fallback.
+        if timeout 6s "${TEENSY_LOADER_CLI}" --mcu=TEENSY41 -w -s -v "${remote_hex}"; then
+            echo "Teensy firmware programmed successfully"
+            rm -f "${remote_hex}"
+            exit 0
+        fi
+
+        # If soft reboot path fails, force bootloader entry and flash without -s.
+        if [ -x "${TEENSY_REBOOT}" ]; then
+            timeout 3s "${TEENSY_REBOOT}" >/dev/null 2>&1 || true
+        fi
+        if timeout $((TEENSY_LOADER_TIMEOUT_SECONDS + 10))s "${TEENSY_LOADER_CLI}" --mcu=TEENSY41 -w -v "${remote_hex}"; then
+            echo "Teensy firmware programmed successfully"
+            rm -f "${remote_hex}"
+            exit 0
+        fi
+    else
+        # M1TB: try soft reboot path first, then direct bootloader flash fallback.
+        if timeout 6s "${TEENSY_LOADER_CLI}" --mcu=TEENSY41 -w -s -v "${remote_hex}"; then
+            echo "Teensy firmware programmed successfully"
+            rm -f "${remote_hex}"
+            exit 0
+        fi
+
+        # If soft reboot path fails, force bootloader entry and flash without -s.
+        if [ -x "${TEENSY_REBOOT}" ]; then
+            timeout 3s "${TEENSY_REBOOT}" >/dev/null 2>&1 || true
+        fi
+        if timeout $((TEENSY_LOADER_TIMEOUT_SECONDS + 10))s "${TEENSY_LOADER_CLI}" --mcu=TEENSY41 -w -v "${remote_hex}"; then
+            echo "Teensy firmware programmed successfully"
+            rm -f "${remote_hex}"
+            exit 0
+        fi
     fi
     attempt=\$((attempt + 1))
 done
