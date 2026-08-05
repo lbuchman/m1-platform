@@ -4,14 +4,14 @@
 
 set -euo pipefail
 
-IP=$1
-TYPE=$2
-NUM=$3
-
-if [ -z "$IP" ] || [ -z "$TYPE" ] || [ -z "$NUM" ]; then
+if [ "$#" -ne 3 ]; then
     echo "Usage: $0 <ipaddress> <m1|mnp> <fixture_num>"
     exit 1
 fi
+
+IP=$1
+TYPE=$2
+NUM=$3
 
 # Ensure we are in the repository root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -99,9 +99,6 @@ get_snap() {
     fi
 }
 
-# m1client comes from tfcroncli
-get_snap "m1client" "m1client.snap" "tfcroncli" || echo "Warning: m1client snap missing"
-
 # m1tfc is the CLI/board-programming snap
 get_snap "m1tfc" "m1tfc.snap" "m1tfc" || echo "Warning: m1tfc snap missing"
 
@@ -112,7 +109,7 @@ get_snap "m1tfc-rest-server" "m1tfc-rest-server.snap" "m1-rest-server" || echo "
 get_snap "gui-react" "gui-react.snap" "m1-operator-ui" || echo "Warning: gui-react snap missing"
 
 # Check if they reached the temp dir
-for required_snap in m1client.snap m1tfc.snap m1tfc-rest-server.snap gui-react.snap; do
+for required_snap in m1tfc.snap m1tfc-rest-server.snap gui-react.snap; do
     if [ ! -f "$TEMP_DEPLOY/$required_snap" ]; then
         echo "Error: Required snap $required_snap could not be found or built."
         exit 1

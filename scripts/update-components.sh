@@ -58,7 +58,6 @@ components=(
     "stm32mp1-baremetal"
     "m1-rest-server"
     "m1-operator-ui"
-    "tfcroncli"
 )
 
 if [[ -n "${SELECTED_COMPONENT}" ]]; then

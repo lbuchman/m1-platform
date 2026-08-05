@@ -9,7 +9,6 @@ This guide covers fixture deployment using `deploy.sh`.
 - Private key available at `setup/id_rsa`.
 - Required local deploy inputs present:
   - `setup/setup.sh`
-  - `setup/snaps/m1client.snap`
   - `setup/snaps/m1tfc.snap`
   - `setup/snaps/m1tfc-rest-server.snap`
   - `setup/snaps/gui-react.snap`
@@ -31,7 +30,7 @@ Examples:
 ## What Deploy Does
 
 1. Builds a temporary deploy payload from `setup/`.
-2. Resolves `m1client.snap`, `m1tfc.snap`, `m1tfc-rest-server.snap`, and `gui-react.snap` and includes them in payload root.
+2. Resolves `m1tfc.snap`, `m1tfc-rest-server.snap`, and `gui-react.snap` and includes them in payload root.
 3. Creates a unique temporary archive in repo root, named like `setup_deploy.<random>.tar`.
 4. Copies archive to target `/home/lenel/setup_deploy.<random>.tar`.
 5. Unpacks to target `/home/lenel/setup_tmp/`.
@@ -58,7 +57,7 @@ setup script completed successfully
 - SSH auth fails (`Permission denied (publickey)`):
   - Ensure `setup/id_rsa` is the key used for target host.
 - Missing snaps on local machine:
-  - Ensure `setup/snaps/m1client.snap`, `setup/snaps/m1tfc.snap`, `setup/snaps/m1tfc-rest-server.snap`, and `setup/snaps/gui-react.snap` exist.
+  - Ensure `setup/snaps/m1tfc.snap`, `setup/snaps/m1tfc-rest-server.snap`, and `setup/snaps/gui-react.snap` exist.
 - Apt/network fetch errors on target:
   - Retry deployment when target network/mirror access is stable.
 

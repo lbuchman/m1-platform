@@ -20,7 +20,6 @@ REQUIRED_SNAP_PATTERNS=(
     "m1tfc_*.snap"
     "m1tfc-rest-server_*.snap"
     "gui-react_*.snap"
-    "m1client_*.snap"
 )
 
 REQUIRED_METADATA_FILES=(

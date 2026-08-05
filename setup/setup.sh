@@ -140,7 +140,6 @@ echo 'lenel ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/lenel-nopasswd > 
 sudo chmod 0440 /etc/sudoers.d/lenel-nopasswd
 sudo visudo -c
 
-sudo tar -xJf "$SCRIPT_DIR"/STMicroelectronics.txz -C /opt
 rm -f /etc/netplan/*
 sed -e "s/__ETH_DHCP_IF__/$ETH_DHCP_IF/" \
     -e "s/__ETH_STATIC_IF__/$ETH_STATIC_IF/" \
@@ -156,14 +155,24 @@ sed -i 's/20007/'"${SSHPORT}"'/'  /lib/systemd/system/autossh.service
 # and expected sha512 always come from the manifest, never hardcoded here.
 mkdir -p /var/m1mtf /var/m1mtf/logs /var/m1mtf/m1cli /var/m1mtf/backup /var/m1mtf/synclogs
 
-MANIFEST_URL=$(node -e "console.log(require('/etc/m1platform/config.json').firmwareManifestUrl)")
-if [ -z "$MANIFEST_URL" ] || [ "$MANIFEST_URL" = "undefined" ]; then
-    echo "ERROR: firmwareManifestUrl missing from /etc/m1platform/config.json"
+# conString comes from azureStorage.json, staged into the deploy payload by
+# deploy.sh; it is never hardcoded here and never committed to the repo.
+if [ ! -f "$SCRIPT_DIR/azureStorage.json" ]; then
+    echo "ERROR: $SCRIPT_DIR/azureStorage.json not found"
+    exit 1
+fi
+CON_STRING=$(node -e "console.log(require('$SCRIPT_DIR/azureStorage.json').conString)")
+if [ -z "$CON_STRING" ] || [ "$CON_STRING" = "undefined" ]; then
+    echo "ERROR: conString missing from $SCRIPT_DIR/azureStorage.json"
     exit 1
 fi
 
+if ! command -v az >/dev/null 2>&1; then
+    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+fi
+
 MANIFEST_TMP=$(mktemp)
-curl -fsSL -o "$MANIFEST_TMP" "$MANIFEST_URL"
+az storage blob download --container-name deployment --name manifestFile.json --file "$MANIFEST_TMP" --connection-string "$CON_STRING" --no-progress --output none
 
 if [ "$TYPE" = "m1" ]; then
     MANIFEST_KEY="m1firmware"
@@ -185,10 +194,29 @@ const entry = manifest.find((e) => e.filetype === '$MANIFEST_KEY');
 if (!entry) { process.exit(1); }
 console.log(entry.hash);
 ")
+
+STM32PROG_URL=$(node -e "
+const fs = require('fs');
+const manifest = JSON.parse(fs.readFileSync('$MANIFEST_TMP', 'utf8'));
+const entry = manifest.find((e) => e.filetype === 'stm32programmer');
+if (!entry) { process.exit(1); }
+console.log(entry.filename);
+")
+STM32PROG_SHA512=$(node -e "
+const fs = require('fs');
+const manifest = JSON.parse(fs.readFileSync('$MANIFEST_TMP', 'utf8'));
+const entry = manifest.find((e) => e.filetype === 'stm32programmer');
+if (!entry) { process.exit(1); }
+console.log(entry.hash);
+")
 rm -f "$MANIFEST_TMP"
 
 if [ -z "$FW_URL" ] || [ -z "$FW_SHA512" ]; then
     echo "ERROR: manifest entry '$MANIFEST_KEY' not found in firmware manifest"
+    exit 1
+fi
+if [ -z "$STM32PROG_URL" ] || [ -z "$STM32PROG_SHA512" ]; then
+    echo "ERROR: manifest entry 'stm32programmer' not found in firmware manifest"
     exit 1
 fi
 
@@ -205,6 +233,19 @@ fi
 rm -rf "/var/m1mtf/${FWDIR}"
 tar -xJf "$FW_TMP" -C /var/m1mtf
 rm -f "$FW_TMP"
+
+STM32PROG_TMP=$(mktemp --suffix=.txz)
+curl -fsSL -o "$STM32PROG_TMP" "$STM32PROG_URL"
+
+STM32PROG_ACTUAL_SHA512=$(sha512sum "$STM32PROG_TMP" | awk '{print $1}')
+if [ "$STM32PROG_ACTUAL_SHA512" != "$STM32PROG_SHA512" ]; then
+    echo "ERROR: STM32CubeProgrammer sha512 mismatch (expected $STM32PROG_SHA512, got $STM32PROG_ACTUAL_SHA512)"
+    rm -f "$STM32PROG_TMP"
+    exit 1
+fi
+
+sudo tar -xJf "$STM32PROG_TMP" -C /opt
+rm -f "$STM32PROG_TMP"
 
 # Install the STM32MP1 ICT FSBL, staged alongside setup.sh in the deploy
 # payload (see deploy.sh, which copies it from artifacts/ before packaging).
@@ -244,39 +285,21 @@ SQL
 curl -sL https://deb.nodesource.com/setup_24.x -o /tmp/nodesource_setup.sh
 sudo bash /tmp/nodesource_setup.sh
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
-sed -i '/m1client/d' /etc/crontab
 sed -i '/systemctl/d' /etc/crontab
 sed -i '/m1mtf/d' /etc/crontab
 
 echo "@reboot root sleep 120  && systemctl restart autossh" >> /etc/crontab
-echo "0  3  * * *   root /snap/bin/m1client update" >> /etc/crontab
-echo "20  3  * * *   root /snap/bin/m1client synclogs" >> /etc/crontab
-echo "40  3  * * *   root /snap/bin/m1client syncsecrets" >> /etc/crontab
-echo "40  4  * * *   root /snap/bin/m1client backupdb" >> /etc/crontab
 echo "40  6  * * *   root sudo sed -i '/root snap install/d'" >> /etc/crontab
 echo "50  3  * * *   root find /var/m1mtf/synclogs -type f -mtime +365 -delete" >> /etc/crontab
 echo "10  4  * * *   root find /var/m1mtf/logs -type d -mtime +365 -delete" >> /etc/crontab
 echo "10  4  * * *   root find /var/m1mtf/m1cli -type f -mtime +365 -delete" >> /etc/crontab
 
-snap install --classic --dangerous  m1client.snap 
 snap install --classic --dangerous  m1tfc.snap
 snap install --classic --dangerous  m1tfc-rest-server.snap
 snap install --dangerous  gui-react.snap
 
 # Install configs to system-wide location /etc/m1platform
 sudo mkdir -p /etc/m1platform
-
-# conString comes from azureStorage.json, staged into the deploy payload by
-# deploy.sh; it is never hardcoded here and never committed to the repo.
-if [ ! -f "$SCRIPT_DIR/azureStorage.json" ]; then
-    echo "ERROR: $SCRIPT_DIR/azureStorage.json not found"
-    exit 1
-fi
-CON_STRING=$(node -e "console.log(require('$SCRIPT_DIR/azureStorage.json').conString)")
-if [ -z "$CON_STRING" ] || [ "$CON_STRING" = "undefined" ]; then
-    echo "ERROR: conString missing from $SCRIPT_DIR/azureStorage.json"
-    exit 1
-fi
 
 # Create config.json on target
 cat << EOF > /etc/m1platform/config.json
@@ -338,6 +361,5 @@ sudo chown lenel: * -R /home/lenel
 sudo systemctl enable autossh.service
 sudo chown lenel: -R  /var/m1mtf
 netplan generate
-m1client update
 echo "setup script completed successfully"
 

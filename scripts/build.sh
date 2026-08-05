@@ -18,7 +18,6 @@ SNAP_COMPONENTS=(
     "m1tfc"
     "m1-rest-server"
     "m1-operator-ui"
-    "tfcroncli"
 )
 
 # Teensy loader
@@ -34,6 +33,7 @@ ARTIFACT_DIR=""
 UPDATE=0
 CLEAN=0
 DRY_RUN=0
+FULL_BUILD=0
 FAILED_ARTIFACTS=()
 MANIFEST_CHECK_FAILED=0
 
@@ -53,7 +53,11 @@ Commands:
       m1tfc             Build m1tfc snap only
       m1-rest-server    Build m1-rest-server snap only
       m1-operator-ui    Build m1-operator-ui snap only
-      tfcroncli         Build tfcroncli snap only
+
+    A full build ("all", i.e. no TARGET) embeds each component's real git
+    commit hash as its version, and is refused if any component repo has
+    uncommitted changes. Building an individual TARGET always uses the
+    fixed version "devbuild" instead.
 
   program-teensy [acm|m1tb]
     Build and upload Teensy firmware via USB (libusb)
@@ -63,7 +67,8 @@ Commands:
 
 Options:
   --update              Fetch and fast-forward component repos before build.
-  --clean               Run snapcraft clean before each snap build.
+  --clean               Remove artifacts/ (including manifestFile.json) before
+                        building, and run snapcraft clean before each snap build.
   --output-dir PATH     Copy artifacts to PATH instead of artifacts/.
 
   --dry-run             Print actions without building or installing.
@@ -170,13 +175,35 @@ component_dirty_state() {
     fi
 }
 
-extract_stm32_fw_revision() {
-    local source_file="${STM32_DIR}/src/main.cc"
-    if [[ ! -f "${source_file}" ]]; then
-        printf 'unknown'
-        return
+# Only a full "build all" run (FULL_BUILD=1) embeds the real git commit hash;
+# building an individual component/target always uses "devbuild".
+build_revision_for() {
+    local component_dir="$1"
+    if [[ "${FULL_BUILD}" -eq 1 ]]; then
+        component_revision "${component_dir}"
+    else
+        printf 'devbuild'
     fi
-    sed -n 's/.*fwRev[[:space:]]*=[[:space:]]*(char\*)[[:space:]]*"\([^"]*\)".*/\1/p' "${source_file}" | head -n 1
+}
+
+all_build_component_dirs() {
+    printf '%s\n' "${ACM_DIR}" "${FIXTURE_DIR}" "${STM32_DIR}"
+    local c
+    for c in "${SNAP_COMPONENTS[@]}"; do
+        printf '%s\n' "${ROOT_DIR}/components/${c}"
+    done
+}
+
+check_full_build_clean() {
+    local dirty=0
+    local d
+    while IFS= read -r d; do
+        if [[ "$(component_dirty_state "${d}")" == "dirty" ]]; then
+            log "Component repo is dirty: ${d}"
+            dirty=1
+        fi
+    done < <(all_build_component_dirs)
+    return $dirty
 }
 
 validate_manifest() {
@@ -268,12 +295,12 @@ build_acm() {
 
     local commit
     local firmware_hex="${ACM_DIR}/.pio/build/${ACM_ENVIRONMENT}/firmware.hex"
-    commit="$(component_revision "${ACM_DIR}")"
+    commit="$(build_revision_for "${ACM_DIR}")"
 
     log "== ACM Test Board firmware =="
     log "source: ${ACM_DIR}"
     log "commit: ${commit}"
-    run_in_dir "${ACM_DIR}" pio run --environment "${ACM_ENVIRONMENT}"
+    FW_REV="${commit}" run_in_dir "${ACM_DIR}" pio run --environment "${ACM_ENVIRONMENT}"
 
     if [[ "${DRY_RUN}" -eq 0 ]]; then
         if [[ ! -f "${firmware_hex}" ]]; then
@@ -296,12 +323,12 @@ build_fixture() {
 
     local commit
     local fixture_hex="${FIXTURE_DIR}/.pio/build/teensy41/firmware.hex"
-    commit="$(component_revision "${FIXTURE_DIR}")"
+    commit="$(build_revision_for "${FIXTURE_DIR}")"
 
     log "== M1 fixture Teensy firmware =="
     log "source: ${FIXTURE_DIR}"
     log "commit: ${commit}"
-    run_in_dir "${FIXTURE_DIR}" pio run --environment teensy41
+    FW_REV="${commit}" run_in_dir "${FIXTURE_DIR}" pio run --environment teensy41
 
     if [[ "${DRY_RUN}" -eq 0 ]]; then
         if [[ ! -f "${fixture_hex}" ]]; then
@@ -320,33 +347,23 @@ build_stm32() {
 
     local commit
     local firmware_stm32="${STM32_DIR}/build/fsbl.stm32"
-    local fw_revision
-    local fw_revision_file="${STM32_DIR}/stm32mp1_rev"
-    commit="$(component_revision "${STM32_DIR}")"
-    fw_revision="$(extract_stm32_fw_revision)"
-
-    if [[ -z "${fw_revision}" ]]; then
-        fw_revision="unknown"
-    fi
+    commit="$(build_revision_for "${STM32_DIR}")"
 
     log "== STM32MP1 ICT FSBL =="
     log "source: ${STM32_DIR}"
     log "commit: ${commit}"
-    log "fw revision: ${fw_revision}"
-    log "+ (cd ${STM32_DIR} && source env.sh && make clean && make)"
+    log "+ (cd ${STM32_DIR} && source env.sh && make clean && make FW_REV=${commit})"
     if [[ "${DRY_RUN}" -eq 0 ]]; then
         (
             cd "${STM32_DIR}"
             source env.sh
             make clean
-            make
+            make FW_REV="${commit}"
         )
         if [[ ! -f "${firmware_stm32}" ]]; then
             log "No STM32 FSBL artifact found after build: ${firmware_stm32}"
             return 1
         fi
-        printf '%s\n' "${fw_revision}" > "${fw_revision_file}"
-        log "revision file: ${fw_revision_file}"
         copy_artifact "${STM32_COMPONENT}" "${firmware_stm32}" "${commit}" "stm32mp1_fsbl.stm32"
     fi
 }
@@ -443,7 +460,7 @@ build_snap_component() {
         git_fast_forward_update "${dir}"
     fi
 
-    commit="$(git -C "${dir}" rev-parse --short HEAD 2>/dev/null || printf 'unknown')"
+    commit="$(build_revision_for "${dir}")"
 
     log "source: ${dir}"
     log "commit: ${commit}"
@@ -456,10 +473,18 @@ build_snap_component() {
         run_in_dir "${dir}" snapcraft clean
     fi
 
+    # Version comes from snapcraft.yaml's adopt-info part, which reads this
+    # file (snapcraft's build environment does not inherit host env vars).
+    local fw_rev_file="${dir}/.fw_rev"
+    printf '%s' "${commit}" > "${fw_rev_file}"
+
     if ! run_in_dir "${dir}" snapcraft pack; then
         log "snapcraft pack failed for ${component}"
+        rm -f "${fw_rev_file}"
         return 1
     fi
+
+    rm -f "${fw_rev_file}"
 
     if [[ "${DRY_RUN}" -eq 1 ]]; then
         return 0
@@ -605,12 +630,24 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+if [[ "${CLEAN}" -eq 1 && "${COMMAND}" == "build" ]]; then
+    artifacts_dir="${ARTIFACT_DIR:-${ROOT_DIR}/artifacts}"
+    log "Removing ${artifacts_dir} (--clean)"
+    rm -rf "${artifacts_dir}"
+fi
+
 case "${COMMAND}" in
     build)
         # parse: build [firmware|snaps|TARGET]
         case "${TARGET}" in
             ""|all)
                 # build all
+                FULL_BUILD=1
+                if ! check_full_build_clean; then
+                    log "Refusing full build: one or more component repos have uncommitted changes."
+                    log "Commit or stash changes, or build an individual target (which uses 'devbuild')."
+                    exit 1
+                fi
                 if ! build_all_firmware; then
                     :
                 fi
@@ -639,7 +676,7 @@ case "${COMMAND}" in
                     stm32mp1) build_stm32 || FAILED_ARTIFACTS+=("stm32mp1-baremetal") ;;
                 esac
                 ;;
-            m1tfc|m1-rest-server|m1-operator-ui|tfcroncli)
+            m1tfc|m1-rest-server|m1-operator-ui)
                 # Snap component shorthand
                 build_one_snap "${TARGET}" || FAILED_ARTIFACTS+=("${TARGET}")
                 ;;
