@@ -69,6 +69,25 @@ Use values appropriate to the installed fixture, product, and production site. T
 - `coinCellMinVoltageUsed`: minimum coin-cell voltage for `--cellBatTol used`.
 - `skipTestpointCheck`, `skipRS485test`, `skipBatteryTest`, and `forceEppromOverwrite`: production-test behavior controls.
 
+## Operator UI PIN Gate
+
+`productionPassword` and `debugPassword` in `config.json` gate the "production"
+and "debug" views in the operator UI (`m1-rest-server`'s `/auth` and
+`/changepin` routes). This is a UI convenience to keep regular operators out
+of the debug log view, not a network access control — the REST API itself
+does not require a PIN to execute fixture commands, so it must only run on a
+controlled, isolated fixture LAN.
+
+`config.json` is the only place these PINs live; `m1-rest-server` has no
+built-in default and requires them to be present. `provision-new-pc/setup/setup.sh`
+inserts default values (`productionPassword: "1234"`, `debugPassword: "4321"`)
+when it creates `config.json` on a freshly provisioned fixture PC. Change them
+per-site with:
+
+```bash
+sudoedit /etc/m1platform/config.json
+```
+
 Some deployments also store service credentials or production passwords in this file. Do not copy those values into source control, logs, or documentation. Apply host access controls appropriate to the users and services that must run `m1tfc`.
 
 Edit and validate the file:
