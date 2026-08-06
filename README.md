@@ -107,6 +107,15 @@ artifacts:
 ./scripts/build.sh build all         # build all firmware and all snaps
 ```
 
+Individual snaps can be built the same way:
+
+```bash
+./scripts/build.sh build m1tfc            # build m1tfc snap only
+./scripts/build.sh build m1-rest-server   # build m1-rest-server snap only
+./scripts/build.sh build m1-operator-ui   # build m1-operator-ui snap only
+./scripts/build.sh build snaps            # build all snaps
+```
+
 Build artifacts are copied to `artifacts/` directly, alongside a
 `build-manifest.txt` containing the source commit and dirty/clean state.
 Use `--output-dir PATH` to select another artifact directory or `--dry-run` to
