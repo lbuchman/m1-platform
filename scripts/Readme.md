@@ -14,3 +14,34 @@ Automation used to bootstrap, build, program, and publish the M1 platform.
 | `update-components.sh` | Fast-forward pulls already-cloned `components/*` repos without re-cloning; supports `--component` and `--dry-run`. |
 
 Run any script with `-h`/`--help` (where supported) for full usage and options.
+
+## build.sh Usage
+
+Build firmware and stage artifacts:
+
+```bash
+./scripts/build.sh build acm        # build ACM firmware
+./scripts/build.sh build fixture     # build M1 fixture Teensy firmware
+./scripts/build.sh build stm32mp1    # build STM32MP1 ICT FSBL
+./scripts/build.sh build firmware    # build all firmware components
+./scripts/build.sh build all         # build all firmware and all snaps
+```
+
+Build snap packages the same way:
+
+```bash
+./scripts/build.sh build m1tfc            # build m1tfc snap only
+./scripts/build.sh build m1-rest-server   # build m1-rest-server snap only
+./scripts/build.sh build m1-operator-ui   # build m1-operator-ui snap only
+./scripts/build.sh build snaps            # build all snaps
+```
+
+Build artifacts are copied to `artifacts/` directly, alongside a
+`build-manifest.txt` containing the source commit and dirty/clean state.
+Use `--output-dir PATH` to select another artifact directory, `--update` for
+fast-forward-only git updates from current remotes, or `--dry-run` to inspect
+a command without building, installing, or programming hardware.
+
+`build fixture` compiles `components/m1testBoardFw` with PlatformIO
+(`pio run --environment teensy41`) and stages the resulting `.hex` as
+`artifacts/m1firmware.hex`.

@@ -4,15 +4,35 @@ This repository is the root repository for the M1 embedded manufacturing test pl
 
 The root repository does not replace the component repositories. It documents and organizes them so the full platform can be cloned, set up, released, and recovered as one system.
 
-## Deployment Guide
+## Top-Level Directory Structure
 
-See [provision-new-pc/Readme.md](provision-new-pc/Readme.md) for fixture deployment instructions, required inputs, examples, and troubleshooting.
+| Directory | Purpose |
+| --- | --- |
+| `artifacts/` | Build output (snaps, firmware images, manifest) produced by `scripts/build.sh`. |
+| `components/` | Independently git-tracked component repos (`m1tfc`, `m1testBoardFw`, `acm-testboard-fw`, `stm32mp1-baremetal`, `m1-rest-server`, `m1-operator-ui`), populated via `scripts/clone-components.sh`. |
+| `documentation/` | Controlled documentation baseline: architecture, hardware, assembly, operations, validation, sustainment, and cloud-deployment docs. |
+| `provision-new-pc/` | Fixture PC provisioning and deployment tooling (`setup.sh`, `deploy.sh`, required inputs). |
+| `scripts/` | Automation scripts: build, clone/update components, publish firmware, program Teensy boards. |
 
 ## Build PC Software Requirements
 
 See [documentation/BuildPC/Readme.md](documentation/BuildPC/Readme.md) for the software required
 on a workstation used to build platform components (Ubuntu packages, Node,
 Snapcraft, VS Code/PlatformIO, and the Arm toolchain).
+
+## Build the Platform
+
+From the repository root, after cloning components (see [Bootstrap Components](#bootstrap-components) below):
+
+```bash
+./scripts/build.sh build
+```
+
+Builds all firmware and all snaps, staging artifacts in `artifacts/` alongside `manifestFile.json`.
+
+## Fixture PC Deployment Guide
+
+See [provision-new-pc/Readme.md](provision-new-pc/Readme.md) for fixture deployment instructions, required inputs, examples, and troubleshooting.
 
 ## Firmware Publishing
 
@@ -26,20 +46,7 @@ After cloning the platform root, populate `components/` with split repositories:
 ./scripts/clone-components.sh
 ```
 
-Cloning uses SSH git URLs (`git@github.com:...`). Use `--update` to fast-forward
-existing component clones:
-
-```bash
-./scripts/clone-components.sh --update
-```
-
-To update already-present component repos without re-cloning them, use:
-
-```bash
-./scripts/update-components.sh
-./scripts/update-components.sh --component m1tfc
-./scripts/update-components.sh --dry-run
-```
+See [scripts/Readme.md](scripts/Readme.md) for update/dry-run options and the rest of the automation scripts.
 
 ## Components
 
@@ -66,33 +73,7 @@ Production snap packages should use Node 24.
 
 ## Platform Snap Builds
 
-Use `scripts/build.sh` to build snap packages:
-
-```bash
-./scripts/build.sh build snaps
-```
-
-It builds the three snap packages that currently have snap packaging in the split workspace:
-
-- M1TFC
-- REST server
-- Operator UI
-
-Each snap can also be built individually:
-
-```bash
-./scripts/build.sh build m1tfc
-./scripts/build.sh build m1-rest-server
-./scripts/build.sh build m1-operator-ui
-```
-
-Use fast-forward-only git updates when a fresh build from current remotes is needed:
-
-```bash
-./scripts/build.sh build snaps --update
-```
-
-The script copies built snap artifacts into `artifacts/` and writes a small `manifestFile.json` with component names, source commits, dirty/clean state, and artifact names.
+See [scripts/Readme.md](scripts/Readme.md#buildsh-usage) for full `build.sh` firmware/snap target usage and options.
 
 ## Fast Smoke Test Checklist
 
@@ -102,34 +83,7 @@ Run the post-install and pre-release smoke checks in:
 
 ## Platform Firmware Builds
 
-Use `scripts/build.sh` from the platform root to build and stage firmware
-artifacts:
-
-```bash
-./scripts/build.sh build acm        # build ACM firmware
-./scripts/build.sh build fixture     # build M1 fixture Teensy firmware
-./scripts/build.sh build stm32mp1    # build STM32MP1 ICT FSBL
-./scripts/build.sh build firmware    # build all firmware components
-./scripts/build.sh build all         # build all firmware and all snaps
-```
-
-Individual snaps can be built the same way:
-
-```bash
-./scripts/build.sh build m1tfc            # build m1tfc snap only
-./scripts/build.sh build m1-rest-server   # build m1-rest-server snap only
-./scripts/build.sh build m1-operator-ui   # build m1-operator-ui snap only
-./scripts/build.sh build snaps            # build all snaps
-```
-
-Build artifacts are copied to `artifacts/` directly, alongside a
-`build-manifest.txt` containing the source commit and dirty/clean state.
-Use `--output-dir PATH` to select another artifact directory or `--dry-run` to
-inspect a command without building, installing, or programming hardware.
-
-`build fixture` compiles `components/m1testBoardFw` with PlatformIO
-(`pio run --environment teensy41`) and stages the resulting `.hex` as
-`artifacts/m1firmware.hex`.
+See [scripts/Readme.md](scripts/Readme.md#buildsh-usage) for full `build.sh` firmware/snap target usage and options.
 
 ### Program Teensy Boards
 
