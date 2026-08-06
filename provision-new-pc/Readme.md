@@ -5,14 +5,19 @@ This guide covers fixture deployment using `deploy.sh`.
 ## Prerequisites
 
 - Run commands from the repository root.
-- SSH access to the target host as `lenel`.
-- Private key available at `setup/id_rsa`.
-- Required local deploy inputs present:
-  - `setup/setup.sh`
-  - `setup/snaps/m1tfc.snap`
-  - `setup/snaps/m1tfc-rest-server.snap`
-  - `setup/snaps/gui-react.snap`
-  - setup assets under `setup/` (keys, netplan, rules, archives)
+- Build PC set up per [documentation/BuildPC/Readme.md](../documentation/BuildPC/Readme.md) (Ubuntu packages, Node, Snapcraft, VS Code/PlatformIO, Arm toolchain) before building anything.
+- Component repos present and current, from the repository root:
+  - `./scripts/clone-components.sh` (first time), or
+  - `./scripts/update-components.sh` (already cloned).
+- Snap and firmware artifacts built, from the repository root:
+  - `./scripts/build.sh build`
+- SSH access to the target host as `lenel`, using `setup/id_rsa`:
+  - Install `id_rsa` on the build machine under a distinct filename (not the
+    default `~/.ssh/id_rsa`, to avoid clobbering any personal key there) —
+    e.g. `~/.ssh/id_rsa_m1fixture`, mode `600`.
+  - Add an entry in `~/.ssh/config` for the target PC being set up as the
+    test fixture, with `IdentityFile ~/.ssh/id_rsa_m1fixture`.
+- Required local deploy input: `azureStorage.json` in this directory (`provision-new-pc/`), containing the connection string from the Azure Portal — Storage account `lenels2boardsprodsa` → Access keys.
 
 ## Command
 

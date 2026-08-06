@@ -10,7 +10,7 @@ See [provision-new-pc/DEPLOY.md](provision-new-pc/DEPLOY.md) for fixture deploym
 
 ## Build PC Software Requirements
 
-See [documentation/BuildPC/README.md](documentation/BuildPC/README.md) for the software required
+See [documentation/BuildPC/Readme.md](documentation/BuildPC/Readme.md) for the software required
 on a workstation used to build platform components (Ubuntu packages, Node,
 Snapcraft, VS Code/PlatformIO, and the Arm toolchain).
 
