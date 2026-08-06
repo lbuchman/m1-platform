@@ -28,7 +28,7 @@ This package is the controlled documentation baseline for the M1/MNPlus Unified 
 ## Repository layout
 
 ```text
-doc/
+documentation/
 ├── Architecture/
 │   ├── Platform/
 │   │   ├── 01_EVM_Platform_Overview.md

@@ -6,7 +6,7 @@ The root repository does not replace the component repositories. It documents an
 
 ## Deployment Guide
 
-See [provision-new-pc/DEPLOY.md](provision-new-pc/DEPLOY.md) for fixture deployment instructions, required inputs, examples, and troubleshooting.
+See [provision-new-pc/Readme.md](provision-new-pc/Readme.md) for fixture deployment instructions, required inputs, examples, and troubleshooting.
 
 ## Build PC Software Requirements
 
@@ -149,18 +149,9 @@ connected board identity before programming.
 
 See [documentation/BuildPC/STM32MP1-ICT-FIRMWARE.md](documentation/BuildPC/STM32MP1-ICT-FIRMWARE.md) for build requirements and FSBL build/output details.
 
-## Current Local State
+## Repository Layout
 
-The local staging path is:
-
-```text
-/home/lenel/myGitHub/m1-platform-work
-```
-
-The local component repositories are under:
-
-```text
-/home/lenel/myGitHub/m1-platform-work/components
-```
+- Repository root: this directory.
+- Component repositories: `components/` (relative to repository root), populated by `scripts/clone-components.sh`.
 
 
