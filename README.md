@@ -1,16 +1,22 @@
 # M1 Platform
 
-This repository is the planned root repository for the M1 embedded manufacturing test platform.
+This repository is the root repository for the M1 embedded manufacturing test platform.
 
 The root repository does not replace the component repositories. It documents and organizes them so the full platform can be cloned, set up, released, and recovered as one system.
 
 ## Deployment Guide
 
-See [DEPLOY.md](DEPLOY.md) for fixture deployment instructions, required inputs, examples, and troubleshooting.
+See [provision-new-pc/DEPLOY.md](provision-new-pc/DEPLOY.md) for fixture deployment instructions, required inputs, examples, and troubleshooting.
+
+## Build PC Software Requirements
+
+See [documentation/BuildPC/README.md](documentation/BuildPC/README.md) for the software required
+on a workstation used to build platform components (Ubuntu packages, Node,
+Snapcraft, VS Code/PlatformIO, and the Arm toolchain).
 
 ## Firmware Publishing
 
-See [PUBLISH.md](PUBLISH.md) for publishing firmware/snap artifacts to Azure Blob storage.
+See [scripts/publish-fw.md](scripts/publish-fw.md) for publishing firmware/snap artifacts to Azure Blob storage.
 
 ## Bootstrap Components
 
@@ -37,7 +43,7 @@ To update already-present component repos without re-cloning them, use:
 
 ## Components
 
-| Component | Planned Repo | Local Path | Purpose |
+| Component | Repo | Local Path | Purpose |
 | --- | --- | --- | --- |
 | M1TFC | `git@github.com:lbuchman/m1tfc.git` | `components/m1tfc` | Fixture CLI, ICT, functional tests, hardware orchestration |
 | M1 fixture Teensy firmware | `git@github.com:lbuchman/m1testBoardFw.git` | `components/m1testBoardFw` | Teensy 4.1 firmware for M1 fixture boards |
@@ -92,7 +98,7 @@ The script copies built snap artifacts into `artifacts/` and writes a small `man
 
 Run the post-install and pre-release smoke checks in:
 
-- `doc/fast-smoke-test-checklist.md`
+- [documentation/Validation/fast-smoke-test-checklist.md](documentation/Validation/fast-smoke-test-checklist.md)
 
 ## Platform Firmware Builds
 
@@ -121,8 +127,9 @@ Build artifacts are copied to `artifacts/` directly, alongside a
 Use `--output-dir PATH` to select another artifact directory or `--dry-run` to
 inspect a command without building, installing, or programming hardware.
 
-`build fixture` compiles `components/m1testBoardFw` with CMake using
-`cross/arm-teensy41-gnueabihf.cmake` and stages `build/M1Teensy41.hex`.
+`build fixture` compiles `components/m1testBoardFw` with PlatformIO
+(`pio run --environment teensy41`) and stages the resulting `.hex` as
+`artifacts/m1firmware.hex`.
 
 ### Program Teensy Boards
 
@@ -140,7 +147,7 @@ connected board identity before programming.
 
 ### STM32MP1 ICT Firmware
 
-See [STM32MP1-ICT-FIRMWARE.md](STM32MP1-ICT-FIRMWARE.md) for build requirements and FSBL build/output details.
+See [documentation/BuildPC/STM32MP1-ICT-FIRMWARE.md](documentation/BuildPC/STM32MP1-ICT-FIRMWARE.md) for build requirements and FSBL build/output details.
 
 ## Current Local State
 
