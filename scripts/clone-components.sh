@@ -134,6 +134,10 @@ clone_or_update_component "m1-operator-ui" \
     "git@github.com:lbuchman/m1-operator-ui.git" \
     "https://github.com/lbuchman/m1-operator-ui.git"
 
+clone_or_update_component "m1-fixture-agent" \
+    "git@github.com:lbuchman/m1-fixture-agent.git" \
+    "https://github.com/lbuchman/m1-fixture-agent.git"
+
 if [[ "${#FAILED_COMPONENTS[@]}" -gt 0 ]]; then
     log ""
     log "Missing or inaccessible repos: ${FAILED_COMPONENTS[*]}"

@@ -19,6 +19,7 @@ SNAPS=(
     "m1tfc:m1tfc:--classic"
     "m1-rest-server:m1tfc-rest-server:--classic"
     "m1-operator-ui:gui-react:"
+    "m1-fixture-agent:m1-fixture-agent:--classic"
 )
 
 if [[ ! -d "${ARTIFACT_DIR}" ]]; then

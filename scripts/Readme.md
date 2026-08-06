@@ -4,7 +4,7 @@ Automation used to bootstrap, build, program, and publish the M1 platform.
 
 | Script | Purpose |
 | --- | --- |
-| `build.sh` | Builds firmware (`acm`, `fixture`, `stm32mp1`) and platform Snaps (`m1tfc`, `m1-rest-server`, `m1-operator-ui`); stages artifacts and `manifestFile.json` in `artifacts/`. |
+| `build.sh` | Builds firmware (`acm`, `fixture`, `stm32mp1`) and platform Snaps (`m1tfc`, `m1-rest-server`, `m1-operator-ui`, `m1-fixture-agent`); stages artifacts and `manifestFile.json` in `artifacts/`. |
 | `check-dirty-components.sh` | Reports Git cleanliness (clean/dirty/not-git) for each repo under `components/`. |
 | `clone-components.sh` | Clones all split `components/*` repos via SSH (falls back to HTTPS); `--update` fast-forwards existing clones. |
 | `install-snaps.sh` | Copies built snaps from `artifacts/` to a remote host via `scp` and installs them there via `ssh`. |
@@ -33,6 +33,7 @@ Build snap packages the same way:
 ./scripts/build.sh build m1tfc            # build m1tfc snap only
 ./scripts/build.sh build m1-rest-server   # build m1-rest-server snap only
 ./scripts/build.sh build m1-operator-ui   # build m1-operator-ui snap only
+./scripts/build.sh build m1-fixture-agent # build m1-fixture-agent snap only
 ./scripts/build.sh build snaps            # build all snaps
 ```
 

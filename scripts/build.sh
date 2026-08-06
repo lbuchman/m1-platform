@@ -18,6 +18,7 @@ SNAP_COMPONENTS=(
     "m1tfc"
     "m1-rest-server"
     "m1-operator-ui"
+    "m1-fixture-agent"
 )
 
 # Teensy loader
@@ -53,6 +54,7 @@ Commands:
       m1tfc             Build m1tfc snap only
       m1-rest-server    Build m1-rest-server snap only
       m1-operator-ui    Build m1-operator-ui snap only
+      m1-fixture-agent  Build m1-fixture-agent snap only
 
     A full build ("all", i.e. no TARGET) embeds each component's real git
     commit hash as its version, and is refused if any component repo has
@@ -676,7 +678,7 @@ case "${COMMAND}" in
                     stm32mp1) build_stm32 || FAILED_ARTIFACTS+=("stm32mp1-baremetal") ;;
                 esac
                 ;;
-            m1tfc|m1-rest-server|m1-operator-ui)
+            m1tfc|m1-rest-server|m1-operator-ui|m1-fixture-agent)
                 # Snap component shorthand
                 build_one_snap "${TARGET}" || FAILED_ARTIFACTS+=("${TARGET}")
                 ;;
