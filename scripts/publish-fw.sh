@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 ARTIFACT_DIR="${ROOT_DIR}/artifacts"
-AZURE_STORAGE_JSON="${ROOT_DIR}/azureStorage.json"
+AZURE_STORAGE_JSON="${ROOT_DIR}/provision-new-pc/azureStorage.json"
 DESTINATION_URL=""
 CONTAINER_NAME="firmware"
 DRY_RUN=0
@@ -39,7 +39,7 @@ Default destination path:
 
 Requires an authenticated azcopy session (azcopy login), a SAS-embedded
 --destination-url, or an Azure Storage connection string. If --destination-url
-is not given and azureStorage.json exists at the repo root, its "conString"
+is not given and provision-new-pc/azureStorage.json exists, its "conString"
 value is used as the connection string.
 
 Options:
@@ -336,7 +336,7 @@ fi
 
 if [[ -z "${DESTINATION_URL}" ]]; then
     log "ERROR: upload destination is not configured"
-    log "Provide --destination-url or create azureStorage.json with a conString"
+    log "Provide --destination-url or create provision-new-pc/azureStorage.json with a conString"
     exit 2
 fi
 
