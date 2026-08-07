@@ -17,3 +17,7 @@ setup_deploy.tar.gz
 setup/STMicroelectronics.txz
 setup/fixture_m1mtf_base.tgz
 
+# Test run outputs
+tests/**/results/
+tests/**/*.log
+
