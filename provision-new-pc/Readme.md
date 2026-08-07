@@ -2,6 +2,12 @@
 
 This guide covers fixture deployment using `deploy.sh`.
 
+## Recommended PC
+
+- Fanless, Celeron or better
+- 4GB RAM
+- 32GB flash
+
 ## Prerequisites
 
 - Run commands from the repository root.
@@ -19,7 +25,21 @@ This guide covers fixture deployment using `deploy.sh`.
     test fixture, with `IdentityFile ~/.ssh/id_rsa_m1fixture`.
 - Required local deploy input: `azureStorage.json` in this directory (`provision-new-pc/`), containing the connection string from the Azure Portal — Storage account `lenels2boardsprodsa` → Access keys.
 
-## Command
+## Commission New Test Fixture PC
+
+- Install Ubuntu 26.04 Server:
+  - Use the entire disk.
+  - No LVM.
+  - Accept the remaining defaults.
+  - Check the "Install OpenSSH server" option on the SSH Setup screen.
+- Create user `lenel` with password `lene`.
+
+From the development PC where the platform files are built:
+
+1. Build the platform artifacts: `./scripts/build.sh build`.
+2. Publish the artifacts to the deploy container: `./scripts/publish-fw.sh`
+   (see [scripts/publish-fw.md](../scripts/publish-fw.md)).
+3. Run the deploy script against the fixture PC:
 
 ```bash
 ./deploy.sh <host_or_ip> <m1|mnp> <fixture_num>
