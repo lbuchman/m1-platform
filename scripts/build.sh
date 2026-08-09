@@ -125,11 +125,11 @@ update_manifest() {
     timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
     if [[ "${DRY_RUN}" -eq 0 ]]; then
-        if [[ ! -f "${manifest_path}" ]]; then
+        if [[ ! -f "${manifest_path}" ]] || ! jq -e 'type == "array"' "${manifest_path}" >/dev/null 2>&1; then
             printf '[]\n' > "${manifest_path}"
         fi
 
-        jq \
+        if ! jq \
             --arg component "${component}" \
             --arg filename "${filename}" \
             --arg commit "${commit}" \
@@ -137,7 +137,18 @@ update_manifest() {
             --arg sha512 "${sha512}" \
             --arg timestamp "${timestamp}" \
             'map(select(.component != $component)) + [{"component": $component, "filename": $filename, "commit": $commit, "type": $type, "sha512": $sha512, "timestamp": $timestamp}]' \
-            "${manifest_path}" > "${manifest_path}.tmp"
+            "${manifest_path}" > "${manifest_path}.tmp"; then
+            rm -f "${manifest_path}.tmp"
+            log "Manifest update error: failed to write ${manifest_path}"
+            return 1
+        fi
+
+        if [[ ! -s "${manifest_path}.tmp" ]] || ! jq -e 'type == "array"' "${manifest_path}.tmp" >/dev/null 2>&1; then
+            rm -f "${manifest_path}.tmp"
+            log "Manifest update error: invalid temporary manifest content for ${manifest_path}"
+            return 1
+        fi
+
         mv "${manifest_path}.tmp" "${manifest_path}"
 
         log "manifest: ${manifest_path}"
