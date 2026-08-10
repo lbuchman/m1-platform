@@ -73,30 +73,16 @@ if [ -d "$ROOT_DIR/artifacts" ]; then
     cp -r "$ROOT_DIR/artifacts/." "$TEMP_DEPLOY/artifacts/"
 fi
 
-# Function to find or build snaps
+# Function to find snaps built by scripts/build.sh
 get_snap() {
     local pattern="$1"
     local target_name="$2"
-    local component="$3"
 
-    # 1. Look in setup/snaps/ (Checked-in artifacts) - exact filename match,
-    #    since these are already named to match target_name.
-    local latest=""
-    if [ -f "setup/snaps/$target_name" ]; then
-        latest="setup/snaps/$target_name"
-    fi
-
-    # 2. Look in artifacts/ (Local build output). Require '_' immediately
-    #    after the pattern so e.g. pattern "m1tfc" cannot match
-    #    "m1tfc-rest-server_0.1.0_amd64.snap".
-    if [ -z "$latest" ]; then
-        latest=$(ls -t "$ROOT_DIR"/artifacts/"$pattern"_*.snap 2>/dev/null | head -n 1)
-    fi
-
-    # 3. Look in component dir (same boundary rule as above)
-    if [ -z "$latest" ]; then
-        latest=$(ls -t "$ROOT_DIR"/components/"$component"/"$pattern"_*.snap 2>/dev/null | head -n 1)
-    fi
+    # Look in artifacts/ (Local build output) only. Require '_' immediately
+    # after the pattern so e.g. pattern "m1tfc" cannot match
+    # "m1tfc-rest-server_0.1.0_amd64.snap".
+    local latest
+    latest=$(ls -t "$ROOT_DIR"/artifacts/"$pattern"_*.snap 2>/dev/null | head -n 1)
 
     if [ -f "$latest" ]; then
         echo "Using snap: $latest -> $target_name"
@@ -108,13 +94,13 @@ get_snap() {
 }
 
 # m1tfc is the CLI/board-programming snap
-get_snap "m1tfc" "m1tfc.snap" "m1tfc" || echo "Warning: m1tfc snap missing"
+get_snap "m1tfc" "m1tfc.snap" || echo "Warning: m1tfc snap missing"
 
 # m1tfc-rest-server comes from m1-rest-server
-get_snap "m1tfc-rest-server" "m1tfc-rest-server.snap" "m1-rest-server" || echo "Warning: m1tfc-rest-server snap missing"
+get_snap "m1tfc-rest-server" "m1tfc-rest-server.snap" || echo "Warning: m1tfc-rest-server snap missing"
 
 # gui-react comes from m1-operator-ui
-get_snap "gui-react" "gui-react.snap" "m1-operator-ui" || echo "Warning: gui-react snap missing"
+get_snap "gui-react" "gui-react.snap" || echo "Warning: gui-react snap missing"
 
 # Check if they reached the temp dir
 for required_snap in m1tfc.snap m1tfc-rest-server.snap gui-react.snap; do
