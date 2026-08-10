@@ -16,7 +16,7 @@ setup_deploy.tar.gz
 # Local setup archives (too large for GitHub)
 setup/STMicroelectronics.txz
 setup/fixture_m1mtf_base.tgz
-setup/usbDiskImageProv.image.xz
+provision-new-pc/setup/usbDiskImageProv.image.xz
 
 # Test run outputs
 tests/**/results/
