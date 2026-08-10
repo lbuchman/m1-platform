@@ -5,9 +5,9 @@ Software required on a workstation used to build `m1-platform-work` components
 
 ## OS
 
-Ubuntu 26.04 LTS (matching `base: core22` used by the platform Snaps). Development is only
-supported on Ubuntu — other OSes (macOS, Windows, WSL, other Linux distros) are not supported
-for building or running this platform's build/deploy tooling.
+Ubuntu is required for development — other OSes (macOS, Windows, WSL, other Linux distros) are not
+supported for building or running this platform's build/deploy tooling. Ubuntu 26.04 LTS is recommended
+(matching `base: core22` used by the platform Snaps).
 
 ## Base packages
 
