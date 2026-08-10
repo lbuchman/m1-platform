@@ -16,9 +16,9 @@ The root repository does not replace the component repositories. It documents an
 
 ## Build PC Software Requirements
 
-See [documentation/BuildPC/Readme.md](documentation/BuildPC/Readme.md) for the software required
-on a workstation used to build platform components (Ubuntu packages, Node,
-Snapcraft, VS Code/PlatformIO, and the Arm toolchain).
+Development is only supported on Ubuntu (see [documentation/BuildPC/Readme.md](documentation/BuildPC/Readme.md) for the exact
+release and required software: Ubuntu packages, Node, Snapcraft, VS Code/PlatformIO, and the Arm toolchain).
+Other OSes are not supported for building or running the platform's build/deploy tooling.
 
 ## Build the Platform
 
