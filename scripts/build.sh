@@ -125,7 +125,7 @@ update_manifest() {
     timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
     if [[ "${DRY_RUN}" -eq 0 ]]; then
-        if [[ ! -f "${manifest_path}" ]] || ! jq -e 'type == "array"' "${manifest_path}" >/dev/null 2>&1; then
+        if [[ ! -s "${manifest_path}" ]] || ! jq -e 'type == "array"' "${manifest_path}" >/dev/null 2>&1; then
             printf '[]\n' > "${manifest_path}"
         fi
 
