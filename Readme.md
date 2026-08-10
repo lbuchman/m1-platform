@@ -16,9 +16,10 @@ The root repository does not replace the component repositories. It documents an
 
 ## Build PC Software Requirements
 
-See [documentation/BuildPC/Readme.md](documentation/BuildPC/Readme.md) for the software required
-on a workstation used to build platform components (Ubuntu packages, Node,
-Snapcraft, VS Code/PlatformIO, and the Arm toolchain).
+Ubuntu is required for development — other OSes (macOS, Windows, WSL, other Linux distros) are not
+supported for building or running this platform's build/deploy tooling. Ubuntu 26.04 LTS is recommended.
+See [documentation/BuildPC/Readme.md](documentation/BuildPC/Readme.md) for the exact release and required
+software: Ubuntu packages, Node, Snapcraft, VS Code/PlatformIO, and the Arm toolchain.
 
 ## Build the Platform
 

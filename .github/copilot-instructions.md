@@ -37,11 +37,6 @@ Permission model:
 - If scope is ambiguous, ask exactly one clarifying question.
 - For missing information, ask one clarifying question instead of taking action.
 
-Execution unlock token:
-- Required format: go: <one exact action>
-- Execute exactly one authorized action.
-- Auto-return to ANALYSIS-ONLY immediately after that action.
-- If any additional action is needed, stop and request a new go token.
 
 Pre-action gate:
 - Before each executable action, restate the exact intended action (files and commands) and wait for explicit go.

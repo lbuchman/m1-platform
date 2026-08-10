@@ -2,20 +2,22 @@
 set -e
 TYPE=$1          # m1 or mnp
 FIXTURE_NUM=$2   # e.g. 1, 2, 3..
+ETH_DHCP_IF=$3   # optional: Internet/uplink interface name (skips prompt)
+ETH_STATIC_IF=$4 # optional: TestFixture interface name (skips prompt)
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 cd "$SCRIPT_DIR"
 
-# Interface names vary between PCs; setup.sh auto-detects the real names via
-# `ip link` and substitutes them into the netplan template (see
-# 01-network-manager-all.yaml) instead of hardcoding them.
+# Interface names vary between PCs, so setup.sh asks for the real names and
+# substitutes them into the netplan template (see 01-network-manager-all.yaml)
+# instead of hardcoding or auto-detecting them.
 # Mate disable screen timeout
 # sshd no password login
 # verify autossh service has correct port
 # disable power mng in the control centre
 
 usage() {
-        echo "usage: $0 <m1|mnp> <fixtureNumber>"
+        echo "usage: $0 <m1|mnp> <fixtureNumber> [internetInterface] [testFixtureInterface]"
 }
 
 if [ -z "$TYPE" ] || [ -z "$FIXTURE_NUM" ]; then
@@ -23,30 +25,48 @@ if [ -z "$TYPE" ] || [ -z "$FIXTURE_NUM" ]; then
    exit 1
 fi
 
-# Auto-detect real wired ethernet interface names on this machine (order-
-# matched to `ip link`, since names like enp0s31f6/enp1s0 vary by PC). First
-# wired interface found -> DHCP uplink, second wired interface found ->
-# static-IP test-fixture interface (also used as tfInterface below).
-ETH_DHCP_IF=""
-ETH_STATIC_IF=""
+# List wired ethernet interfaces on this machine as a hint for the operator
+# (names like enp0s31f6/enp1s0 vary by PC).
+echo "Available wired ethernet interfaces:"
 for ifc in $(ip -o link show | awk -F': ' '{print $2}'); do
     ifc=${ifc%%@*}
     case "$ifc" in
         lo|docker*|veth*|virbr*|br-*|wl*) continue ;;
     esac
     [ -d "/sys/class/net/$ifc/wireless" ] && continue
-    if [ -z "$ETH_DHCP_IF" ]; then
-        ETH_DHCP_IF="$ifc"
-    elif [ -z "$ETH_STATIC_IF" ]; then
-        ETH_STATIC_IF="$ifc"
-    fi
+    echo "  $ifc"
 done
 
-if [ -z "$ETH_DHCP_IF" ] || [ -z "$ETH_STATIC_IF" ]; then
-    echo "ERROR: could not detect two wired ethernet interfaces (found: ETH_DHCP_IF=$ETH_DHCP_IF ETH_STATIC_IF=$ETH_STATIC_IF)"
+# If not supplied as arguments, prompt the operator on the controlling
+# terminal (falls back here rather than reading a possibly-piped stdin).
+if [ -z "$ETH_DHCP_IF" ]; then
+    if [ ! -e /dev/tty ]; then
+        echo "ERROR: no controlling terminal available to prompt for interface names."
+        echo "Pass them as arguments instead: $0 $TYPE $FIXTURE_NUM <internetInterface> <testFixtureInterface>"
+        exit 1
+    fi
+    printf "Enter the Internet/uplink interface name: " > /dev/tty
+    read -r ETH_DHCP_IF < /dev/tty
+fi
+if [ -z "$ETH_STATIC_IF" ]; then
+    if [ ! -e /dev/tty ]; then
+        echo "ERROR: no controlling terminal available to prompt for interface names."
+        echo "Pass them as arguments instead: $0 $TYPE $FIXTURE_NUM <internetInterface> <testFixtureInterface>"
+        exit 1
+    fi
+    printf "Enter the TestFixture interface name: " > /dev/tty
+    read -r ETH_STATIC_IF < /dev/tty
+fi
+
+if [ ! -d "/sys/class/net/$ETH_DHCP_IF" ]; then
+    echo "ERROR: interface '$ETH_DHCP_IF' not found on this machine"
     exit 1
 fi
-echo "Detected interfaces: dhcp-uplink=$ETH_DHCP_IF static-fixture=$ETH_STATIC_IF"
+if [ ! -d "/sys/class/net/$ETH_STATIC_IF" ]; then
+    echo "ERROR: interface '$ETH_STATIC_IF' not found on this machine"
+    exit 1
+fi
+echo "Using interfaces: internet=$ETH_DHCP_IF testfixture=$ETH_STATIC_IF"
 
 # Calculate parameters based on type and fixture number
 if [ "$TYPE" = "m1" ]; then
@@ -144,8 +164,8 @@ sudo chmod 0440 /etc/sudoers.d/lenel-nopasswd
 sudo visudo -c
 
 rm -f /etc/netplan/*
-sed -e "s/__ETH_DHCP_IF__/$ETH_DHCP_IF/" \
-    -e "s/__ETH_STATIC_IF__/$ETH_STATIC_IF/" \
+sed -e "s/__Internet/$ETH_DHCP_IF/" \
+    -e "s/__TestFixture/$ETH_STATIC_IF/" \
     "$SCRIPT_DIR"/01-network-manager-all.yaml > /etc/netplan/01-network-manager-all.yaml
 sudo chown root:root /etc/netplan/01-network-manager-all.yaml
 sudo chmod 600 /etc/netplan/01-network-manager-all.yaml
@@ -164,6 +184,18 @@ if [ ! -f "$SCRIPT_DIR/azureStorage.json" ]; then
     echo "ERROR: $SCRIPT_DIR/azureStorage.json not found"
     exit 1
 fi
+
+if ! command -v node >/dev/null 2>&1; then
+  curl -sL https://deb.nodesource.com/setup_24.x -o /tmp/nodesource_setup.sh
+  sudo bash /tmp/nodesource_setup.sh
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
+fi
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "ERROR: node install failed"
+  exit 1
+fi
+
 CON_STRING=$(node -e "console.log(require('$SCRIPT_DIR/azureStorage.json').conString)")
 if [ -z "$CON_STRING" ] || [ "$CON_STRING" = "undefined" ]; then
     echo "ERROR: conString missing from $SCRIPT_DIR/azureStorage.json"
@@ -224,7 +256,7 @@ if [ -z "$STM32PROG_URL" ] || [ -z "$STM32PROG_SHA512" ]; then
 fi
 
 FW_TMP=$(mktemp --suffix=.txz)
-curl -fsSL -o "$FW_TMP" "$FW_URL"
+az storage blob download --container-name deployment --name "$FW_URL" --file "$FW_TMP" --connection-string "$CON_STRING" --no-progress --output none
 
 FW_ACTUAL_SHA512=$(sha512sum "$FW_TMP" | awk '{print $1}')
 if [ "$FW_ACTUAL_SHA512" != "$FW_SHA512" ]; then
@@ -238,7 +270,7 @@ tar -xJf "$FW_TMP" -C /var/m1mtf
 rm -f "$FW_TMP"
 
 STM32PROG_TMP=$(mktemp --suffix=.txz)
-curl -fsSL -o "$STM32PROG_TMP" "$STM32PROG_URL"
+az storage blob download --container-name deployment --name "$STM32PROG_URL" --file "$STM32PROG_TMP" --connection-string "$CON_STRING" --no-progress --output none
 
 STM32PROG_ACTUAL_SHA512=$(sha512sum "$STM32PROG_TMP" | awk '{print $1}')
 if [ "$STM32PROG_ACTUAL_SHA512" != "$STM32PROG_SHA512" ]; then
@@ -285,9 +317,6 @@ DELETE FROM UID;
 INSERT INTO UID (uid) VALUES ('${STARTMAC}');
 SQL
 
-curl -sL https://deb.nodesource.com/setup_24.x -o /tmp/nodesource_setup.sh
-sudo bash /tmp/nodesource_setup.sh
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
 sed -i '/systemctl/d' /etc/crontab
 sed -i '/m1mtf/d' /etc/crontab
 

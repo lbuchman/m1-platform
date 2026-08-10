@@ -1,17 +1,21 @@
 #!/bin/bash
 # Remote deployment script for M1/MNP fixtures
-# Usage: ./deploy.sh <ipaddress> <m1|mnp> <fixture_num>
+# Usage: ./deploy.sh <ipaddress> <m1|mnp> <fixture_num> [internetInterface] [testFixtureInterface]
 
 set -euo pipefail
 
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <ipaddress> <m1|mnp> <fixture_num>"
+if [ "$#" -ne 3 ] && [ "$#" -ne 5 ]; then
+    echo "Usage: $0 <ipaddress> <m1|mnp> <fixture_num> [internetInterface] [testFixtureInterface]"
     exit 1
 fi
 
 IP=$1
 TYPE=$2
 NUM=$3
+# Optional: pass interface names up front so remote setup.sh runs
+# non-interactively (it has no controlling tty over this ssh session).
+ETH_DHCP_IF=${4:-}
+ETH_STATIC_IF=${5:-}
 
 # Ensure we are in the repository root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -69,30 +73,65 @@ if [ -d "$ROOT_DIR/artifacts" ]; then
     cp -r "$ROOT_DIR/artifacts/." "$TEMP_DEPLOY/artifacts/"
 fi
 
-# Function to find or build snaps
+# Cache the USB disk provisioning image locally in setup/ (gitignored - too
+# large for GitHub). Re-fetched only if missing or its hash no longer
+# matches the Azure manifest, so most deploys reuse the local copy.
+fetch_usb_disk_image() {
+    local local_file="$SCRIPT_DIR/setup/usbDiskImageProv.image.xz"
+    local con_string
+    con_string=$(node -e "console.log(require('$SCRIPT_DIR/azureStorage.json').conString)")
+
+    local manifest_tmp
+    manifest_tmp=$(mktemp)
+    az storage blob download --container-name deployment --name manifestFile.json \
+        --file "$manifest_tmp" --connection-string "$con_string" --no-progress --output none
+
+    local expected_sha512
+    expected_sha512=$(node -e "
+        const fs = require('fs');
+        const manifest = JSON.parse(fs.readFileSync('$manifest_tmp', 'utf8'));
+        const entry = manifest.find((e) => e.filetype === 'usbdiskimageprov');
+        if (!entry) { process.exit(1); }
+        console.log(entry.hash);
+    ")
+    rm -f "$manifest_tmp"
+
+    if [ -z "$expected_sha512" ]; then
+        echo "Warning: 'usbdiskimageprov' entry not found in Azure manifest, skipping USB disk image fetch"
+        return 1
+    fi
+
+    if [ -f "$local_file" ] && [ "$(sha512sum "$local_file" | awk '{print $1}')" = "$expected_sha512" ]; then
+        echo "Using cached USB disk image: $local_file"
+        return 0
+    fi
+
+    echo "Fetching USB disk image from Azure (usbDiskImageProv.image.xz)..."
+    mkdir -p "$SCRIPT_DIR/setup"
+    az storage blob download --container-name deployment --name usbDiskImageProv.image.xz \
+        --file "$local_file" --connection-string "$con_string" --no-progress --output none
+
+    local actual_sha512
+    actual_sha512=$(sha512sum "$local_file" | awk '{print $1}')
+    if [ "$actual_sha512" != "$expected_sha512" ]; then
+        echo "Error: USB disk image sha512 mismatch (expected $expected_sha512, got $actual_sha512)"
+        rm -f "$local_file"
+        return 1
+    fi
+}
+
+fetch_usb_disk_image || echo "Warning: USB disk image fetch failed, continuing without it"
+
+# Function to find snaps built by scripts/build.sh
 get_snap() {
     local pattern="$1"
     local target_name="$2"
-    local component="$3"
 
-    # 1. Look in setup/snaps/ (Checked-in artifacts) - exact filename match,
-    #    since these are already named to match target_name.
-    local latest=""
-    if [ -f "setup/snaps/$target_name" ]; then
-        latest="setup/snaps/$target_name"
-    fi
-
-    # 2. Look in artifacts/ (Local build output). Require '_' immediately
-    #    after the pattern so e.g. pattern "m1tfc" cannot match
-    #    "m1tfc-rest-server_0.1.0_amd64.snap".
-    if [ -z "$latest" ]; then
-        latest=$(ls -t "$ROOT_DIR"/artifacts/"$pattern"_*.snap 2>/dev/null | head -n 1)
-    fi
-
-    # 3. Look in component dir (same boundary rule as above)
-    if [ -z "$latest" ]; then
-        latest=$(ls -t "$ROOT_DIR"/components/"$component"/"$pattern"_*.snap 2>/dev/null | head -n 1)
-    fi
+    # Look in artifacts/ (Local build output) only. Require '_' immediately
+    # after the pattern so e.g. pattern "m1tfc" cannot match
+    # "m1tfc-rest-server_0.1.0_amd64.snap".
+    local latest
+    latest=$(ls -t "$ROOT_DIR"/artifacts/"$pattern"_*.snap 2>/dev/null | head -n 1)
 
     if [ -f "$latest" ]; then
         echo "Using snap: $latest -> $target_name"
@@ -104,13 +143,13 @@ get_snap() {
 }
 
 # m1tfc is the CLI/board-programming snap
-get_snap "m1tfc" "m1tfc.snap" "m1tfc" || echo "Warning: m1tfc snap missing"
+get_snap "m1tfc" "m1tfc.snap" || echo "Warning: m1tfc snap missing"
 
 # m1tfc-rest-server comes from m1-rest-server
-get_snap "m1tfc-rest-server" "m1tfc-rest-server.snap" "m1-rest-server" || echo "Warning: m1tfc-rest-server snap missing"
+get_snap "m1tfc-rest-server" "m1tfc-rest-server.snap" || echo "Warning: m1tfc-rest-server snap missing"
 
 # gui-react comes from m1-operator-ui
-get_snap "gui-react" "gui-react.snap" "m1-operator-ui" || echo "Warning: gui-react snap missing"
+get_snap "gui-react" "gui-react.snap" || echo "Warning: gui-react snap missing"
 
 # Check if they reached the temp dir
 for required_snap in m1tfc.snap m1tfc-rest-server.snap gui-react.snap; do
@@ -146,7 +185,7 @@ ssh $SSH_OPTS lenel@$IP "
     mkdir -p /home/lenel/setup_tmp &&
     cd /home/lenel/setup_tmp &&
     tar -xf '$REMOTE_ARCHIVE' && 
-    echo 'lenel' | sudo -S ./setup.sh $TYPE $NUM
+    echo 'lenel' | sudo -S ./setup.sh $TYPE $NUM $ETH_DHCP_IF $ETH_STATIC_IF
 "
 
 echo "--- Step 5: Cleanup ---"

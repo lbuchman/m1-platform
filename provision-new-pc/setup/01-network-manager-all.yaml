@@ -8,9 +8,9 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    __ETH_DHCP_IF__:
+    __Internet:
       dhcp4: yes
-    __ETH_STATIC_IF__:
+    __TestFixture:
       dhcp4: no
       optional: true
       addresses: [192.168.0.100/24]
