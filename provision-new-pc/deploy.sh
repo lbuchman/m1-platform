@@ -1,17 +1,21 @@
 #!/bin/bash
 # Remote deployment script for M1/MNP fixtures
-# Usage: ./deploy.sh <ipaddress> <m1|mnp> <fixture_num>
+# Usage: ./deploy.sh <ipaddress> <m1|mnp> <fixture_num> [internetInterface] [testFixtureInterface]
 
 set -euo pipefail
 
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <ipaddress> <m1|mnp> <fixture_num>"
+if [ "$#" -ne 3 ] && [ "$#" -ne 5 ]; then
+    echo "Usage: $0 <ipaddress> <m1|mnp> <fixture_num> [internetInterface] [testFixtureInterface]"
     exit 1
 fi
 
 IP=$1
 TYPE=$2
 NUM=$3
+# Optional: pass interface names up front so remote setup.sh runs
+# non-interactively (it has no controlling tty over this ssh session).
+ETH_DHCP_IF=${4:-}
+ETH_STATIC_IF=${5:-}
 
 # Ensure we are in the repository root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -146,7 +150,7 @@ ssh $SSH_OPTS lenel@$IP "
     mkdir -p /home/lenel/setup_tmp &&
     cd /home/lenel/setup_tmp &&
     tar -xf '$REMOTE_ARCHIVE' && 
-    echo 'lenel' | sudo -S ./setup.sh $TYPE $NUM
+    echo 'lenel' | sudo -S ./setup.sh $TYPE $NUM $ETH_DHCP_IF $ETH_STATIC_IF
 "
 
 echo "--- Step 5: Cleanup ---"
