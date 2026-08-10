@@ -73,6 +73,55 @@ if [ -d "$ROOT_DIR/artifacts" ]; then
     cp -r "$ROOT_DIR/artifacts/." "$TEMP_DEPLOY/artifacts/"
 fi
 
+# Cache the USB disk provisioning image locally in setup/ (gitignored - too
+# large for GitHub). Re-fetched only if missing or its hash no longer
+# matches the Azure manifest, so most deploys reuse the local copy.
+fetch_usb_disk_image() {
+    local local_file="$SCRIPT_DIR/setup/usbDiskImageProv.image.xz"
+    local con_string
+    con_string=$(node -e "console.log(require('$SCRIPT_DIR/azureStorage.json').conString)")
+
+    local manifest_tmp
+    manifest_tmp=$(mktemp)
+    az storage blob download --container-name deployment --name manifestFile.json \
+        --file "$manifest_tmp" --connection-string "$con_string" --no-progress --output none
+
+    local expected_sha512
+    expected_sha512=$(node -e "
+        const fs = require('fs');
+        const manifest = JSON.parse(fs.readFileSync('$manifest_tmp', 'utf8'));
+        const entry = manifest.find((e) => e.filetype === 'usbdiskimageprov');
+        if (!entry) { process.exit(1); }
+        console.log(entry.hash);
+    ")
+    rm -f "$manifest_tmp"
+
+    if [ -z "$expected_sha512" ]; then
+        echo "Warning: 'usbdiskimageprov' entry not found in Azure manifest, skipping USB disk image fetch"
+        return 1
+    fi
+
+    if [ -f "$local_file" ] && [ "$(sha512sum "$local_file" | awk '{print $1}')" = "$expected_sha512" ]; then
+        echo "Using cached USB disk image: $local_file"
+        return 0
+    fi
+
+    echo "Fetching USB disk image from Azure (usbDiskImageProv.image.xz)..."
+    mkdir -p "$SCRIPT_DIR/setup"
+    az storage blob download --container-name deployment --name usbDiskImageProv.image.xz \
+        --file "$local_file" --connection-string "$con_string" --no-progress --output none
+
+    local actual_sha512
+    actual_sha512=$(sha512sum "$local_file" | awk '{print $1}')
+    if [ "$actual_sha512" != "$expected_sha512" ]; then
+        echo "Error: USB disk image sha512 mismatch (expected $expected_sha512, got $actual_sha512)"
+        rm -f "$local_file"
+        return 1
+    fi
+}
+
+fetch_usb_disk_image || echo "Warning: USB disk image fetch failed, continuing without it"
+
 # Function to find snaps built by scripts/build.sh
 get_snap() {
     local pattern="$1"
