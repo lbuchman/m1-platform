@@ -73,11 +73,12 @@ if [ -d "$ROOT_DIR/artifacts" ]; then
     cp -r "$ROOT_DIR/artifacts/." "$TEMP_DEPLOY/artifacts/"
 fi
 
-# Cache the USB disk provisioning image locally in setup/ (gitignored - too
-# large for GitHub). Re-fetched only if missing or its hash no longer
-# matches the Azure manifest, so most deploys reuse the local copy.
+# Cache the USB disk provisioning image locally in provision-new-pc/usbImage/
+# (gitignored - too large for GitHub). Re-fetched only if missing or its
+# hash no longer matches the Azure manifest, so most deploys reuse the
+# local copy.
 fetch_usb_disk_image() {
-    local local_file="$SCRIPT_DIR/setup/usbDiskImageProv.image.xz"
+    local local_file="$SCRIPT_DIR/usbImage/usbDiskImageProv.image.xz"
     local con_string
     con_string=$(node -e "console.log(require('$SCRIPT_DIR/azureStorage.json').conString)")
 
@@ -107,7 +108,7 @@ fetch_usb_disk_image() {
     fi
 
     echo "Fetching USB disk image from Azure (usbDiskImageProv.image.xz)..."
-    mkdir -p "$SCRIPT_DIR/setup"
+    mkdir -p "$SCRIPT_DIR/usbImage"
     az storage blob download --container-name deployment --name usbDiskImageProv.image.xz \
         --file "$local_file" --connection-string "$con_string" --no-progress --output none
 
