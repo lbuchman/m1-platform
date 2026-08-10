@@ -24,8 +24,6 @@ Current component inventory (verify before edits if directories change):
 
 ## Operator Control Protocol (Fail-Closed)
 
-Default mode is ANALYSIS-ONLY.
-
 In ANALYSIS-ONLY mode:
 - No tools.
 - No terminal commands.
@@ -40,13 +38,13 @@ Permission model:
 - For missing information, ask one clarifying question instead of taking action.
 
 Execution unlock token:
-- Required format: GO-EXECUTE: <one exact action>
+- Required format: go: <one exact action>
 - Execute exactly one authorized action.
 - Auto-return to ANALYSIS-ONLY immediately after that action.
-- If any additional action is needed, stop and request a new GO-EXECUTE token.
+- If any additional action is needed, stop and request a new go token.
 
 Pre-action gate:
-- Before each executable action, restate the exact intended action (files and commands) and wait for explicit GO.
+- Before each executable action, restate the exact intended action (files and commands) and wait for explicit go.
 - Execute only the approved list, nothing extra.
 
 Immediate halt rule:
